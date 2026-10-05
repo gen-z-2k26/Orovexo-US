@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { SectionComponentProps } from "@/lib/sections-registry";
 import { Reveal } from "@/components/sections/Reveal";
+import { categoryToSlug } from "@/lib/category";
 import { useMotionEnabled } from "@/lib/use-motion-enabled";
 import { pageContainer, sectionStackClass, sectionYClass } from "@/lib/layout";
 import { cn } from "@/lib/utils";
@@ -55,7 +56,7 @@ export function CategoriesSection({ props, products }: SectionComponentProps) {
             <li key={category} className="h-full">
               <Reveal delay={index * 0.04} className="h-full">
                 <Link
-                  href={`/products?q=${encodeURIComponent(category)}`}
+                  href={`/collection/${categoryToSlug(category)}`}
                   aria-label={`Shop ${category}, ${meta.count} products`}
                   className={cn(
                     "group relative flex h-full min-h-44 flex-col justify-end overflow-hidden rounded-3xl border border-border bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:min-h-52",

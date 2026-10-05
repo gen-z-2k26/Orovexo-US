@@ -208,5 +208,635 @@
     ],
     "category": "Kitchen",
     "inStock": true
+  },
+  {
+    "id": "aurora-chair-02",
+    "storeId": "aurora",
+    "slug": "cove-accent-chair",
+    "name": "Cove Accent Chair",
+    "price": 349,
+    "description": "A compact accent chair with boucle upholstery and tapered walnut legs. Fits tight corners without looking small.",
+    "images": [
+      "https://images.pexels.com/photos/276583/pexels-photo-276583.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1866149/pexels-photo-1866149.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Seating",
+    "inStock": true
+  },
+  {
+    "id": "aurora-sofa-01",
+    "storeId": "aurora",
+    "slug": "harbor-two-seat-sofa",
+    "name": "Harbor Two-Seat Sofa",
+    "price": 890,
+    "description": "A low-profile two-seater with deep cushions and a kiln-dried hardwood frame. Quiet, solid, and easy to live with.",
+    "images": [
+      "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1571458/pexels-photo-1571458.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Seating",
+    "inStock": true
+  },
+  {
+    "id": "aurora-bench-01",
+    "storeId": "aurora",
+    "slug": "ridge-entry-bench",
+    "name": "Ridge Entry Bench",
+    "price": 275,
+    "description": "An oak entry bench with a woven seat and a lower shelf for shoes. Built for daily drop-offs.",
+    "images": [
+      "https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1866149/pexels-photo-1866149.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/271816/pexels-photo-271816.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Seating",
+    "inStock": true
+  },
+  {
+    "id": "aurora-ottoman-01",
+    "storeId": "aurora",
+    "slug": "softline-ottoman",
+    "name": "Softline Ottoman",
+    "price": 180,
+    "description": "A round upholstered ottoman that doubles as extra seating or a casual side table with a tray on top.",
+    "images": [
+      "https://images.pexels.com/photos/1571463/pexels-photo-1571463.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/276583/pexels-photo-276583.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1571453/pexels-photo-1571453.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Seating",
+    "inStock": false
+  },
+  {
+    "id": "aurora-lamp-02",
+    "storeId": "aurora",
+    "slug": "arc-table-lamp",
+    "name": "Arc Table Lamp",
+    "price": 128,
+    "description": "A curved metal table lamp with a linen shade. Warm directional light for desks and nightstands.",
+    "images": [
+      "https://images.pexels.com/photos/1090638/pexels-photo-1090638.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1125130/pexels-photo-1125130.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Lighting",
+    "inStock": true
+  },
+  {
+    "id": "aurora-lamp-03",
+    "storeId": "aurora",
+    "slug": "orbit-pendant",
+    "name": "Orbit Pendant",
+    "price": 210,
+    "description": "A frosted glass pendant that throws a soft pool of light. Ideal over dining tables and kitchen islands.",
+    "images": [
+      "https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1125130/pexels-photo-1125130.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1090638/pexels-photo-1090638.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Lighting",
+    "inStock": true
+  },
+  {
+    "id": "aurora-lamp-04",
+    "storeId": "aurora",
+    "slug": "lumen-wall-sconce",
+    "name": "Lumen Wall Sconce",
+    "price": 95,
+    "description": "A flush wall sconce with a brushed brass finish. Soft uplight that keeps corridors calm after dark.",
+    "images": [
+      "https://images.pexels.com/photos/1123262/pexels-photo-1123262.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1125130/pexels-photo-1125130.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Lighting",
+    "inStock": true
+  },
+  {
+    "id": "aurora-lamp-05",
+    "storeId": "aurora",
+    "slug": "dusk-desk-lamp",
+    "name": "Dusk Desk Lamp",
+    "price": 142,
+    "description": "An adjustable desk lamp with a matte black arm and dimmable LED. Built for long evenings at the desk.",
+    "images": [
+      "https://images.pexels.com/photos/667838/pexels-photo-667838.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/374074/pexels-photo-374074.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1957477/pexels-photo-1957477.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Lighting",
+    "inStock": false
+  },
+  {
+    "id": "aurora-table-02",
+    "storeId": "aurora",
+    "slug": "shore-side-table",
+    "name": "Shore Side Table",
+    "price": 165,
+    "description": "A round side table in pale ash with a lower shelf. Just enough surface for a lamp and a book.",
+    "images": [
+      "https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1571453/pexels-photo-1571453.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/276583/pexels-photo-276583.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Tables",
+    "inStock": true
+  },
+  {
+    "id": "aurora-table-03",
+    "storeId": "aurora",
+    "slug": "northline-dining-table",
+    "name": "Northline Dining Table",
+    "price": 780,
+    "description": "A six-seat dining table with a solid oak top and tapered legs. Built for weeknight dinners and weekend guests.",
+    "images": [
+      "https://images.pexels.com/photos/1080721/pexels-photo-1080721.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1571453/pexels-photo-1571453.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Tables",
+    "inStock": true
+  },
+  {
+    "id": "aurora-table-04",
+    "storeId": "aurora",
+    "slug": "folio-console",
+    "name": "Folio Console",
+    "price": 390,
+    "description": "A slim console with two drawers and a soft-close mechanism. Made for hallways that need quiet storage.",
+    "images": [
+      "https://images.pexels.com/photos/271816/pexels-photo-271816.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1957477/pexels-photo-1957477.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1648776/pexels-photo-1648776.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Tables",
+    "inStock": true
+  },
+  {
+    "id": "aurora-shelf-02",
+    "storeId": "aurora",
+    "slug": "frame-bookcase",
+    "name": "Frame Bookcase",
+    "price": 420,
+    "description": "An open bookcase with adjustable shelves and a powder-coated steel frame. Light enough for apartments, strong enough for hardbacks.",
+    "images": [
+      "https://images.pexels.com/photos/1648776/pexels-photo-1648776.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1090638/pexels-photo-1090638.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/271816/pexels-photo-271816.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Storage",
+    "inStock": true
+  },
+  {
+    "id": "aurora-cabinet-01",
+    "storeId": "aurora",
+    "slug": "grove-media-cabinet",
+    "name": "Grove Media Cabinet",
+    "price": 560,
+    "description": "A low media cabinet with cable cutouts and soft-close doors. Keeps remotes and routers out of sight.",
+    "images": [
+      "https://images.pexels.com/photos/271816/pexels-photo-271816.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1648776/pexels-photo-1648776.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1571453/pexels-photo-1571453.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Storage",
+    "inStock": true
+  },
+  {
+    "id": "aurora-cabinet-02",
+    "storeId": "aurora",
+    "slug": "nest-sideboard",
+    "name": "Nest Sideboard",
+    "price": 640,
+    "description": "A three-door sideboard in white oak with adjustable interior shelves. Dining storage without the bulk.",
+    "images": [
+      "https://images.pexels.com/photos/1080721/pexels-photo-1080721.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/271816/pexels-photo-271816.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1648776/pexels-photo-1648776.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Storage",
+    "inStock": true
+  },
+  {
+    "id": "aurora-bin-01",
+    "storeId": "aurora",
+    "slug": "canvas-storage-bin",
+    "name": "Canvas Storage Bin",
+    "price": 38,
+    "description": "A structured canvas bin with leather handles. Sized for blankets, toys, and closet overflow.",
+    "images": [
+      "https://images.pexels.com/photos/1152077/pexels-photo-1152077.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/904350/pexels-photo-904350.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/934070/pexels-photo-934070.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Storage",
+    "inStock": true
+  },
+  {
+    "id": "aurora-vase-02",
+    "storeId": "aurora",
+    "slug": "pebble-bud-vase",
+    "name": "Pebble Bud Vase",
+    "price": 32,
+    "description": "A small stoneware bud vase with an irregular silhouette. Made for single stems and windowsills.",
+    "images": [
+      "https://images.pexels.com/photos/4207785/pexels-photo-4207785.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/4207892/pexels-photo-4207892.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/4207891/pexels-photo-4207891.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Decor",
+    "inStock": true
+  },
+  {
+    "id": "aurora-mirror-01",
+    "storeId": "aurora",
+    "slug": "circle-wall-mirror",
+    "name": "Circle Wall Mirror",
+    "price": 145,
+    "description": "A round wall mirror with a slim black frame. Brightens entries and small bathrooms instantly.",
+    "images": [
+      "https://images.pexels.com/photos/6580227/pexels-photo-6580227.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/6492403/pexels-photo-6492403.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1571458/pexels-photo-1571458.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Decor",
+    "inStock": true
+  },
+  {
+    "id": "aurora-object-01",
+    "storeId": "aurora",
+    "slug": "cast-bookend-set",
+    "name": "Cast Bookend Set",
+    "price": 68,
+    "description": "A pair of solid cast-metal bookends with a matte finish. Heavy enough for art books and magazines.",
+    "images": [
+      "https://images.pexels.com/photos/733856/pexels-photo-733856.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1925536/pexels-photo-1925536.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/261763/pexels-photo-261763.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Decor",
+    "inStock": true
+  },
+  {
+    "id": "aurora-frame-01",
+    "storeId": "aurora",
+    "slug": "gallery-frame-set",
+    "name": "Gallery Frame Set",
+    "price": 84,
+    "description": "A set of three ash frames in mixed sizes. Ready for prints, postcards, and family photos.",
+    "images": [
+      "https://images.pexels.com/photos/1571458/pexels-photo-1571458.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/4207892/pexels-photo-4207892.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/6492403/pexels-photo-6492403.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Decor",
+    "inStock": false
+  },
+  {
+    "id": "aurora-rug-02",
+    "storeId": "aurora",
+    "slug": "dune-runner",
+    "name": "Dune Runner",
+    "price": 198,
+    "description": "A flatweave runner in sand and ivory stripes. Soft underfoot for halls and kitchens.",
+    "images": [
+      "https://images.pexels.com/photos/6492403/pexels-photo-6492403.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1571458/pexels-photo-1571458.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/6580227/pexels-photo-6580227.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Textiles",
+    "inStock": true
+  },
+  {
+    "id": "aurora-throw-01",
+    "storeId": "aurora",
+    "slug": "cloud-knit-throw",
+    "name": "Cloud Knit Throw",
+    "price": 110,
+    "description": "A chunky knit throw in undyed cotton. Soft enough for sofas, warm enough for cool evenings.",
+    "images": [
+      "https://images.pexels.com/photos/6580227/pexels-photo-6580227.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1571458/pexels-photo-1571458.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/6492403/pexels-photo-6492403.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Textiles",
+    "inStock": true
+  },
+  {
+    "id": "aurora-pillow-01",
+    "storeId": "aurora",
+    "slug": "linen-cushion-pair",
+    "name": "Linen Cushion Pair",
+    "price": 76,
+    "description": "A pair of stonewashed linen cushions with hidden zippers. Soft structure without stiff inserts.",
+    "images": [
+      "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1866149/pexels-photo-1866149.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Textiles",
+    "inStock": true
+  },
+  {
+    "id": "aurora-curtain-01",
+    "storeId": "aurora",
+    "slug": "sheer-panel-pair",
+    "name": "Sheer Panel Pair",
+    "price": 132,
+    "description": "Floor-length sheer panels that diffuse daylight without blocking it. Includes rod pocket and rings.",
+    "images": [
+      "https://images.pexels.com/photos/1571458/pexels-photo-1571458.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/6580227/pexels-photo-6580227.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/6492403/pexels-photo-6492403.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Textiles",
+    "inStock": true
+  },
+  {
+    "id": "ember-plate-01",
+    "storeId": "ember",
+    "slug": "clay-dinner-plate-set",
+    "name": "Clay Dinner Plate Set",
+    "price": 88,
+    "description": "A set of four dinner plates in warm clay tones. Slightly irregular rims from the wheel.",
+    "images": [
+      "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/563067/pexels-photo-563067.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1099680/pexels-photo-1099680.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Tableware",
+    "inStock": true
+  },
+  {
+    "id": "ember-cup-01",
+    "storeId": "ember",
+    "slug": "espresso-cup-pair",
+    "name": "Espresso Cup Pair",
+    "price": 34,
+    "description": "Two small cups with matching saucers. Speckled glaze and a comfortable finger loop.",
+    "images": [
+      "https://images.pexels.com/photos/302899/pexels-photo-302899.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1251175/pexels-photo-1251175.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/851555/pexels-photo-851555.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Tableware",
+    "inStock": true
+  },
+  {
+    "id": "ember-platter-01",
+    "storeId": "ember",
+    "slug": "oval-serving-platter",
+    "name": "Oval Serving Platter",
+    "price": 54,
+    "description": "An oval platter with a soft cream glaze. Wide enough for roast vegetables or a cheese board.",
+    "images": [
+      "https://images.pexels.com/photos/1099680/pexels-photo-1099680.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/563067/pexels-photo-563067.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Tableware",
+    "inStock": true
+  },
+  {
+    "id": "ember-tumbler-01",
+    "storeId": "ember",
+    "slug": "smoked-glass-tumblers",
+    "name": "Smoked Glass Tumblers",
+    "price": 46,
+    "description": "A set of four smoked glass tumblers. Stackable, dishwasher safe, and good for water or wine.",
+    "images": [
+      "https://images.pexels.com/photos/851555/pexels-photo-851555.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/302899/pexels-photo-302899.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1251175/pexels-photo-1251175.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Tableware",
+    "inStock": false
+  },
+  {
+    "id": "ember-candle-02",
+    "storeId": "ember",
+    "slug": "citrus-grove-candle",
+    "name": "Citrus Grove Candle",
+    "price": 32,
+    "description": "A bright soy candle with notes of bergamot, lemon peel, and green leaf. Clean burn for open kitchens.",
+    "images": [
+      "https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/278664/pexels-photo-278664.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1123262/pexels-photo-1123262.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Home Fragrance",
+    "inStock": true
+  },
+  {
+    "id": "ember-diffuser-01",
+    "storeId": "ember",
+    "slug": "reed-diffuser-amber",
+    "name": "Reed Diffuser Amber",
+    "price": 40,
+    "description": "An amber glass reed diffuser with warm spice and soft wood. No flame required.",
+    "images": [
+      "https://images.pexels.com/photos/1123262/pexels-photo-1123262.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/278664/pexels-photo-278664.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Home Fragrance",
+    "inStock": true
+  },
+  {
+    "id": "ember-incense-01",
+    "storeId": "ember",
+    "slug": "hinoki-incense-bundle",
+    "name": "Hinoki Incense Bundle",
+    "price": 22,
+    "description": "A bundle of hinoki wood incense sticks with a ceramic holder. Light smoke and a forest-room scent.",
+    "images": [
+      "https://images.pexels.com/photos/278664/pexels-photo-278664.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1123262/pexels-photo-1123262.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Home Fragrance",
+    "inStock": true
+  },
+  {
+    "id": "ember-room-01",
+    "storeId": "ember",
+    "slug": "linen-room-spray",
+    "name": "Linen Room Spray",
+    "price": 26,
+    "description": "A fine mist room spray with clean cotton and light florals. Safe for linens and soft furnishings.",
+    "images": [
+      "https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1123262/pexels-photo-1123262.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/278664/pexels-photo-278664.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Home Fragrance",
+    "inStock": true
+  },
+  {
+    "id": "ember-towel-01",
+    "storeId": "ember",
+    "slug": "stonewash-tea-towels",
+    "name": "Stonewash Tea Towels",
+    "price": 28,
+    "description": "A set of three stonewashed cotton tea towels. Soft from the first wash and quick to dry.",
+    "images": [
+      "https://images.pexels.com/photos/4252140/pexels-photo-4252140.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/4252137/pexels-photo-4252137.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/4252142/pexels-photo-4252142.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Textiles",
+    "inStock": true
+  },
+  {
+    "id": "ember-napkin-01",
+    "storeId": "ember",
+    "slug": "hemmed-linen-napkins",
+    "name": "Hemmed Linen Napkins",
+    "price": 36,
+    "description": "Four hemmed linen napkins in warm ivory. Soften with every wash and look better worn-in.",
+    "images": [
+      "https://images.pexels.com/photos/4252142/pexels-photo-4252142.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/4252140/pexels-photo-4252140.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/4252137/pexels-photo-4252137.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Textiles",
+    "inStock": true
+  },
+  {
+    "id": "ember-tablecloth-01",
+    "storeId": "ember",
+    "slug": "everyday-tablecloth",
+    "name": "Everyday Tablecloth",
+    "price": 64,
+    "description": "A midweight cotton tablecloth that drapes cleanly and washes easily. Sized for four to six seats.",
+    "images": [
+      "https://images.pexels.com/photos/1080721/pexels-photo-1080721.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1099680/pexels-photo-1099680.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Textiles",
+    "inStock": true
+  },
+  {
+    "id": "ember-journal-02",
+    "storeId": "ember",
+    "slug": "pocket-field-notebook",
+    "name": "Pocket Field Notebook",
+    "price": 14,
+    "description": "A pocket notebook with weather-resistant covers and dotted pages. Built for markets and travel notes.",
+    "images": [
+      "https://images.pexels.com/photos/1925536/pexels-photo-1925536.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/733856/pexels-photo-733856.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/261763/pexels-photo-261763.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Stationery",
+    "inStock": true
+  },
+  {
+    "id": "ember-card-01",
+    "storeId": "ember",
+    "slug": "letterpress-card-set",
+    "name": "Letterpress Card Set",
+    "price": 18,
+    "description": "A set of eight letterpress cards with matching envelopes. Blank inside for short notes.",
+    "images": [
+      "https://images.pexels.com/photos/261763/pexels-photo-261763.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/733856/pexels-photo-733856.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1925536/pexels-photo-1925536.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Stationery",
+    "inStock": true
+  },
+  {
+    "id": "ember-pen-01",
+    "storeId": "ember",
+    "slug": "brass-mechanical-pencil",
+    "name": "Brass Mechanical Pencil",
+    "price": 29,
+    "description": "A solid brass mechanical pencil that ages with a soft patina. Refillable 0.7mm lead.",
+    "images": [
+      "https://images.pexels.com/photos/733856/pexels-photo-733856.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/261763/pexels-photo-261763.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1925536/pexels-photo-1925536.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Stationery",
+    "inStock": true
+  },
+  {
+    "id": "ember-desk-01",
+    "storeId": "ember",
+    "slug": "cork-desk-mat",
+    "name": "Cork Desk Mat",
+    "price": 35,
+    "description": "A natural cork desk mat with rounded corners. Soft under the wrist and easy to wipe clean.",
+    "images": [
+      "https://images.pexels.com/photos/1957477/pexels-photo-1957477.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/667838/pexels-photo-667838.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/374074/pexels-photo-374074.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Stationery",
+    "inStock": false
+  },
+  {
+    "id": "ember-board-01",
+    "storeId": "ember",
+    "slug": "end-grain-cutting-board",
+    "name": "End Grain Cutting Board",
+    "price": 86,
+    "description": "An end-grain cutting board in mixed hardwoods. Knife-friendly surface with juice grooves.",
+    "images": [
+      "https://images.pexels.com/photos/1416530/pexels-photo-1416530.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/3737639/pexels-photo-3737639.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/3737638/pexels-photo-3737638.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Kitchen",
+    "inStock": true
+  },
+  {
+    "id": "ember-utensil-01",
+    "storeId": "ember",
+    "slug": "beechwood-utensil-set",
+    "name": "Beechwood Utensil Set",
+    "price": 44,
+    "description": "A four-piece beechwood utensil set for stirring, serving, and tasting. Oiled and ready for daily use.",
+    "images": [
+      "https://images.pexels.com/photos/3737638/pexels-photo-3737638.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1416530/pexels-photo-1416530.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/3737639/pexels-photo-3737639.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Kitchen",
+    "inStock": true
+  },
+  {
+    "id": "ember-bowl-02",
+    "storeId": "ember",
+    "slug": "prep-mixing-bowl",
+    "name": "Prep Mixing Bowl",
+    "price": 48,
+    "description": "A deep ceramic mixing bowl with a pour spout and a grip base. Sized for everyday dough and batter work.",
+    "images": [
+      "https://images.pexels.com/photos/563067/pexels-photo-563067.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1099680/pexels-photo-1099680.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Kitchen",
+    "inStock": true
+  },
+  {
+    "id": "ember-jar-01",
+    "storeId": "ember",
+    "slug": "lidded-storage-jars",
+    "name": "Lidded Storage Jars",
+    "price": 52,
+    "description": "A set of three glass storage jars with cork lids. Clear fronts for flour, oats, and coffee.",
+    "images": [
+      "https://images.pexels.com/photos/3737639/pexels-photo-3737639.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1416530/pexels-photo-1416530.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/3737638/pexels-photo-3737638.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Kitchen",
+    "inStock": true
   }
 ]

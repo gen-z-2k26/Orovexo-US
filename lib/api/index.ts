@@ -46,6 +46,27 @@ export async function getProducts(storeId: string): Promise<Product[]> {
   );
 }
 
+export async function getProductsByCategory(
+  storeId: string,
+  category: string,
+): Promise<Product[]> {
+  return withLatency(
+    productCatalog.filter(
+      (product) =>
+        product.storeId === storeId && product.category === category,
+    ),
+  );
+}
+
+export async function getCategories(storeId: string): Promise<string[]> {
+  const categories = new Set(
+    productCatalog
+      .filter((product) => product.storeId === storeId)
+      .map((product) => product.category),
+  );
+  return withLatency(Array.from(categories).sort());
+}
+
 export async function getProduct(
   storeId: string,
   slug: string,
