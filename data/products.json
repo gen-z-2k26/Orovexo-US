@@ -1,0 +1,212 @@
+[
+  {
+    "id": "aurora-chair-01",
+    "storeId": "aurora",
+    "slug": "nimbus-lounge-chair",
+    "name": "Nimbus Lounge Chair",
+    "price": 429,
+    "description": "A low, soft lounge chair with rounded arms and a light oak frame. Built for reading corners and quiet evenings.",
+    "images": [
+      "https://images.pexels.com/photos/1866149/pexels-photo-1866149.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Seating",
+    "inStock": true
+  },
+  {
+    "id": "aurora-lamp-01",
+    "storeId": "aurora",
+    "slug": "halo-floor-lamp",
+    "name": "Halo Floor Lamp",
+    "price": 189,
+    "description": "A slim floor lamp with a frosted dome and warm LED. Soft ambient light without visual clutter.",
+    "images": [
+      "https://images.pexels.com/photos/1125130/pexels-photo-1125130.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1090638/pexels-photo-1090638.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Lighting",
+    "inStock": true
+  },
+  {
+    "id": "aurora-table-01",
+    "storeId": "aurora",
+    "slug": "drift-coffee-table",
+    "name": "Drift Coffee Table",
+    "price": 320,
+    "description": "A low oval coffee table in pale ash with a matte lacquer top. Easy to style and easy to live with.",
+    "images": [
+      "https://images.pexels.com/photos/1571453/pexels-photo-1571453.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/276583/pexels-photo-276583.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Tables",
+    "inStock": true
+  },
+  {
+    "id": "aurora-shelf-01",
+    "storeId": "aurora",
+    "slug": "linea-wall-shelf",
+    "name": "Linea Wall Shelf",
+    "price": 98,
+    "description": "A floating shelf with concealed brackets and a clean edge profile. Ideal for books and ceramics.",
+    "images": [
+      "https://images.pexels.com/photos/1090638/pexels-photo-1090638.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/271816/pexels-photo-271816.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1648776/pexels-photo-1648776.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Storage",
+    "inStock": true
+  },
+  {
+    "id": "aurora-vase-01",
+    "storeId": "aurora",
+    "slug": "ridge-ceramic-vase",
+    "name": "Ridge Ceramic Vase",
+    "price": 54,
+    "description": "A tall ceramic vase with subtle vertical ridges and a cool mineral glaze.",
+    "images": [
+      "https://images.pexels.com/photos/4207892/pexels-photo-4207892.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/4207785/pexels-photo-4207785.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/4207891/pexels-photo-4207891.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Decor",
+    "inStock": true
+  },
+  {
+    "id": "aurora-rug-01",
+    "storeId": "aurora",
+    "slug": "mist-wool-rug",
+    "name": "Mist Wool Rug",
+    "price": 260,
+    "description": "A hand-tufted wool rug in muted blue-grey. Soft underfoot with a low, even pile.",
+    "images": [
+      "https://images.pexels.com/photos/1571458/pexels-photo-1571458.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/6492403/pexels-photo-6492403.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/6580227/pexels-photo-6580227.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Textiles",
+    "inStock": false
+  },
+  {
+    "id": "aurora-desk-01",
+    "storeId": "aurora",
+    "slug": "clearline-desk",
+    "name": "Clearline Desk",
+    "price": 510,
+    "description": "A compact work desk with cable channels and a powder-coated steel base. Designed for focused days.",
+    "images": [
+      "https://images.pexels.com/photos/1957477/pexels-photo-1957477.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/667838/pexels-photo-667838.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/374074/pexels-photo-374074.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Tables",
+    "inStock": true
+  },
+  {
+    "id": "ember-mug-01",
+    "storeId": "ember",
+    "slug": "ember-stoneware-mug",
+    "name": "Ember Stoneware Mug",
+    "price": 28,
+    "description": "A sturdy handmade mug with a speckled glaze and a generous handle. Dishwasher safe.",
+    "images": [
+      "https://images.pexels.com/photos/302899/pexels-photo-302899.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1251175/pexels-photo-1251175.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/851555/pexels-photo-851555.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Tableware",
+    "inStock": true
+  },
+  {
+    "id": "ember-bowl-01",
+    "storeId": "ember",
+    "slug": "hearth-serving-bowl",
+    "name": "Hearth Serving Bowl",
+    "price": 64,
+    "description": "A wide serving bowl thrown on the wheel and finished in warm terracotta tones.",
+    "images": [
+      "https://images.pexels.com/photos/563067/pexels-photo-563067.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1099680/pexels-photo-1099680.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Tableware",
+    "inStock": true
+  },
+  {
+    "id": "ember-candle-01",
+    "storeId": "ember",
+    "slug": "cedar-resin-candle",
+    "name": "Cedar Resin Candle",
+    "price": 36,
+    "description": "A soy wax candle poured in a recycled glass jar. Notes of cedar, resin, and soft smoke.",
+    "images": [
+      "https://images.pexels.com/photos/278664/pexels-photo-278664.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1123262/pexels-photo-1123262.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Home Fragrance",
+    "inStock": true
+  },
+  {
+    "id": "ember-tote-01",
+    "storeId": "ember",
+    "slug": "market-canvas-tote",
+    "name": "Market Canvas Tote",
+    "price": 42,
+    "description": "A heavyweight canvas tote with reinforced straps and an internal pocket for market runs.",
+    "images": [
+      "https://images.pexels.com/photos/1152077/pexels-photo-1152077.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/904350/pexels-photo-904350.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/934070/pexels-photo-934070.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Textiles",
+    "inStock": true
+  },
+  {
+    "id": "ember-journal-01",
+    "storeId": "ember",
+    "slug": "studio-linen-journal",
+    "name": "Studio Linen Journal",
+    "price": 24,
+    "description": "A linen-bound notebook with cream pages. Made for recipes, sketches, and quiet notes.",
+    "images": [
+      "https://images.pexels.com/photos/733856/pexels-photo-733856.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1925536/pexels-photo-1925536.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/261763/pexels-photo-261763.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Stationery",
+    "inStock": true
+  },
+  {
+    "id": "ember-apron-01",
+    "storeId": "ember",
+    "slug": "baker-linen-apron",
+    "name": "Baker Linen Apron",
+    "price": 58,
+    "description": "A cross-back linen apron washed for softness. Deep pockets and a warm rust dye.",
+    "images": [
+      "https://images.pexels.com/photos/4252137/pexels-photo-4252137.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/4252140/pexels-photo-4252140.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/4252142/pexels-photo-4252142.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Textiles",
+    "inStock": false
+  },
+  {
+    "id": "ember-tray-01",
+    "storeId": "ember",
+    "slug": "olivewood-serving-tray",
+    "name": "Olivewood Serving Tray",
+    "price": 72,
+    "description": "A hand-finished olivewood tray with raised edges. Perfect for breakfast in bed or coffee service.",
+    "images": [
+      "https://images.pexels.com/photos/1416530/pexels-photo-1416530.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/3737639/pexels-photo-3737639.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/3737638/pexels-photo-3737638.jpeg?auto=compress&cs=tinysrgb&w=1200"
+    ],
+    "category": "Kitchen",
+    "inStock": true
+  }
+]
