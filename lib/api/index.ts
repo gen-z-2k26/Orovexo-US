@@ -17,6 +17,79 @@ import type {
 
 const designSettings = site as StoreSettings;
 const REVALIDATE_SECONDS = 60;
+const CACHE_TTL_MS = REVALIDATE_SECONDS * 1000;
+
+const PRODUCT_FIELDS = [
+  "id",
+  "name",
+  "slug",
+  "price",
+  "regular_price",
+  "sale_price",
+  "on_sale",
+  "featured",
+  "average_rating",
+  "rating_count",
+  "menu_order",
+  "description",
+  "short_description",
+  "images",
+  "categories",
+  "stock_status",
+].join(",");
+
+type CacheEntry<T> = {
+  value: T;
+  expiresAt: number;
+};
+
+const memoryCache = new Map<string, CacheEntry<unknown>>();
+const inFlight = new Map<string, Promise<unknown>>();
+
+async function cachedSoftWooCall<T>(
+  key: string,
+  action: () => Promise<T>,
+  fallback: T,
+  label: string,
+): Promise<T> {
+  const now = Date.now();
+  const cached = memoryCache.get(key) as CacheEntry<T> | undefined;
+  if (cached && cached.expiresAt > now) {
+    return cached.value;
+  }
+
+  const pending = inFlight.get(key) as Promise<T> | undefined;
+  if (pending) {
+    return pending;
+  }
+
+  const promise = (async () => {
+    try {
+      const value = await withWooErrorHandling(action);
+      memoryCache.set(key, {
+        value,
+        expiresAt: Date.now() + CACHE_TTL_MS,
+      });
+      return value;
+    } catch (error) {
+      if (cached) {
+        return cached.value;
+      }
+      return softWooCall(
+        async () => {
+          throw error;
+        },
+        fallback,
+        label,
+      );
+    } finally {
+      inFlight.delete(key);
+    }
+  })();
+
+  inFlight.set(key, promise);
+  return promise;
+}
 
 async function fetchWpSiteInfo(): Promise<{
   name?: string;
@@ -60,7 +133,8 @@ export async function getSiteSettings(): Promise<StoreSettings> {
   try {
     const [siteInfo, general] = await Promise.all([
       fetchWpSiteInfo(),
-      softWooCall(
+      cachedSoftWooCall(
+        "settings/general",
         () =>
           wooGet<Array<{ id?: string; value?: string }>>("settings/general"),
         [],
@@ -95,25 +169,29 @@ export async function getProducts(options?: {
     return [];
   }
 
-  return softWooCall(
+  const params: Record<string, string | number | boolean> = {
+    per_page: options?.perPage ?? 100,
+    page: options?.page ?? 1,
+    status: "publish",
+    orderby: "menu_order",
+    order: "asc",
+    _fields: PRODUCT_FIELDS,
+  };
+
+  if (options?.featured) params.featured = true;
+  if (options?.onSale) params.on_sale = true;
+  if (options?.category) params.category = options.category;
+  if (options?.include?.length) {
+    params.include = options.include.join(",");
+    params.orderby = "include";
+    params.per_page = options.include.length;
+  }
+
+  const cacheKey = `products:${JSON.stringify(params)}`;
+
+  return cachedSoftWooCall(
+    cacheKey,
     async () => {
-      const params: Record<string, string | number | boolean> = {
-        per_page: options?.perPage ?? 100,
-        page: options?.page ?? 1,
-        status: "publish",
-        orderby: "menu_order",
-        order: "asc",
-      };
-
-      if (options?.featured) params.featured = true;
-      if (options?.onSale) params.on_sale = true;
-      if (options?.category) params.category = options.category;
-      if (options?.include?.length) {
-        params.include = options.include.join(",");
-        params.orderby = "include";
-        params.per_page = options.include.length;
-      }
-
       const data = await wooGet<WooProduct[]>("products", params);
       return data.map(mapWooProduct);
     },
@@ -129,12 +207,12 @@ export async function getProductsByIds(ids: number[]): Promise<Product[]> {
 
 /** Featured products as marked in WooCommerce admin. Falls back to latest products. */
 export async function getFeaturedProducts(limit = 8): Promise<Product[]> {
-  const featured = await getProducts({ featured: true, perPage: limit });
+  const all = await getProducts({ perPage: 100 });
+  const featured = all.filter((product) => product.featured);
   if (featured.length >= limit) return featured.slice(0, limit);
 
-  const rest = await getProducts({ perPage: limit });
   const seen = new Set(featured.map((product) => product.id));
-  for (const product of rest) {
+  for (const product of all) {
     if (seen.has(product.id)) continue;
     featured.push(product);
     if (featured.length >= limit) break;
@@ -143,19 +221,35 @@ export async function getFeaturedProducts(limit = 8): Promise<Product[]> {
 }
 
 export async function getOnSaleProducts(limit = 8): Promise<Product[]> {
-  return getProducts({ onSale: true, perPage: limit });
+  const all = await getProducts({ perPage: 100 });
+  return all.filter((product) => product.onSale).slice(0, limit);
 }
 
 export async function getProductsByCategory(
   category: string,
 ): Promise<Product[]> {
-  const categories = await getCategoryRecords();
+  const [categories, allProducts] = await Promise.all([
+    getCategoryRecords(),
+    getProducts({ perPage: 100 }),
+  ]);
+  const target = category.toLowerCase();
   const match = categories.find(
     (entry) =>
-      entry.slug === category ||
-      entry.name.toLowerCase() === category.toLowerCase(),
+      entry.slug.toLowerCase() === target ||
+      entry.name.toLowerCase() === target,
   );
   if (match) {
+    const filtered = allProducts.filter((product) =>
+      product.categories.some(
+        (cat) =>
+          cat.id === match.id ||
+          cat.slug.toLowerCase() === match.slug.toLowerCase() ||
+          cat.name.toLowerCase() === match.name.toLowerCase(),
+      ),
+    );
+    if (filtered.length > 0) {
+      return filtered;
+    }
     return getProducts({ category: match.id, perPage: 100 });
   }
   return [];
@@ -166,28 +260,55 @@ export async function getCategoryRecords(): Promise<Category[]> {
     return [];
   }
 
-  return softWooCall(
-    async () => {
-      const data = await wooGet<Parameters<typeof mapWooCategory>[0][]>(
-        "products/categories",
-        {
-          per_page: 100,
-          hide_empty: true,
-          orderby: "count",
-          order: "desc",
-        },
-      );
-      return data.map(mapWooCategory);
-    },
-    [],
-    "getCategoryRecords",
-  );
+  const [rawCategories, allProducts] = await Promise.all([
+    cachedSoftWooCall(
+      "categories:all",
+      async () => {
+        const data = await wooGet<Parameters<typeof mapWooCategory>[0][]>(
+          "products/categories",
+          {
+            per_page: 100,
+            hide_empty: true,
+            orderby: "count",
+            order: "desc",
+          },
+        );
+        return data.map(mapWooCategory);
+      },
+      [],
+      "getCategoryRecords",
+    ),
+    getProducts({ perPage: 100 }),
+  ]);
+
+  return rawCategories.map((category) => {
+    if (category.image) return category;
+    const sampleProduct = allProducts.find(
+      (product) =>
+        product.images.length > 0 &&
+        product.categories.some(
+          (cat) =>
+            cat.id === category.id ||
+            cat.slug.toLowerCase() === category.slug.toLowerCase() ||
+            cat.name.toLowerCase() === category.name.toLowerCase(),
+        ),
+    );
+    if (!sampleProduct) return category;
+    return {
+      ...category,
+      image: sampleProduct.images[0],
+      imageAlt: sampleProduct.imageAlts[0] || category.name,
+    };
+  });
 }
 
 export async function getTopCategories(limit = 6): Promise<Category[]> {
   const all = await getCategoryRecords();
   return all
-    .filter((category) => category.parent === 0)
+    .filter(
+      (category) =>
+        category.parent === 0 && category.slug.toLowerCase() !== "uncategorized",
+    )
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
     .slice(0, limit);
 }
@@ -202,9 +323,19 @@ export async function getProduct(slug: string): Promise<Product | null> {
     return null;
   }
 
-  return softWooCall(
+  const all = await getProducts({ perPage: 100 });
+  const fromCatalog = all.find((entry) => entry.slug === slug);
+  if (fromCatalog) {
+    return fromCatalog;
+  }
+
+  return cachedSoftWooCall(
+    `product:slug:${slug}`,
     async () => {
-      const data = await wooGet<WooProduct[]>("products", { slug });
+      const data = await wooGet<WooProduct[]>("products", {
+        slug,
+        _fields: PRODUCT_FIELDS,
+      });
       const [product] = data;
       return product ? mapWooProduct(product) : null;
     },

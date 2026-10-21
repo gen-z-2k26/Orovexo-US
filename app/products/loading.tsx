@@ -9,7 +9,7 @@ export default function ProductsLoading() {
         <div className="h-10 w-56 animate-pulse rounded-md bg-muted" />
         <div className="h-5 w-80 max-w-full animate-pulse rounded-md bg-muted" />
       </div>
-      <ProductGridSkeleton />
+      <ProductGridSkeleton showLoader />
     </div>
   );
 }

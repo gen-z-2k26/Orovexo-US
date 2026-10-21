@@ -30,7 +30,8 @@ const wcRemotePatterns = uniqueHostnames().flatMap((hostname) =>
 );
 
 const nextConfig: NextConfig = {
-  reactCompiler: true,
+  // Babel react-compiler workers were SIGBUS-crashing Turbopack on this machine.
+  reactCompiler: false,
   images: {
     remotePatterns: [
       {

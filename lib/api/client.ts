@@ -5,7 +5,7 @@ import axios, {
 } from "axios";
 import { toWooCommerceApiError, WooCommerceApiError } from "@/lib/api/errors";
 
-const TIMEOUT_MS = 15_000;
+const TIMEOUT_MS = 25_000;
 
 export function isWooConfigured() {
   return Boolean(

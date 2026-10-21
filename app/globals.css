@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "lenis/dist/lenis.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -132,7 +133,7 @@
 
   html {
     @apply font-sans;
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
   }
 
   h1,
@@ -220,8 +221,8 @@ html[data-theme-transition] *::after {
   transition: none !important;
 }
 
-::view-transition-old(root),
-::view-transition-new(root) {
+html[data-theme-transition]::view-transition-old(root),
+html[data-theme-transition]::view-transition-new(root) {
   animation-duration: 700ms;
   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   mix-blend-mode: normal;
@@ -237,11 +238,38 @@ html[data-theme-transition="circle"]::view-transition-new(root) {
   z-index: 2;
 }
 
+html[data-search-transition]::view-transition-old(root),
+html[data-search-transition]::view-transition-new(root) {
+  animation-duration: 180ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-group(header-search) {
+  animation-duration: 280ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-old(header-search),
+::view-transition-new(header-search) {
+  height: 100%;
+  overflow: clip;
+  border-radius: 1rem;
+}
+
 @keyframes theme-circle-reveal {
   from {
     clip-path: circle(0px at var(--vt-x, 50%) var(--vt-y, 0%));
   }
   to {
     clip-path: circle(var(--vt-r, 150vmax) at var(--vt-x, 50%) var(--vt-y, 0%));
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
   }
 }

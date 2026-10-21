@@ -9,7 +9,7 @@ export default function CollectionLoading() {
         <div className="h-10 w-48 animate-pulse rounded-md bg-muted" />
         <div className="h-5 w-72 max-w-full animate-pulse rounded-md bg-muted" />
       </div>
-      <ProductGridSkeleton />
+      <ProductGridSkeleton showLoader />
     </div>
   );
 }

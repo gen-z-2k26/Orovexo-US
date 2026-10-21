@@ -44,15 +44,15 @@ export function Header() {
   }, [badgeBump, enabled]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/95 supports-backdrop-filter:bg-background/90">
+    <header className="sticky top-0 z-40 border-b border-border/80 bg-background/85 backdrop-blur-xl supports-backdrop-filter:bg-background/75">
       <PromoBanner />
 
-      <div className={pageContainer("flex items-center gap-3 py-3 lg:gap-6")}>
+      <div className={pageContainer("flex h-16 items-center gap-3 lg:gap-8")}>
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="rounded-2xl lg:hidden"
+          className="size-10 rounded-2xl lg:hidden"
           aria-label={menuOpen ? "Close menu" : "Open menu"}
           onClick={() => setMenuOpen((open) => !open)}
         >
@@ -61,33 +61,36 @@ export function Header() {
 
         <Link
           href="/"
-          className="rounded-2xl font-display text-xl font-semibold tracking-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-2xl"
+          className="inline-flex items-center gap-2 rounded-2xl font-display text-xl font-bold tracking-tight transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-2xl"
         >
-          Jansen
+          <span>Jansen</span>
         </Link>
 
         <nav
           aria-label="Main navigation"
-          className="hidden items-center gap-6 text-base font-medium lg:flex"
+          className="hidden items-center gap-1 text-sm font-medium lg:flex"
         >
           {navLinks.map((link) => (
             <Link
               key={`${link.href}-${link.label}`}
               href={link.href}
-              className="py-1 hover:text-primary"
+              className="rounded-xl px-3.5 py-2 text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground"
             >
               {link.label}
             </Link>
           ))}
         </nav>
 
-        <div className="ml-auto flex min-w-0 flex-1 items-center justify-end gap-2 lg:max-w-lg lg:gap-3">
+        <div
+          data-header-chrome
+          className="ml-auto flex min-w-0 items-center justify-end gap-2"
+        >
           <Suspense
             fallback={
-              <div className="hidden h-11 flex-1 rounded-2xl border border-border bg-card md:block" />
+              <div className="size-10 rounded-2xl border border-border bg-background" />
             }
           >
-            <SearchBar className="hidden min-w-0 flex-1 md:flex" />
+            <SearchBar />
           </Suspense>
 
           <ThemeToggle />
@@ -95,18 +98,18 @@ export function Header() {
           <Button
             type="button"
             variant="outline"
-            className="relative h-11 gap-2 rounded-2xl px-3.5"
+            size="icon"
+            className="relative size-10 rounded-2xl"
             aria-label={`Open cart${count ? `, ${count} items` : ""}`}
             onClick={openCart}
           >
             <ShoppingBag className="size-4" />
-            <span className="hidden text-sm sm:inline">Cart</span>
             {count > 0 ? (
               <Badge
                 className={cn(
-                  "absolute -right-2 -top-2 size-5 justify-center rounded-full px-0 text-[10px] tabular-nums",
+                  "absolute -top-1.5 -right-1.5 flex size-5 items-center justify-center rounded-full bg-primary px-0 text-[10px] font-bold text-primary-foreground tabular-nums shadow-xs",
                   enabled && "transition-transform duration-150",
-                  bump && "scale-110",
+                  bump && "scale-125",
                 )}
               >
                 {count}
@@ -116,18 +119,8 @@ export function Header() {
         </div>
       </div>
 
-      <div className="border-t border-border px-4 py-3 sm:px-6 md:hidden lg:px-8">
-        <Suspense
-          fallback={
-            <div className="h-11 rounded-2xl border border-border bg-card" />
-          }
-        >
-          <SearchBar />
-        </Suspense>
-      </div>
-
       {menuOpen ? (
-        <div className="border-t border-border bg-card px-4 py-4 sm:px-6 lg:hidden lg:px-8">
+        <div className="border-t border-border bg-card/95 px-4 py-4 backdrop-blur-lg sm:px-6 lg:hidden lg:px-8">
           <nav
             aria-label="Mobile"
             className="flex flex-col gap-1 text-base font-medium"
@@ -137,7 +130,7 @@ export function Header() {
                 key={`${item.href}-${item.label}`}
                 href={item.href}
                 onClick={() => setMenuOpen(false)}
-                className="rounded-xl px-3 py-2.5 hover:bg-muted"
+                className="rounded-xl px-3 py-2.5 transition-colors hover:bg-muted"
               >
                 {item.label}
               </Link>

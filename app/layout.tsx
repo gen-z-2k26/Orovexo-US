@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { CartDrawer } from "@/components/CartDrawer";
 import { JsonLd } from "@/components/JsonLd";
 import { StoreProvider } from "@/lib/store-context";
+import { SmoothScroll } from "@/components/SmoothScroll";
 import { ThemeModeProvider } from "@/lib/theme-mode";
 import { getSiteSettings, getSiteUrl } from "@/lib/api";
 import { getThemeStyle } from "@/lib/theme";
@@ -156,12 +157,14 @@ export default async function RootLayout({
         <JsonLd data={websiteLd} />
         <ThemeModeProvider defaultMode={settings.theme.defaultMode}>
           <StoreProvider settings={settings}>
-            <Header />
-            <main id="main-content" className="flex-1">
-              {children}
-            </main>
-            <Footer settings={settings} />
-            <CartDrawer />
+            <SmoothScroll>
+              <Header />
+              <main id="main-content" className="flex-1">
+                {children}
+              </main>
+              <Footer settings={settings} />
+              <CartDrawer />
+            </SmoothScroll>
           </StoreProvider>
         </ThemeModeProvider>
       </body>

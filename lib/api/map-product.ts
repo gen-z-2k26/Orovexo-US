@@ -92,11 +92,11 @@ export function mapWooProduct(product: WooProduct): Product {
   const gallerySrcs = gallery
     .map((image) => image.src?.replace(/^http:\/\//i, "https://"))
     .filter((src): src is string => Boolean(src));
-  const images = uniqueUrls([
-    ...gallerySrcs,
+  const htmlSrcs = [
     ...imagesFromHtml(product.short_description || ""),
     ...imagesFromHtml(product.description || ""),
-  ]);
+  ];
+  const images = uniqueUrls(gallerySrcs.length > 0 ? gallerySrcs : htmlSrcs);
   const imageAlts =
     gallery.length > 0
       ? gallery.map((image) => image.alt || product.name)
