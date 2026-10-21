@@ -103,7 +103,10 @@ export function CheckoutModal({
         if (!next) reset();
       }}
     >
-      <DialogContent className="max-h-[90dvh] gap-0 overflow-y-auto overscroll-contain rounded-3xl p-0 sm:max-w-xl">
+      <DialogContent
+        data-lenis-prevent
+        className="max-h-[90dvh] gap-0 overflow-y-auto overscroll-contain rounded-3xl p-0 sm:max-w-xl"
+      >
         <div className="space-y-6 p-5 sm:p-7">
           <DialogHeader className="space-y-3 text-left">
             <DialogTitle className="text-2xl font-semibold">

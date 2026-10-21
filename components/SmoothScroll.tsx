@@ -1,29 +1,38 @@
 "use client";
 
-import { ReactLenis } from "lenis/react";
-import type { ReactNode } from "react";
+import Lenis from "lenis";
+import { useEffect, type ReactNode } from "react";
 import { useMotionEnabled } from "@/lib/use-motion-enabled";
+
+function shouldPrevent(node: HTMLElement) {
+  return Boolean(
+    node.closest(
+      "[data-lenis-prevent],[data-slot='dialog-content'],[data-slot='sheet-content'],[role='dialog']",
+    ),
+  );
+}
 
 export function SmoothScroll({ children }: { children: ReactNode }) {
   const { enabled, prefersReducedMotion } = useMotionEnabled();
 
-  if (!enabled || prefersReducedMotion) {
-    return children;
-  }
+  useEffect(() => {
+    if (!enabled || prefersReducedMotion) return;
 
-  return (
-    <ReactLenis
-      root
-      options={{
-        autoRaf: true,
-        duration: 1.15,
-        lerp: 0.08,
-        smoothWheel: true,
-        anchors: true,
-        syncTouch: false,
-      }}
-    >
-      {children}
-    </ReactLenis>
-  );
+    const lenis = new Lenis({
+      autoRaf: true,
+      lerp: 0.1,
+      wheelMultiplier: 0.95,
+      touchMultiplier: 1.1,
+      smoothWheel: true,
+      syncTouch: false,
+      anchors: true,
+      prevent: shouldPrevent,
+    });
+
+    return () => {
+      lenis.destroy();
+    };
+  }, [enabled, prefersReducedMotion]);
+
+  return children;
 }

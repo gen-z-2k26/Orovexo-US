@@ -138,7 +138,7 @@ export default async function RootLayout({
   return (
     <html
       lang={settings.locale.startsWith("nl") ? "nl" : "en"}
-      className={`${dmSans.variable} ${bricolage.variable} h-full antialiased`}
+      className={`${dmSans.variable} ${bricolage.variable} antialiased`}
       style={getThemeStyle(settings)}
       data-store={settings.id}
       data-motion={settings.theme.motion}

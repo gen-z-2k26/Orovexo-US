@@ -30,7 +30,11 @@ export function CartDrawer() {
   return (
     <>
       <Sheet open={isOpen} onOpenChange={setOpen}>
-        <SheetContent side="right" className="flex w-full flex-col gap-0 sm:max-w-md">
+        <SheetContent
+          side="right"
+          data-lenis-prevent
+          className="flex w-full flex-col gap-0 overflow-y-auto overscroll-contain sm:max-w-md"
+        >
           <SheetHeader className="space-y-1.5">
             <SheetTitle>Your cart</SheetTitle>
             <SheetDescription>
