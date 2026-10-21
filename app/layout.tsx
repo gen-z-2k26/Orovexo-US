@@ -1,60 +1,77 @@
 import type { Metadata } from "next";
-import { Manrope } from "next/font/google";
+import Script from "next/script";
+import { Bricolage_Grotesque, DM_Sans } from "next/font/google";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CartDrawer } from "@/components/CartDrawer";
 import { JsonLd } from "@/components/JsonLd";
 import { StoreProvider } from "@/lib/store-context";
-import { getCurrentStoreId } from "@/lib/get-current-store-id";
-import { getStoreSettings, listStores } from "@/lib/api";
+import { ThemeModeProvider } from "@/lib/theme-mode";
+import { getSiteSettings, getSiteUrl } from "@/lib/api";
 import { getThemeStyle } from "@/lib/theme";
+import { themeInitScript } from "@/lib/theme-script";
 import "./globals.css";
 
-const manrope = Manrope({
+const dmSans = DM_Sans({
   subsets: ["latin"],
-  variable: "--font-manrope",
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const bricolage = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-display",
   display: "swap",
 });
 
 export async function generateMetadata(): Promise<Metadata> {
   try {
-    const storeId = await getCurrentStoreId();
-    const settings = await getStoreSettings(storeId);
-    const description = `Shop ${settings.name}. Browse products, add to cart, and checkout in this multi-store ecommerce demo.`;
+    const settings = await getSiteSettings();
+    const siteUrl = getSiteUrl(settings);
+    const title =
+      settings.seo.title || `${settings.name} | Online store`;
+    const description =
+      settings.seo.description ||
+      `Shop ${settings.name}. ${settings.tagline}`;
+    const ogImage = settings.seo.ogImage || settings.logo;
 
     return {
+      metadataBase: siteUrl ? new URL(siteUrl) : undefined,
       title: {
-        default: `${settings.name} | Online store`,
+        default: title,
         template: `%s | ${settings.name}`,
       },
       description,
       applicationName: settings.name,
       authors: [{ name: settings.name }],
       creator: settings.name,
-      keywords: [
-        settings.name,
-        "online store",
-        "ecommerce",
-        "shop",
-        "multi-store",
-      ],
+      keywords: settings.seo.keywords.length
+        ? settings.seo.keywords
+        : [
+            settings.name,
+            "online store",
+            "household appliances",
+            "computers",
+            "audio equipment",
+          ],
       openGraph: {
         type: "website",
         siteName: settings.name,
-        title: `${settings.name} | Online store`,
+        title,
         description,
+        url: siteUrl || "/",
         images: [
           {
-            url: settings.logo,
+            url: ogImage,
             alt: `${settings.name} logo`,
           },
         ],
       },
       twitter: {
         card: "summary_large_image",
-        title: `${settings.name} | Online store`,
+        title,
         description,
-        images: [settings.logo],
+        images: [ogImage],
       },
       robots: {
         index: true,
@@ -66,8 +83,8 @@ export async function generateMetadata(): Promise<Metadata> {
     };
   } catch {
     return {
-      title: "Multi-store storefront",
-      description: "Frontend demo for a self-serve ecommerce product.",
+      title: "Online store",
+      description: "Simple ecommerce storefront.",
       robots: {
         index: true,
         follow: true,
@@ -81,51 +98,72 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const storeId = await getCurrentStoreId();
-  const [settings, stores] = await Promise.all([
-    getStoreSettings(storeId),
-    listStores(),
-  ]);
+  const settings = await getSiteSettings();
+  const siteUrl = getSiteUrl(settings);
+  const absolute = (path: string) =>
+    siteUrl ? `${siteUrl}${path.startsWith("/") ? path : `/${path}`}` : path;
 
   const organizationLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: settings.name,
-    logo: settings.logo,
-    url: "/",
+    legalName: settings.contact.legalName || settings.name,
+    logo: absolute(settings.logo),
+    url: absolute("/"),
+    email: settings.contact.email,
+    telephone: settings.contact.phone,
+    address: settings.contact.address
+      ? {
+          "@type": "PostalAddress",
+          streetAddress: settings.contact.address,
+          addressCountry: "NL",
+        }
+      : undefined,
+    vatID: settings.contact.vatNumber || undefined,
   };
 
   const websiteLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: settings.name,
-    url: "/",
+    url: absolute("/"),
     potentialAction: {
       "@type": "SearchAction",
-      target: "/products?q={search_term_string}",
+      target: absolute("/products?q={search_term_string}"),
       "query-input": "required name=search_term_string",
     },
   };
 
   return (
     <html
-      lang={settings.locale.startsWith("en") ? "en" : "en"}
-      className={`${manrope.variable} h-full antialiased`}
+      lang={settings.locale.startsWith("nl") ? "nl" : "en"}
+      className={`${dmSans.variable} ${bricolage.variable} h-full antialiased`}
       style={getThemeStyle(settings)}
       data-store={settings.id}
       data-motion={settings.theme.motion}
+      suppressHydrationWarning
     >
-      <body className="flex min-h-full flex-col bg-background font-sans text-foreground">
+      <body
+        className="flex min-h-full flex-col bg-background font-sans text-foreground"
+        suppressHydrationWarning
+      >
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: themeInitScript }}
+        />
         <JsonLd data={organizationLd} />
         <JsonLd data={websiteLd} />
-        <StoreProvider settings={settings}>
-          <Header />
-          <main id="main-content" className="flex-1">
-            {children}
-          </main>
-          <Footer settings={settings} stores={stores} />
-          <CartDrawer />
-        </StoreProvider>
+        <ThemeModeProvider defaultMode={settings.theme.defaultMode}>
+          <StoreProvider settings={settings}>
+            <Header />
+            <main id="main-content" className="flex-1">
+              {children}
+            </main>
+            <Footer settings={settings} />
+            <CartDrawer />
+          </StoreProvider>
+        </ThemeModeProvider>
       </body>
     </html>
   );

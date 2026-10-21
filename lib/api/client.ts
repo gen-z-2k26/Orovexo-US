@@ -1,0 +1,174 @@
+import axios, {
+  type AxiosInstance,
+  type AxiosRequestConfig,
+  type AxiosResponse,
+} from "axios";
+import { toWooCommerceApiError, WooCommerceApiError } from "@/lib/api/errors";
+
+const TIMEOUT_MS = 15_000;
+
+export function isWooConfigured() {
+  return Boolean(
+    process.env.WC_URL &&
+      process.env.WC_CONSUMER_KEY &&
+      process.env.WC_CONSUMER_SECRET,
+  );
+}
+
+function requireEnv(name: "WC_URL" | "WC_CONSUMER_KEY" | "WC_CONSUMER_SECRET") {
+  const value = process.env[name]?.trim();
+  if (!value) {
+    throw new WooCommerceApiError(
+      `WooCommerce is not configured. Set ${name} in .env.local.`,
+      { code: "missing_env" },
+    );
+  }
+  return value;
+}
+
+function assertJsonPayload(response: AxiosResponse) {
+  const contentType = String(response.headers["content-type"] ?? "");
+  const data = response.data;
+
+  if (typeof data === "string") {
+    const trimmed = data.trim();
+    if (
+      trimmed.startsWith("<!DOCTYPE") ||
+      trimmed.startsWith("<html") ||
+      /jschallenge|Checking your browser|hcdn-cgi/i.test(trimmed)
+    ) {
+      throw new WooCommerceApiError(
+        "The WooCommerce API is blocked by Hostinger bot protection. Allow /wp-json/* or disable bot protection for the site.",
+        {
+          status: response.status,
+          code: "bot_challenge",
+          endpoint: response.config.url,
+        },
+      );
+    }
+  }
+
+  if (
+    contentType &&
+    !/application\/json|application\/.*\+json/i.test(contentType) &&
+    typeof data === "string"
+  ) {
+    throw new WooCommerceApiError(
+      "WooCommerce did not return JSON. Check that /wp-json/wc/v3 is reachable.",
+      {
+        status: response.status,
+        code: "invalid_content_type",
+        endpoint: response.config.url,
+      },
+    );
+  }
+}
+
+let cachedClient: AxiosInstance | null = null;
+
+/**
+ * Shared Axios client for WooCommerce REST (wc/v3).
+ * Uses HTTPS Basic Auth with consumer key / secret.
+ */
+export function getWooClient(): AxiosInstance {
+  if (cachedClient) return cachedClient;
+
+  // Hostinger redirects HTTP to HTTPS and drops Basic Auth on the follow-up,
+  // which surfaces as 401 woocommerce_rest_cannot_view. Always call HTTPS.
+  const origin = requireEnv("WC_URL")
+    .replace(/\/$/, "")
+    .replace(/^http:\/\//i, "https://");
+  const baseURL = `${origin}/wp-json/wc/v3/`;
+  const consumerKey = requireEnv("WC_CONSUMER_KEY");
+  const consumerSecret = requireEnv("WC_CONSUMER_SECRET");
+
+  const client = axios.create({
+    baseURL,
+    timeout: TIMEOUT_MS,
+    auth: {
+      username: consumerKey,
+      password: consumerSecret,
+    },
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "User-Agent": "Ecom-Builder-Storefront/1.0",
+    },
+    // Avoid following HTML challenge redirects as success.
+    maxRedirects: 3,
+    validateStatus: (status) => status >= 200 && status < 300,
+  });
+
+  client.interceptors.response.use(
+    (response) => {
+      assertJsonPayload(response);
+      return response;
+    },
+    (error) => {
+      throw toWooCommerceApiError(error);
+    },
+  );
+
+  cachedClient = client;
+  return client;
+}
+
+export type WooQuery = Record<
+  string,
+  string | number | boolean | Array<string | number> | undefined
+>;
+
+function cleanParams(params?: WooQuery) {
+  if (!params) return undefined;
+  const out: Record<string, string | number | boolean> = {};
+  for (const [key, value] of Object.entries(params)) {
+    if (value === undefined) continue;
+    if (Array.isArray(value)) {
+      out[key] = value.join(",");
+      continue;
+    }
+    out[key] = value;
+  }
+  return out;
+}
+
+/** GET helper that returns response.data and maps Axios errors. */
+export async function wooGet<T>(
+  path: string,
+  params?: WooQuery,
+  config?: AxiosRequestConfig,
+): Promise<T> {
+  if (!isWooConfigured()) {
+    throw new WooCommerceApiError(
+      "WooCommerce is not configured. Set WC_URL, WC_CONSUMER_KEY, and WC_CONSUMER_SECRET.",
+      { code: "missing_env" },
+    );
+  }
+
+  const response = await getWooClient().get<T>(path.replace(/^\//, ""), {
+    ...config,
+    params: cleanParams(params),
+  });
+  return response.data;
+}
+
+/** POST helper that returns response.data and maps Axios errors. */
+export async function wooPost<T>(
+  path: string,
+  body?: unknown,
+  config?: AxiosRequestConfig,
+): Promise<T> {
+  if (!isWooConfigured()) {
+    throw new WooCommerceApiError(
+      "WooCommerce is not configured. Set WC_URL, WC_CONSUMER_KEY, and WC_CONSUMER_SECRET.",
+      { code: "missing_env" },
+    );
+  }
+
+  const response = await getWooClient().post<T>(
+    path.replace(/^\//, ""),
+    body,
+    config,
+  );
+  return response.data;
+}

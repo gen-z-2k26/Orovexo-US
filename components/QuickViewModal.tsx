@@ -75,6 +75,7 @@ export function QuickViewModal({
             <ProductImageCarousel
               images={active.images}
               alt={active.name}
+              fallbackImage={settings.logo}
               rounded="rounded-none"
               className="absolute inset-0 size-full"
               sizes="(max-width: 768px) 100vw, 50vw"
@@ -121,7 +122,7 @@ export function QuickViewModal({
                   className="h-12 flex-1 rounded-2xl text-sm font-semibold"
                 >
                   <ShoppingBag className="size-4" />
-                  {added ? "Added" : active.inStock ? "Add to bag" : "Unavailable"}
+                  {added ? "Added" : active.inStock ? "Add to cart" : "Unavailable"}
                 </Button>
 
                 <button

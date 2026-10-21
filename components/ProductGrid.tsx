@@ -8,9 +8,10 @@ export function ProductGrid({ products }: { products: Product[] }) {
   if (!products.length) {
     return (
       <div className="rounded-3xl border border-dashed border-border px-6 py-16 text-center">
-        <p className="font-medium">No products match these filters.</p>
+        <p className="font-medium">No products found</p>
         <p className="mt-2 text-pretty text-sm text-muted-foreground">
-          Try another category, sort option, or clear your search.
+          Try another category or sort option, or clear your search. New
+          products come straight from WooCommerce.
         </p>
         <Link
           href="/products"

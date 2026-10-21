@@ -1,13 +1,14 @@
 "use client";
 
-import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import { StoreImage } from "@/components/StoreImage";
 import { cn } from "@/lib/utils";
 
 export function ProductImageCarousel({
   images,
   alt,
+  fallbackImage,
   className,
   showOnHover = false,
   rounded = "rounded-2xl",
@@ -16,13 +17,14 @@ export function ProductImageCarousel({
 }: {
   images: string[];
   alt: string;
+  fallbackImage: string;
   className?: string;
   showOnHover?: boolean;
   rounded?: string;
   sizes?: string;
   priority?: boolean;
 }) {
-  const slides = images.length ? images : ["/stores/aurora-logo.svg"];
+  const slides = images.length ? images : [fallbackImage];
   const [index, setIndex] = useState(0);
   const current = slides[index] ?? slides[0];
 
@@ -51,13 +53,13 @@ export function ProductImageCarousel({
         className,
       )}
     >
-      <Image
+      <StoreImage
         src={current}
         alt={alt}
-        fill
+        fallbackSrc={fallbackImage}
         priority={priority}
         sizes={sizes}
-        className="object-cover transition-transform duration-200 group-hover:scale-[1.02] group-hover/carousel:scale-[1.02]"
+        className="transition-transform duration-200 group-hover:scale-[1.02] group-hover/carousel:scale-[1.02]"
       />
 
       {slides.length > 1 ? (

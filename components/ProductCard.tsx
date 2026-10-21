@@ -52,21 +52,26 @@ export function ProductCard({ product }: { product: Product }) {
 
           <ProductImageCarousel
             images={product.images}
-            alt={product.name}
+            alt={product.imageAlts[0] || product.name}
+            fallbackImage={settings.logo}
             showOnHover
             rounded="rounded-none"
             className="relative z-[1] aspect-square"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           />
 
-          {!product.inStock ? (
-            <Badge
-              className="absolute left-3 top-14 z-10 rounded-full"
-              variant="secondary"
-            >
-              Out of stock
-            </Badge>
-          ) : null}
+          <div className="absolute left-3 top-3 z-10 flex flex-col gap-2">
+            {product.onSale ? (
+              <Badge className="rounded-full bg-accent text-accent-foreground">
+                Sale
+              </Badge>
+            ) : null}
+            {!product.inStock ? (
+              <Badge className="rounded-full" variant="secondary">
+                Out of stock
+              </Badge>
+            ) : null}
+          </div>
 
           <button
             type="button"
@@ -84,13 +89,24 @@ export function ProductCard({ product }: { product: Product }) {
             </p>
             <Link
               href={`/products/${product.slug}`}
-              className="relative z-10 line-clamp-2 min-h-11 text-sm font-semibold leading-snug text-balance hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="relative z-10 line-clamp-2 min-h-12 text-base font-semibold leading-snug text-balance hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {product.name}
             </Link>
-            <p className="text-base font-semibold tabular-nums">
-              {formatPrice(product.price, settings.currency, settings.locale)}
-            </p>
+            <div className="flex flex-wrap items-baseline gap-2">
+              <p className="text-base font-semibold tabular-nums">
+                {formatPrice(product.price, settings.currency, settings.locale)}
+              </p>
+              {product.onSale && product.regularPrice > product.price ? (
+                <p className="text-sm tabular-nums text-muted-foreground line-through">
+                  {formatPrice(
+                    product.regularPrice,
+                    settings.currency,
+                    settings.locale,
+                  )}
+                </p>
+              ) : null}
+            </div>
           </div>
 
           <Button
@@ -104,7 +120,11 @@ export function ProductCard({ product }: { product: Product }) {
                 : `${product.name} is out of stock`
             }
           >
-            {added ? "Added" : product.inStock ? "Add to cart" : "Unavailable"}
+            {added
+              ? "Added"
+              : product.inStock
+                ? "Add to cart"
+                : "Unavailable"}
           </Button>
         </div>
       </article>

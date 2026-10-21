@@ -1,42 +1,135 @@
 export type MotionLevel = "none" | "subtle" | "expressive";
+export type ColorMode = "light" | "dark" | "system";
 
-export type HomeSectionType = "hero" | "featuredProducts" | "categories";
+export type TrustIcon =
+  | "truck"
+  | "refresh"
+  | "shield"
+  | "message"
+  | "package"
+  | "clock"
+  | "star"
+  | "heart";
 
-export interface HomeSection {
-  type: HomeSectionType;
-  enabled: boolean;
-  props: Record<string, unknown>;
+export interface NavLink {
+  label: string;
+  href: string;
 }
 
-export interface StoreTheme {
+export interface FooterColumn {
+  title: string;
+  links: NavLink[];
+}
+
+export interface TrustItem {
+  icon: TrustIcon;
+  title: string;
+  text: string;
+  number?: string;
+}
+
+/** One palette mode. Values are hex or CSS colors. */
+export interface ThemePalette {
   primary: string;
   accent: string;
-  font: string;
-  motion: MotionLevel;
+  background: string;
+  foreground: string;
+  card: string;
+  muted: string;
+  mutedForeground: string;
+  border: string;
 }
 
+/**
+ * Design tokens live in the Next.js app (data/site.json).
+ * Store identity and catalog data come from WooCommerce.
+ */
+export interface StoreTheme {
+  font: string;
+  fontDisplay: string;
+  radius: string;
+  defaultMode: ColorMode;
+  motion: MotionLevel;
+  light: ThemePalette;
+  dark: ThemePalette;
+}
+
+export interface SiteSeo {
+  title: string;
+  description: string;
+  keywords: string[];
+  ogImage: string;
+  siteUrl: string;
+}
+
+/** Design chrome from site.json; Woo may overlay currency when available. */
 export interface StoreSettings {
   id: string;
   name: string;
+  tagline: string;
   logo: string;
   currency: string;
   locale: string;
-  theme: StoreTheme;
-  homepage: {
-    sections: HomeSection[];
+  contact: {
+    email: string;
+    phone: string;
+    address: string;
+    openingHours: string;
+    legalName: string;
+    vatNumber: string;
   };
+  promoBanner: string;
+  hero: {
+    headline: string;
+    support: string;
+  };
+  navigation: {
+    header: NavLink[];
+    footerColumns: FooterColumn[];
+  };
+  footer: {
+    blurb: string;
+    trustLine: string;
+  };
+  seo: SiteSeo;
+  theme: StoreTheme;
+}
+
+export interface ProductCategoryRef {
+  id: number;
+  name: string;
+  slug: string;
 }
 
 export interface Product {
   id: string;
-  storeId: string;
   slug: string;
   name: string;
   price: number;
+  regularPrice: number;
+  salePrice: number | null;
+  onSale: boolean;
   description: string;
   images: string[];
+  imageAlts: string[];
   category: string;
+  categories: ProductCategoryRef[];
+  featured: boolean;
+  averageRating: number;
+  ratingCount: number;
+  menuOrder: number;
   inStock: boolean;
+}
+
+export interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  image: string;
+  imageAlt: string;
+  count: number;
+  parent: number;
 }
 
 export interface CartItem {
@@ -57,7 +150,6 @@ export interface CheckoutPayload {
 
 export interface CreateOrderResult {
   orderId: string;
-  storeId: string;
   total: number;
   currency: string;
   email: string;

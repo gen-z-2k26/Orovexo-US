@@ -2,12 +2,19 @@ import { cn } from "@/lib/utils";
 
 /** Shared layout tokens for consistent page spacing. */
 export const pageContainerClass =
-  "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8";
+  "mx-auto w-full max-w-[var(--content-width)] px-[var(--page-gutter)]";
 
-export const sectionYClass = "py-14 sm:py-16 lg:py-20";
+export const narrowContainerClass =
+  "mx-auto w-full max-w-[var(--content-narrow)] px-[var(--page-gutter)]";
 
-export const sectionStackClass = "space-y-8";
+export const sectionYClass = "py-[var(--section-y)]";
+
+export const sectionStackClass = "space-y-[var(--section-gap)]";
 
 export function pageContainer(...classes: Array<string | undefined | false>) {
   return cn(pageContainerClass, ...classes);
+}
+
+export function narrowContainer(...classes: Array<string | undefined | false>) {
+  return cn(narrowContainerClass, ...classes);
 }

@@ -1,5 +1,34 @@
 import type { NextConfig } from "next";
 
+function hostnameFromUrl(value?: string) {
+  if (!value) return null;
+  try {
+    return new URL(value).hostname;
+  } catch {
+    return null;
+  }
+}
+
+function uniqueHostnames() {
+  const hosts = new Set<string>([
+    "bonjourmellbourne.com",
+    "www.bonjourmellbourne.com",
+    "elbertjansens.nl",
+    "tilascompany.com",
+  ]);
+  const fromEnv = hostnameFromUrl(process.env.WC_URL);
+  if (fromEnv) hosts.add(fromEnv);
+  return [...hosts];
+}
+
+const wcRemotePatterns = uniqueHostnames().flatMap((hostname) =>
+  (["https", "http"] as const).map((protocol) => ({
+    protocol,
+    hostname,
+    pathname: "/**" as const,
+  })),
+);
+
 const nextConfig: NextConfig = {
   reactCompiler: true,
   images: {
@@ -19,6 +48,12 @@ const nextConfig: NextConfig = {
         hostname: "videos.pexels.com",
         pathname: "/video-files/**",
       },
+      {
+        protocol: "https",
+        hostname: "**.hostingersite.com",
+        pathname: "/**",
+      },
+      ...wcRemotePatterns,
     ],
   },
 };

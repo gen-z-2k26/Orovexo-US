@@ -40,7 +40,8 @@ export function ProductDetail({ product }: { product: Product }) {
     >
       <ProductImageCarousel
         images={product.images}
-        alt={product.name}
+        alt={product.imageAlts[0] || product.name}
+        fallbackImage={settings.logo}
         rounded="rounded-3xl"
         className="aspect-square border border-border"
         sizes="(max-width: 1024px) 100vw, 50vw"
@@ -52,18 +53,36 @@ export function ProductDetail({ product }: { product: Product }) {
           <p className="text-sm font-medium text-primary">
             {settings.name} · {product.category}
           </p>
-          <h1 className="text-balance text-3xl font-semibold sm:text-5xl">
+          <h1 className="font-display text-balance text-3xl font-semibold sm:text-5xl">
             {product.name}
           </h1>
-          <p className="text-2xl font-semibold tabular-nums">
-            {formatPrice(product.price, settings.currency, settings.locale)}
-          </p>
-          <Badge
-            variant={product.inStock ? "default" : "secondary"}
-            className="rounded-full"
-          >
-            {product.inStock ? "In stock" : "Out of stock"}
-          </Badge>
+          <div className="flex flex-wrap items-baseline gap-3">
+            <p className="text-2xl font-semibold tabular-nums">
+              {formatPrice(product.price, settings.currency, settings.locale)}
+            </p>
+            {product.onSale && product.regularPrice > product.price ? (
+              <p className="text-lg tabular-nums text-muted-foreground line-through">
+                {formatPrice(
+                  product.regularPrice,
+                  settings.currency,
+                  settings.locale,
+                )}
+              </p>
+            ) : null}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {product.onSale ? (
+              <Badge className="rounded-full bg-accent text-accent-foreground">
+                Sale
+              </Badge>
+            ) : null}
+            <Badge
+              variant={product.inStock ? "default" : "secondary"}
+              className="rounded-full"
+            >
+              {product.inStock ? "In stock" : "Out of stock"}
+            </Badge>
+          </div>
         </div>
 
         <p className="max-w-prose text-pretty text-base leading-relaxed text-muted-foreground">

@@ -1,23 +1,65 @@
+import type { Metadata } from "next";
 import { HomeSections } from "@/components/HomeSections";
 import { JsonLd } from "@/components/JsonLd";
-import { getCurrentStoreId } from "@/lib/get-current-store-id";
-import { getProducts, getStoreSettings } from "@/lib/api";
+import {
+  getFeaturedProducts,
+  getSiteSettings,
+  getSiteUrl,
+  getTopCategories,
+} from "@/lib/api";
+
+export const revalidate = 60;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  const siteUrl = getSiteUrl(settings);
+  const title =
+    settings.seo.title || `${settings.name} | ${settings.tagline}`;
+  const description =
+    settings.seo.description || `Shop ${settings.name}. ${settings.tagline}`;
+  const ogImage = settings.seo.ogImage || settings.logo;
+
+  return {
+    title,
+    description,
+    keywords: settings.seo.keywords,
+    alternates: {
+      canonical: siteUrl ? `${siteUrl}/` : "/",
+    },
+    openGraph: {
+      title,
+      description,
+      url: siteUrl ? `${siteUrl}/` : "/",
+      images: [{ url: ogImage, alt: settings.name }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage],
+    },
+  };
+}
 
 export default async function HomePage() {
-  const storeId = await getCurrentStoreId();
-  const [settings, products] = await Promise.all([
-    getStoreSettings(storeId),
-    getProducts(storeId),
+  const settings = await getSiteSettings();
+  const [categories, featuredProducts] = await Promise.all([
+    getTopCategories(6),
+    getFeaturedProducts(8),
   ]);
+  const siteUrl = getSiteUrl(settings);
 
   const itemListLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
     name: `${settings.name} featured products`,
-    itemListElement: products.slice(0, 8).map((product, index) => ({
+    numberOfItems: featuredProducts.length,
+    itemListElement: featuredProducts.map((product, index) => ({
       "@type": "ListItem",
       position: index + 1,
-      url: `/products/${product.slug}`,
+      url: siteUrl
+        ? `${siteUrl}/products/${product.slug}`
+        : `/products/${product.slug}`,
       name: product.name,
       image: product.images[0],
     })),
@@ -26,8 +68,11 @@ export default async function HomePage() {
   return (
     <>
       <JsonLd data={itemListLd} />
-      <h1 className="sr-only">{settings.name} online store</h1>
-      <HomeSections settings={settings} products={products} />
+      <HomeSections
+        settings={settings}
+        products={featuredProducts}
+        categories={categories}
+      />
     </>
   );
 }

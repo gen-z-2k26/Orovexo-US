@@ -2,34 +2,25 @@
 
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/format";
+import { useStore } from "@/lib/store-context";
 
 export type PaymentStepProps = {
-  storeId: string;
   amount: number;
   currency: string;
   onSuccess: () => void;
 };
 
-/**
- * Placeholder for a future per-store payment gateway.
- * Each store will eventually connect its own merchant account here.
- */
-export function PaymentStep({
-  storeId,
-  amount,
-  currency,
-  onSuccess,
-}: PaymentStepProps) {
+export function PaymentStep({ amount, currency, onSuccess }: PaymentStepProps) {
+  const { settings } = useStore();
+
   return (
     <div className="space-y-4 rounded-3xl border border-dashed border-border bg-muted/40 p-5">
       <div className="space-y-1.5">
-        <p className="font-medium">Payment integration coming soon</p>
+        <p className="font-medium">Payment coming soon</p>
         <p className="text-pretty text-sm text-muted-foreground">
-          Store <span className="font-medium text-foreground">{storeId}</span>{" "}
-          will use its own gateway account. For this demo, confirm the mock
-          payment of{" "}
+          For {settings.name}, confirm a mock payment of{" "}
           <span className="tabular-nums">
-            {formatPrice(amount, currency, "en-US")}
+            {formatPrice(amount, currency, settings.locale)}
           </span>
           .
         </p>

@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductsCatalog } from "@/components/ProductsCatalog";
-import { getCurrentStoreId } from "@/lib/get-current-store-id";
+import { JsonLd } from "@/components/JsonLd";
 import {
-  getCategories,
-  getProducts,
-  getStoreSettings,
+  getCategoryRecords,
+  getProductsByCategory,
+  getSiteSettings,
+  getSiteUrl,
 } from "@/lib/api";
-import { findCategoryBySlug, categoryToSlug } from "@/lib/category";
 import { pageContainer } from "@/lib/layout";
+
+export const revalidate = 60;
 
 type CollectionPageProps = {
   params: Promise<{ slug: string }>;
@@ -18,16 +20,16 @@ export async function generateMetadata({
   params,
 }: CollectionPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const storeId = await getCurrentStoreId();
   const [settings, categories] = await Promise.all([
-    getStoreSettings(storeId),
-    getCategories(storeId),
+    getSiteSettings(),
+    getCategoryRecords(),
   ]);
-  const category = findCategoryBySlug(categories, slug);
+  const category = categories.find((entry) => entry.slug === slug);
+  const siteUrl = getSiteUrl(settings);
 
   if (!category) {
     return {
-      title: "Collection not found",
+      title: "Collectie niet gevonden",
       robots: {
         index: false,
         follow: false,
@@ -35,57 +37,113 @@ export async function generateMetadata({
     };
   }
 
+  const description =
+    category.description ||
+    `Shop ${category.name} bij ${settings.name}.`;
+
   return {
-    title: category,
-    description: `Shop ${category} at ${settings.name}.`,
+    title: category.name,
+    description,
     alternates: {
-      canonical: `/collection/${categoryToSlug(category)}`,
+      canonical: siteUrl
+        ? `${siteUrl}/collection/${category.slug}`
+        : `/collection/${category.slug}`,
     },
     openGraph: {
-      title: `${category} | ${settings.name}`,
-      description: `Browse ${category} products from ${settings.name}.`,
+      title: `${category.name} | ${settings.name}`,
+      description,
+      images: category.image
+        ? [{ url: category.image, alt: category.imageAlt || category.name }]
+        : undefined,
     },
   };
 }
 
 export default async function CollectionPage({ params }: CollectionPageProps) {
   const { slug } = await params;
-  const storeId = await getCurrentStoreId();
-  const [settings, categories, products] = await Promise.all([
-    getStoreSettings(storeId),
-    getCategories(storeId),
-    getProducts(storeId),
+  const [settings, categories] = await Promise.all([
+    getSiteSettings(),
+    getCategoryRecords(),
   ]);
-  const category = findCategoryBySlug(categories, slug);
+  const category = categories.find((entry) => entry.slug === slug);
 
   if (!category) {
     notFound();
   }
 
-  const collectionCount = products.filter(
-    (product) => product.category === category,
-  ).length;
+  const products = await getProductsByCategory(category.slug);
+  const siteUrl = getSiteUrl(settings);
+  const url = siteUrl
+    ? `${siteUrl}/collection/${category.slug}`
+    : `/collection/${category.slug}`;
+
+  const collectionLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: category.name,
+    description: category.description,
+    url,
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: products.length,
+      itemListElement: products.slice(0, 24).map((product, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        url: siteUrl
+          ? `${siteUrl}/products/${product.slug}`
+          : `/products/${product.slug}`,
+        name: product.name,
+      })),
+    },
+  };
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: siteUrl || "/",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Shop",
+        item: siteUrl ? `${siteUrl}/products` : "/products",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: category.name,
+        item: url,
+      },
+    ],
+  };
 
   return (
-    <div className={pageContainer("space-y-8 py-10 sm:py-12")}>
-      <header className="space-y-3 border-b border-border pb-8">
-        <p className="text-sm font-medium text-primary">
-          Home / Shop / {category}
-        </p>
-        <h1 className="text-balance text-4xl font-semibold sm:text-5xl">
-          {category}
-        </h1>
-        <p className="max-w-2xl text-pretty text-muted-foreground">
-          {collectionCount} product{collectionCount === 1 ? "" : "s"} in this
-          collection at {settings.name}. Use the filters to refine results.
-        </p>
-      </header>
-      <ProductsCatalog
-        key={category}
-        products={products}
-        initialCategory={category}
-        syncCategoryUrl
-      />
-    </div>
+    <>
+      <JsonLd data={collectionLd} />
+      <JsonLd data={breadcrumbLd} />
+      <div className={pageContainer("space-y-8 py-10 sm:py-12")}>
+        <header className="space-y-3 border-b border-border pb-8">
+          <p className="text-sm font-medium text-primary">
+            Home / Shop / {category.name}
+          </p>
+          <h1 className="font-display text-balance text-4xl font-semibold sm:text-5xl">
+            {category.name}
+          </h1>
+          <p className="max-w-2xl text-pretty text-muted-foreground">
+            {category.description ||
+              `${products.length} product${products.length === 1 ? "" : "s"} in this collection at ${settings.name}.`}
+          </p>
+        </header>
+        <ProductsCatalog
+          products={products}
+          initialCategory={category.name}
+        />
+      </div>
+    </>
   );
 }

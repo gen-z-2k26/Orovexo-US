@@ -68,7 +68,10 @@ export function ProductsCatalog({
     if (sort === "name-asc") {
       return [...byAvailability].sort((a, b) => a.name.localeCompare(b.name));
     }
-    return byAvailability;
+    return [...byAvailability].sort((a, b) => {
+      if (a.featured !== b.featured) return a.featured ? -1 : 1;
+      return a.menuOrder - b.menuOrder;
+    });
   }, [products, category, sort, query, availability]);
 
   function handleCategoryChange(value: string) {

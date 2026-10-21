@@ -1,18 +1,16 @@
 "use client";
 
 import { create } from "zustand";
-import { persist, createJSONStorage, type StateStorage } from "zustand/middleware";
-import { createOrder } from "@/lib/api";
+import { persist } from "zustand/middleware";
+import { placeOrderAction } from "@/app/actions/checkout";
 import type { CartItem, CheckoutPayload, CreateOrderResult } from "@/lib/types";
 
 type AddItemInput = Omit<CartItem, "quantity"> & { quantity?: number };
 
 type CartState = {
-  storeId: string;
   items: CartItem[];
   isOpen: boolean;
   badgeBump: number;
-  setStoreId: (storeId: string) => void;
   openCart: () => void;
   closeCart: () => void;
   setOpen: (open: boolean) => void;
@@ -37,67 +35,12 @@ export function getCartCount(items: CartItem[]) {
   return items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
 }
 
-function normalizeItems(items: CartItem[]): CartItem[] {
-  return items.map((item) => ({
-    ...item,
-    price: Number(item.price) || 0,
-    quantity: Number(item.quantity) || 0,
-  }));
-}
-
-let activeStoreId = "";
-
-function storageKey(storeId: string) {
-  return `cart-${storeId || "default"}`;
-}
-
-function readPersistedItems(storeId: string): CartItem[] {
-  if (typeof window === "undefined" || !storeId) return [];
-  try {
-    const raw = window.localStorage.getItem(storageKey(storeId));
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as
-      | { state?: { items?: CartItem[] } }
-      | CartItem[];
-    if (Array.isArray(parsed)) return normalizeItems(parsed);
-    return normalizeItems(parsed.state?.items ?? []);
-  } catch {
-    return [];
-  }
-}
-
-const cartStorage: StateStorage = {
-  getItem: (name: string): string | null => {
-    if (typeof window === "undefined" || !activeStoreId) return null;
-    return window.localStorage.getItem(storageKey(activeStoreId) || name);
-  },
-  setItem: (_name: string, value: string): void => {
-    if (typeof window === "undefined" || !activeStoreId) return;
-    window.localStorage.setItem(storageKey(activeStoreId), value);
-  },
-  removeItem: (_name: string): void => {
-    if (typeof window === "undefined" || !activeStoreId) return;
-    window.localStorage.removeItem(storageKey(activeStoreId));
-  },
-};
-
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
-      storeId: "",
       items: [],
       isOpen: false,
       badgeBump: 0,
-      setStoreId: (storeId) => {
-        const current = get().storeId;
-        if (current === storeId) return;
-        activeStoreId = storeId;
-        set({
-          storeId,
-          items: readPersistedItems(storeId),
-          isOpen: false,
-        });
-      },
       openCart: () => set({ isOpen: true }),
       closeCart: () => set({ isOpen: false }),
       setOpen: (open) => set({ isOpen: open }),
@@ -157,11 +100,8 @@ export const useCartStore = create<CartState>()(
       },
       clearCart: () => set({ items: [] }),
       placeOrder: async (payload) => {
-        const { storeId, items } = get();
-        if (!storeId) {
-          throw new Error("Cart is not bound to a store.");
-        }
-        const result = await createOrder(storeId, {
+        const { items } = get();
+        const result = await placeOrderAction({
           ...payload,
           items,
         });
@@ -170,11 +110,9 @@ export const useCartStore = create<CartState>()(
       },
     }),
     {
-      name: "cart-default",
-      storage: createJSONStorage(() => cartStorage),
+      name: "cart",
       partialize: (state) => ({
         items: state.items,
-        storeId: state.storeId,
       }),
     },
   ),

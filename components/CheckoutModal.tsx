@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { useMemo, useState } from "react";
+import { StoreImage } from "@/components/StoreImage";
 import { motion } from "motion/react";
 import { Check } from "lucide-react";
 import {
@@ -38,7 +38,7 @@ export function CheckoutModal({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const { settings, storeId } = useStore();
+  const { settings } = useStore();
   const items = useCartStore((state) => state.items);
   const placeOrder = useCartStore((state) => state.placeOrder);
   const { enabled } = useMotionEnabled();
@@ -233,7 +233,6 @@ export function CheckoutModal({
                 </p>
               ) : (
                 <PaymentStep
-                  storeId={storeId}
                   amount={amount}
                   currency={settings.currency}
                   onSuccess={handlePaymentSuccess}
@@ -335,13 +334,7 @@ function OrderSummary({
           >
             {"image" in item && item.image ? (
               <div className="relative size-12 shrink-0 overflow-hidden rounded-xl bg-background">
-                <Image
-                  src={item.image}
-                  alt=""
-                  fill
-                  sizes="48px"
-                  className="object-cover"
-                />
+                <StoreImage src={item.image} alt="" sizes="48px" />
               </div>
             ) : (
               <div className="size-12 shrink-0 rounded-xl bg-background" />

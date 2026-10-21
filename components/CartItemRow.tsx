@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { StoreImage } from "@/components/StoreImage";
 import { motion } from "motion/react";
 import type { CartItem } from "@/lib/types";
 import { formatPrice } from "@/lib/format";
@@ -21,13 +21,7 @@ export function CartItemRow({ item }: { item: CartItem }) {
   const content = (
     <div className="flex gap-3.5 rounded-2xl border border-border bg-card p-3.5">
       <div className="relative size-20 shrink-0 overflow-hidden rounded-xl bg-muted">
-        <Image
-          src={item.image}
-          alt={item.name}
-          fill
-          sizes="80px"
-          className="object-cover"
-        />
+        <StoreImage src={item.image} alt={item.name} sizes="80px" />
       </div>
       <div className="min-w-0 flex-1 space-y-2.5">
         <div className="flex items-start justify-between gap-2">

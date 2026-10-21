@@ -9,10 +9,45 @@ export function Reveal({
   children,
   className,
   delay = 0,
+  as = "div",
 }: {
   children: ReactNode;
   className?: string;
   delay?: number;
+  as?: "div" | "li" | "article";
+}) {
+  const { enabled, level } = useMotionEnabled();
+  const tokens = motionByLevel[level];
+  const MotionTag = motion[as];
+
+  if (!enabled) {
+    const Tag = as;
+    return <Tag className={className}>{children}</Tag>;
+  }
+
+  return (
+    <MotionTag
+      className={className}
+      initial={{ opacity: 0, y: tokens.distance }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{
+        duration: tokens.duration,
+        delay,
+        ease: easings.standard,
+      }}
+    >
+      {children}
+    </MotionTag>
+  );
+}
+
+export function RevealImage({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
 }) {
   const { enabled, level } = useMotionEnabled();
   const tokens = motionByLevel[level];
@@ -24,14 +59,10 @@ export function Reveal({
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y: tokens.distance }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, scale: 1.04 }}
+      whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true, amount: 0.25 }}
-      transition={{
-        duration: tokens.duration,
-        delay,
-        ease: easings.standard,
-      }}
+      transition={{ duration: tokens.duration * 1.15, ease: easings.soft }}
     >
       {children}
     </motion.div>

@@ -1,92 +1,97 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import type { SectionComponentProps } from "@/lib/sections-registry";
+import { StoreImage } from "@/components/StoreImage";
+import type { Category, StoreSettings } from "@/lib/types";
+import { SectionHeader } from "@/components/sections/SectionHeader";
 import { Reveal } from "@/components/sections/Reveal";
-import { categoryToSlug } from "@/lib/category";
+import { hoverLiftClass, imageZoomClass } from "@/lib/motion";
 import { useMotionEnabled } from "@/lib/use-motion-enabled";
 import { pageContainer, sectionStackClass, sectionYClass } from "@/lib/layout";
 import { cn } from "@/lib/utils";
 
-function asString(value: unknown, fallback = "") {
-  return typeof value === "string" ? value : fallback;
-}
-
-export function CategoriesSection({ props, products }: SectionComponentProps) {
-  const eyebrow = asString(props.eyebrow, "The collection");
-  const title = asString(props.title, "Categories");
-  const subtitle = asString(props.subtitle, "Browse by category.");
+export function CategoriesSection({
+  categories,
+  settings,
+}: {
+  categories: Category[];
+  settings: StoreSettings;
+}) {
   const { enabled } = useMotionEnabled();
-
-  const categories = Array.from(
-    products.reduce((map, product) => {
-      const current = map.get(product.category);
-      if (!current) {
-        map.set(product.category, {
-          count: 1,
-          image: product.images[0] ?? "",
-        });
-      } else {
-        current.count += 1;
-      }
-      return map;
-    }, new Map<string, { count: number; image: string }>()),
-  ).sort(([a], [b]) => a.localeCompare(b));
+  const resolved = categories.filter((category) => category.parent === 0);
 
   return (
     <section
+      id="categories"
       aria-labelledby="categories-heading"
       className={cn("border-b border-border", sectionYClass)}
     >
       <div className={pageContainer(sectionStackClass)}>
-        <Reveal className="max-w-2xl space-y-3">
-          <p className="text-sm font-medium text-primary">{eyebrow}</p>
-          <h2
-            id="categories-heading"
-            className="text-balance text-3xl font-semibold sm:text-4xl"
-          >
-            {title}
-          </h2>
-          <p className="text-pretty text-muted-foreground">{subtitle}</p>
-        </Reveal>
+        <SectionHeader
+          eyebrow="Catalog"
+          title="For every room and workday"
+          subtitle="Categories from your WooCommerce store, with real products and counts."
+          titleId="categories-heading"
+        />
 
-        <ul className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-          {categories.map(([category, meta], index) => (
-            <li key={category} className="h-full">
-              <Reveal delay={index * 0.04} className="h-full">
+        {resolved.length === 0 ? (
+          <div className="rounded-3xl border border-dashed border-border px-6 py-14 text-center">
+            <p className="font-medium">No categories yet</p>
+            <p className="mt-2 text-pretty text-sm text-muted-foreground">
+              Add categories and products in WooCommerce admin to show them
+              here.
+            </p>
+          </div>
+        ) : (
+          <ul
+            className={cn(
+              "grid gap-4",
+              resolved.length <= 3
+                ? "grid-cols-1 sm:grid-cols-3"
+                : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
+            )}
+          >
+            {resolved.map((category, index) => (
+              <Reveal
+                key={category.id}
+                delay={index * 0.05}
+                as="li"
+                className="h-full"
+              >
                 <Link
-                  href={`/collection/${categoryToSlug(category)}`}
-                  aria-label={`Shop ${category}, ${meta.count} products`}
+                  href={`/collection/${category.slug}`}
+                  aria-label={`Shop ${category.name}, ${category.count} products`}
                   className={cn(
-                    "group relative flex h-full min-h-44 flex-col justify-end overflow-hidden rounded-3xl border border-border bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:min-h-52",
-                    enabled &&
-                      "transition-[transform,border-color] duration-200 hover:-translate-y-1 hover:border-primary/50",
+                    "group relative flex h-full min-h-64 flex-col justify-end overflow-hidden rounded-[calc(var(--radius)*1.8)] border border-border bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                    enabled && hoverLiftClass,
                   )}
                 >
-                  {meta.image ? (
-                    <Image
-                      src={meta.image}
-                      alt={`${category} category`}
-                      fill
-                      sizes="(max-width: 768px) 50vw, 25vw"
-                      className="object-cover transition-transform duration-200 group-hover:scale-105"
-                    />
-                  ) : null}
-                  <div className="absolute inset-0 bg-black/55" />
+                  <StoreImage
+                    src={category.image || settings.logo}
+                    alt={category.imageAlt || category.name}
+                    fallbackSrc={settings.logo}
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className={cn("object-cover", enabled && imageZoomClass)}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-transparent" />
                   <div className="relative z-10 flex flex-col gap-1 p-5 sm:p-6">
-                    <span className="text-xs text-white/75 tabular-nums">
-                      {meta.count} product{meta.count === 1 ? "" : "s"}
+                    <span className="text-xs tabular-nums text-white/75">
+                      {category.count} product{category.count === 1 ? "" : "s"}
                     </span>
-                    <span className="text-xl font-semibold text-balance text-white">
-                      {category}
+                    <span className="font-display text-xl font-semibold text-balance text-white sm:text-2xl">
+                      {category.name}
                     </span>
+                    {category.description ? (
+                      <span className="line-clamp-2 text-sm text-white/80">
+                        {category.description}
+                      </span>
+                    ) : null}
                   </div>
                 </Link>
               </Reveal>
-            </li>
-          ))}
-        </ul>
+            ))}
+          </ul>
+        )}
       </div>
     </section>
   );

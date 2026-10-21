@@ -1,21 +1,26 @@
 ---
-description: Multi-store storefront product context and architecture boundaries
+description: Single-store WooCommerce storefront context and architecture boundaries
 alwaysApply: true
 ---
 
-# Multi-store storefront context
+# Single-store WooCommerce storefront
 
 ## Product
-- Customers sign up on our website and create their own online store. Each store has its own branding, products, and orders.
-- One Next.js app serves ALL stores. The current store is resolved from the request host (subdomain or custom domain).
-- Backend will be WordPress with WooCommerce (one sub-site per store). It is NOT ready, so build everything against mock data behind a thin data layer. Swapping to WooCommerce later must only touch `lib/api`.
-- Purpose right now: a polished stakeholder demo that proves one codebase can power many differently branded stores.
-- Scope: home page, product listing, product detail, add to cart, checkout popup. Do NOT build signup, onboarding, or a store admin area.
+- One Next.js storefront for one WooCommerce / WordPress shop.
+- Backend is WooCommerce REST API (`wc/v3`) via Axios in `lib/api/client.ts`.
+- Design (layout, theme, motion, UI copy) lives in Next.js.
+- Catalog data (products, categories, prices, stock, featured) comes only from WooCommerce admin via the API. Do not hardcode products.
+- If Woo credentials are unset or the API fails, product lists render empty and design fallbacks in `data/site.json` still apply for theme/chrome.
+- Scope: home, product listing, collection, product detail, cart, checkout. No signup, onboarding, or admin UI in this app. No ACF.
+
+## Design system
+- Theme tokens live in `data/site.json` under `theme.light` and `theme.dark`.
+- Tokens are applied as CSS variables through `lib/theme.ts`.
+- Light/dark mode is user-toggleable via `ThemeModeProvider`.
+- Homepage section composition is fixed in Next components (`HomeSections`).
 
 ## Architecture boundaries
-- Resolve store id via `lib/get-current-store-id.ts` (host, demo cookie, `NEXT_PUBLIC_DEFAULT_STORE_ID`).
-- Theme tokens come from store settings and are applied as CSS variables.
+- `getSiteSettings()` uses Next design config (`data/site.json`) for branding, hero, footer, and contact. Currency (and site URL) may be overlaid from Woo when available.
 - Components receive data via props or `useStore()`. Only pages, the provider, and the cart store talk to `lib/api`.
-- Every API function takes `storeId` as its first argument.
-- Cart persistence is per store.
+- Keep consumer keys server-side. Never import the Woo client into client components.
 - Keep UI text and comments free of em dashes.
