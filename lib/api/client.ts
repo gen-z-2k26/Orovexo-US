@@ -178,3 +178,24 @@ export async function wooPost<T>(
   );
   return response.data;
 }
+
+/** PUT helper that returns response.data and maps Axios errors. */
+export async function wooPut<T>(
+  path: string,
+  body?: unknown,
+  config?: AxiosRequestConfig,
+): Promise<T> {
+  if (!isWooConfigured()) {
+    throw new WooCommerceApiError(
+      "WooCommerce is not configured. Set WC_URL, WC_CONSUMER_KEY, and WC_CONSUMER_SECRET.",
+      { code: "missing_env" },
+    );
+  }
+
+  const response = await getWooClient().put<T>(
+    path.replace(/^\//, ""),
+    body,
+    config,
+  );
+  return response.data;
+}

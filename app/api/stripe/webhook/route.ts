@@ -1,0 +1,64 @@
+import { NextResponse } from "next/server";
+import { getOrder, markOrderPaid } from "@/lib/api";
+import { getStripe, stripeAmountMatches } from "@/lib/stripe";
+
+export const dynamic = "force-dynamic";
+
+export async function POST(request: Request) {
+  const secret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
+  if (!secret) {
+    return NextResponse.json(
+      { error: "Stripe webhook secret is not configured." },
+      { status: 500 },
+    );
+  }
+
+  const signature = request.headers.get("stripe-signature");
+  if (!signature) {
+    return NextResponse.json({ error: "Missing Stripe signature." }, { status: 400 });
+  }
+
+  const body = await request.text();
+  let event;
+  try {
+    event = getStripe().webhooks.constructEvent(body, signature, secret);
+  } catch {
+    return NextResponse.json({ error: "Invalid Stripe signature." }, { status: 400 });
+  }
+
+  if (event.type !== "payment_intent.succeeded") {
+    return NextResponse.json({ received: true });
+  }
+
+  const intent = event.data.object;
+  const orderId = intent.metadata?.woo_order_id;
+  if (!orderId) {
+    return NextResponse.json({ received: true });
+  }
+
+  try {
+    const order = await getOrder(orderId);
+    if (
+      !stripeAmountMatches(
+        order.total || 0,
+        order.currency || "",
+        intent.amount,
+        intent.currency,
+      )
+    ) {
+      console.warn("[stripe webhook] amount mismatch", {
+        orderId,
+        intentId: intent.id,
+      });
+      return NextResponse.json({ error: "Amount mismatch." }, { status: 409 });
+    }
+
+    await markOrderPaid(orderId, intent.id);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Webhook failed.";
+    console.warn("[stripe webhook]", message, { orderId, intentId: intent.id });
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+
+  return NextResponse.json({ received: true });
+}

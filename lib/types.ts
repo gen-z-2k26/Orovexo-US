@@ -154,6 +154,18 @@ export interface CheckoutPayload {
   items: CartItem[];
 }
 
+export interface CheckoutSessionResult {
+  orderId: string;
+  clientSecret: string;
+  amount: number;
+  currency: string;
+}
+
+export interface CompleteCheckoutPayload {
+  orderId: string;
+  paymentIntentId: string;
+}
+
 export interface CreateOrderResult {
   orderId: string;
   total: number;
@@ -163,4 +175,6 @@ export interface CreateOrderResult {
   address: string;
   items: CartItem[];
   createdAt: string;
+  paid: boolean;
+  transactionId?: string;
 }

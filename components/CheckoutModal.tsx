@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { StoreImage } from "@/components/StoreImage";
 import { motion } from "motion/react";
 import { Check } from "lucide-react";
@@ -20,7 +20,8 @@ import { useStore } from "@/lib/store-context";
 import { formatPrice } from "@/lib/format";
 import { useMotionEnabled } from "@/lib/use-motion-enabled";
 import { durations, easings } from "@/lib/motion";
-import type { CartItem, CreateOrderResult } from "@/lib/types";
+import { createCheckoutSessionAction } from "@/app/actions/checkout";
+import type { CartItem, CheckoutSessionResult, CreateOrderResult } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 type Step = "details" | "payment" | "success";
@@ -40,7 +41,7 @@ export function CheckoutModal({
 }) {
   const { settings } = useStore();
   const items = useCartStore((state) => state.items);
-  const placeOrder = useCartStore((state) => state.placeOrder);
+  const clearCart = useCartStore((state) => state.clearCart);
   const { enabled } = useMotionEnabled();
 
   const [step, setStep] = useState<Step>("details");
@@ -50,6 +51,8 @@ export function CheckoutModal({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [order, setOrder] = useState<CreateOrderResult | null>(null);
+  const [session, setSession] = useState<CheckoutSessionResult | null>(null);
+  const [sessionError, setSessionError] = useState("");
 
   const amount = useMemo(() => getCartSubtotal(items), [items]);
   const activeStepIndex = steps.findIndex((entry) => entry.id === step);
@@ -62,6 +65,8 @@ export function CheckoutModal({
     setErrors({});
     setSubmitting(false);
     setOrder(null);
+    setSession(null);
+    setSessionError("");
   }
 
   function validate() {
@@ -77,23 +82,40 @@ export function CheckoutModal({
     return Object.keys(next).length === 0;
   }
 
-  async function handlePaymentSuccess() {
+  useEffect(() => {
+    if (step !== "payment" || session) return;
+
+    let cancelled = false;
     setSubmitting(true);
-    try {
-      const result = await placeOrder({
-        name: name.trim(),
-        email: email.trim(),
-        address: address.trim(),
+    setSessionError("");
+
+    createCheckoutSessionAction({
+      name: name.trim(),
+      email: email.trim(),
+      address: address.trim(),
+      items,
+    })
+      .then((next) => {
+        if (!cancelled) setSession(next);
+      })
+      .catch((error: unknown) => {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Could not start checkout. Please try again.";
+        if (!cancelled) {
+          setSessionError(message);
+          setErrors({ form: message });
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setSubmitting(false);
       });
-      setOrder(result);
-      setStep("success");
-    } catch {
-      setErrors({ form: "Could not create the order. Please try again." });
-      setStep("details");
-    } finally {
-      setSubmitting(false);
-    }
-  }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [address, email, items, name, session, step]);
 
   return (
     <Dialog
@@ -105,17 +127,17 @@ export function CheckoutModal({
     >
       <DialogContent
         data-lenis-prevent
-        className="max-h-[90dvh] gap-0 overflow-y-auto overscroll-contain rounded-3xl p-0 sm:max-w-xl"
+        className="max-h-[90dvh] gap-0 overflow-y-auto overscroll-contain rounded-2xl p-0 sm:max-w-xl"
       >
         <div className="space-y-6 p-5 sm:p-7">
           <DialogHeader className="space-y-3 text-left">
-            <DialogTitle className="text-2xl font-semibold">
+            <DialogTitle className="font-display text-2xl">
               {step === "success" ? "Order confirmed" : "Checkout"}
             </DialogTitle>
             <DialogDescription className="text-pretty">
               {step === "success"
-                ? "Your mock order was placed successfully."
-                : "Enter your details, review the summary, then confirm payment."}
+                ? "Your payment was received and the order is confirmed."
+                : "Enter your details, review the summary, then pay with card."}
             </DialogDescription>
           </DialogHeader>
 
@@ -127,7 +149,7 @@ export function CheckoutModal({
                 <li
                   key={entry.id}
                   className={cn(
-                    "rounded-2xl border px-3 py-2.5 text-center text-xs font-medium",
+                    "rounded-xl border px-3 py-2.5 text-center text-xs",
                     current || complete
                       ? "border-primary/40 bg-primary/10 text-foreground"
                       : "border-border bg-muted/40 text-muted-foreground",
@@ -158,7 +180,6 @@ export function CheckoutModal({
                     onChange={(event) => setName(event.target.value)}
                     autoComplete="name"
                     aria-invalid={Boolean(errors.name)}
-                    className="h-11 rounded-2xl"
                     placeholder="Jane Cooper"
                   />
                   {errors.name ? (
@@ -175,7 +196,6 @@ export function CheckoutModal({
                     onChange={(event) => setEmail(event.target.value)}
                     autoComplete="email"
                     aria-invalid={Boolean(errors.email)}
-                    className="h-11 rounded-2xl"
                     placeholder="jane@example.com"
                   />
                   {errors.email ? (
@@ -192,7 +212,6 @@ export function CheckoutModal({
                   onChange={(event) => setAddress(event.target.value)}
                   autoComplete="street-address"
                   aria-invalid={Boolean(errors.address)}
-                  className="h-11 rounded-2xl"
                   placeholder="Street, city, postal code"
                 />
                 {errors.address ? (
@@ -209,7 +228,7 @@ export function CheckoutModal({
               <Button
                 type="submit"
                 size="lg"
-                className="h-12 w-full rounded-2xl"
+                className="w-full"
                 disabled={!items.length}
               >
                 Continue to payment
@@ -219,24 +238,43 @@ export function CheckoutModal({
 
           {step === "payment" ? (
             <div className="space-y-5">
-              <OrderSummary items={items} amount={amount} />
-              {submitting ? (
-                <p className="rounded-2xl border border-border bg-muted/40 px-4 py-5 text-sm text-muted-foreground">
-                  Placing order...
+              <OrderSummary items={items} amount={session?.amount ?? amount} />
+              {submitting && !session ? (
+                <p className="rounded-xl border border-border bg-muted/40 px-4 py-5 text-sm text-muted-foreground">
+                  Preparing secure payment...
                 </p>
-              ) : (
+              ) : null}
+              {sessionError && !session ? (
+                <p className="text-sm text-destructive">{sessionError}</p>
+              ) : null}
+              {session ? (
                 <PaymentStep
-                  amount={amount}
-                  currency={settings.currency}
-                  onSuccess={handlePaymentSuccess}
+                  amount={session.amount}
+                  currency={session.currency}
+                  clientSecret={session.clientSecret}
+                  orderId={session.orderId}
+                  email={email.trim()}
+                  onPaid={(result) => {
+                    setOrder(result);
+                    clearCart();
+                    setStep("success");
+                  }}
+                  onError={(message) => setErrors({ form: message })}
                 />
-              )}
+              ) : null}
+              {errors.form && session ? (
+                <p className="text-sm text-destructive">{errors.form}</p>
+              ) : null}
               <Button
                 type="button"
                 variant="ghost"
-                className="h-11 w-full rounded-2xl"
-                onClick={() => setStep("details")}
-                disabled={submitting}
+                className="w-full"
+                onClick={() => {
+                  setSession(null);
+                  setSessionError("");
+                  setStep("details");
+                }}
+                disabled={submitting && !sessionError}
               >
                 Back to details
               </Button>
@@ -245,7 +283,7 @@ export function CheckoutModal({
 
           {step === "success" && order ? (
             <div className="space-y-5">
-              <div className="flex flex-col items-center gap-3 rounded-3xl border border-border bg-muted/30 px-4 py-6 text-center">
+              <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-muted/30 px-4 py-6 text-center">
                 {enabled ? (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.85 }}
@@ -264,7 +302,7 @@ export function CheckoutModal({
                   </div>
                 )}
                 <div className="space-y-1">
-                  <p className="text-lg font-semibold">Thanks, {order.name}</p>
+                  <p className="text-lg tracking-tight">Thanks, {order.name}</p>
                   <p className="text-sm text-muted-foreground">
                     Order{" "}
                     <span className="font-medium text-foreground tabular-nums">
@@ -279,7 +317,7 @@ export function CheckoutModal({
               <Button
                 type="button"
                 size="lg"
-                className="h-12 w-full rounded-2xl"
+                className="w-full"
                 onClick={() => {
                   onOpenChange(false);
                   reset();
@@ -304,9 +342,9 @@ function OrderSummary({
 }) {
   const { settings } = useStore();
   return (
-    <div className="space-y-4 rounded-3xl border border-border bg-muted/30 p-4 sm:p-5">
+    <div className="space-y-4 rounded-2xl border border-border bg-muted/30 p-4 sm:p-5">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-sm font-semibold">Order summary</p>
+        <p className="text-sm tracking-tight">Order summary</p>
         <p className="text-xs text-muted-foreground tabular-nums">
           {items.length} item{items.length === 1 ? "" : "s"}
         </p>
@@ -336,7 +374,7 @@ function OrderSummary({
           </li>
         ))}
       </ul>
-      <div className="flex items-center justify-between border-t border-border pt-3 text-sm font-semibold">
+      <div className="flex items-center justify-between border-t border-border pt-3 text-sm tracking-tight">
         <span>Total</span>
         <span className="tabular-nums">
           {formatPrice(amount, settings)}

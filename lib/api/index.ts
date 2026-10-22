@@ -4,6 +4,7 @@ import {
   isWooConfigured,
   wooGet,
   wooPost,
+  wooPut,
 } from "@/lib/api/client";
 import { softWooCall, withWooErrorHandling } from "@/lib/api/errors";
 import {
@@ -16,6 +17,7 @@ import {
   type WooStoreMoney,
 } from "@/lib/api/map-woo-store";
 import type {
+  CartItem,
   Category,
   CheckoutPayload,
   CreateOrderResult,
@@ -369,7 +371,89 @@ export async function getProduct(slug: string): Promise<Product | null> {
   );
 }
 
-export async function createOrder(
+type WooOrderLineItem = {
+  product_id?: number;
+  name?: string;
+  quantity?: number;
+  price?: number | string;
+  image?: { src?: string } | string;
+};
+
+export type WooOrder = {
+  id: number | string;
+  status?: string;
+  total?: string;
+  currency?: string;
+  date_created?: string;
+  transaction_id?: string;
+  billing?: {
+    first_name?: string;
+    last_name?: string;
+    address_1?: string;
+    email?: string;
+  };
+  line_items?: WooOrderLineItem[];
+};
+
+function splitName(name: string) {
+  const [firstName, ...rest] = name.trim().split(/\s+/);
+  return {
+    firstName: firstName || name,
+    lastName: rest.join(" ") || "-",
+  };
+}
+
+function lineItemImage(item: WooOrderLineItem) {
+  if (typeof item.image === "string") return item.image;
+  return item.image?.src || "";
+}
+
+function mapWooOrder(order: WooOrder, fallback?: CheckoutPayload): CreateOrderResult {
+  const billing = order.billing;
+  const name =
+    fallback?.name ||
+    [billing?.first_name, billing?.last_name].filter(Boolean).join(" ").trim();
+  const items: CartItem[] =
+    fallback?.items ??
+    (order.line_items ?? []).map((item) => ({
+      productId: String(item.product_id ?? ""),
+      slug: "",
+      name: item.name || "Item",
+      price: Number(item.price) || 0,
+      image: lineItemImage(item),
+      quantity: Number(item.quantity) || 1,
+    }));
+  const paid =
+    order.status === "processing" ||
+    order.status === "completed" ||
+    Boolean(order.transaction_id);
+
+  return {
+    orderId: String(order.id),
+    total: Number(order.total) || 0,
+    currency: order.currency || "EUR",
+    email: fallback?.email || billing?.email || "",
+    name,
+    address: fallback?.address || billing?.address_1 || "",
+    items,
+    createdAt: order.date_created || new Date().toISOString(),
+    paid,
+    transactionId: order.transaction_id || undefined,
+  };
+}
+
+async function fetchLiveCheckoutProducts(ids: number[]): Promise<Product[]> {
+  const unique = [...new Set(ids)];
+  const data = await wooGet<WooProduct[]>("products", {
+    include: unique.join(","),
+    per_page: unique.length,
+    status: "publish",
+    _fields: `${PRODUCT_FIELDS},purchasable`,
+  });
+  return data.map(mapWooProduct);
+}
+
+export async function createPendingOrder(
   payload: CheckoutPayload,
 ): Promise<CreateOrderResult> {
   if (!payload.email || !payload.name || !payload.address) {
@@ -379,47 +463,97 @@ export async function createOrder(
     throw new Error("Checkout requires at least one item.");
   }
 
-  const settings = await getSiteSettings();
-
   return withWooErrorHandling(async () => {
-    const [firstName, ...rest] = payload.name.trim().split(/\s+/);
-    const order = await wooPost<{
-      id: number | string;
-      total?: string;
-      currency?: string;
-      date_created?: string;
-    }>("orders", {
-      payment_method: "cod",
-      payment_method_title: "Cash on delivery",
+    const ids = payload.items.map((item) => Number(item.productId));
+    if (ids.some((id) => !Number.isFinite(id) || id <= 0)) {
+      throw new Error("Cart contains an invalid product.");
+    }
+
+    const products = await fetchLiveCheckoutProducts(ids);
+    const byId = new Map(products.map((product) => [product.id, product]));
+
+    for (const item of payload.items) {
+      const product = byId.get(item.productId);
+      if (!product) {
+        throw new Error(`${item.name} is no longer available.`);
+      }
+      if (!product.inStock) {
+        throw new Error(`${product.name} is out of stock.`);
+      }
+    }
+
+    const { firstName, lastName } = splitName(payload.name);
+    const order = await wooPost<WooOrder>("orders", {
+      payment_method: "stripe",
+      payment_method_title: "Credit card (Stripe)",
+      status: "pending",
       set_paid: false,
       billing: {
-        first_name: firstName || payload.name,
-        last_name: rest.join(" ") || "-",
+        first_name: firstName,
+        last_name: lastName,
         address_1: payload.address,
         email: payload.email,
+        country: "NL",
+      },
+      shipping: {
+        first_name: firstName,
+        last_name: lastName,
+        address_1: payload.address,
         country: "NL",
       },
       line_items: payload.items.map((item) => ({
         product_id: Number(item.productId),
         quantity: item.quantity,
       })),
+      meta_data: [{ key: "_created_via_storefront", value: "next-stripe" }],
     });
 
-    const total = payload.items.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0,
-    );
+    const pricedItems = payload.items.map((item) => {
+      const product = byId.get(item.productId);
+      return {
+        ...item,
+        name: product?.name || item.name,
+        price: product?.price ?? item.price,
+        image: product?.images[0] || item.image,
+      };
+    });
 
-    return {
-      orderId: String(order.id),
-      total: Number(order.total) || total,
-      currency: order.currency || settings.currency,
-      email: payload.email,
-      name: payload.name,
-      address: payload.address,
-      items: payload.items,
-      createdAt: order.date_created || new Date().toISOString(),
-    };
+    return mapWooOrder(order, { ...payload, items: pricedItems });
+  });
+}
+
+export async function getOrder(orderId: string): Promise<WooOrder> {
+  return withWooErrorHandling(async () => {
+    return wooGet<WooOrder>(`orders/${orderId}`);
+  });
+}
+
+export async function markOrderPaid(
+  orderId: string,
+  transactionId: string,
+): Promise<CreateOrderResult> {
+  return withWooErrorHandling(async () => {
+    const existing = await wooGet<WooOrder>(`orders/${orderId}`);
+    const alreadyPaid =
+      existing.status === "processing" || existing.status === "completed";
+    if (alreadyPaid) {
+      if (
+        existing.transaction_id &&
+        existing.transaction_id !== transactionId
+      ) {
+        throw new Error("This order was already paid with a different payment.");
+      }
+      return mapWooOrder(existing);
+    }
+
+    const order = await wooPut<WooOrder>(`orders/${orderId}`, {
+      payment_method: "stripe",
+      payment_method_title: "Credit card (Stripe)",
+      set_paid: true,
+      transaction_id: transactionId,
+    });
+
+    return mapWooOrder(order);
   });
 }
 

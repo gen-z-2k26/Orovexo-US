@@ -2,8 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { placeOrderAction } from "@/app/actions/checkout";
-import type { CartItem, CheckoutPayload, CreateOrderResult } from "@/lib/types";
+import type { CartItem } from "@/lib/types";
 
 type AddItemInput = Omit<CartItem, "quantity"> & { quantity?: number };
 
@@ -18,9 +17,6 @@ type CartState = {
   updateQuantity: (productId: string, quantity: number) => void;
   removeItem: (productId: string) => void;
   clearCart: () => void;
-  placeOrder: (
-    payload: Omit<CheckoutPayload, "items">,
-  ) => Promise<CreateOrderResult>;
 };
 
 export function getCartSubtotal(items: CartItem[]) {
@@ -37,7 +33,7 @@ export function getCartCount(items: CartItem[]) {
 
 export const useCartStore = create<CartState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       items: [],
       isOpen: false,
       badgeBump: 0,
@@ -99,15 +95,6 @@ export const useCartStore = create<CartState>()(
         }));
       },
       clearCart: () => set({ items: [] }),
-      placeOrder: async (payload) => {
-        const { items } = get();
-        const result = await placeOrderAction({
-          ...payload,
-          items,
-        });
-        set({ items: [] });
-        return result;
-      },
     }),
     {
       name: "cart",
