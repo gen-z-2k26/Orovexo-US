@@ -26,11 +26,11 @@ export function StorySection({ settings }: { settings: StoreSettings }) {
           </p>
           <h2
             id="story-heading"
-            className="font-display text-balance text-[length:var(--text-3xl)] font-semibold sm:text-[length:var(--text-4xl)]"
+            className="font-display text-balance text-3xl sm:text-4xl"
           >
             Built to show the storefront flow
           </h2>
-          <p className="text-pretty text-[length:var(--text-lg)] leading-relaxed text-muted-foreground">
+          <p className="text-pretty text-lg leading-relaxed text-muted-foreground">
             Sample pages for browsing, filtering, and checkout. Product data
             comes from WooCommerce when the API is connected; everything else
             here is placeholder demo copy.
@@ -39,14 +39,14 @@ export function StorySection({ settings }: { settings: StoreSettings }) {
             href="/products"
             className={cn(
               buttonVariants({ size: "lg" }),
-              "mt-2 inline-flex rounded-2xl",
+              "mt-2 inline-flex",
             )}
           >
             Browse the catalog
           </Link>
         </Reveal>
 
-        <RevealImage className="relative aspect-[var(--media-story)] overflow-hidden rounded-[calc(var(--radius)*2)] border border-border shadow-[var(--shadow-md)]">
+        <RevealImage className="relative aspect-[var(--media-story)] overflow-hidden rounded-2xl border border-border shadow-md">
           <Image
             src={STORY_IMAGE}
             alt={`${settings.name} workspace`}

@@ -189,7 +189,7 @@ export function SearchBar({
           onClick={openSearch}
           aria-label="Open product search"
           aria-expanded={false}
-          className="size-10 rounded-2xl"
+          className=""
         >
           <Search className="size-4" />
         </Button>
@@ -200,7 +200,7 @@ export function SearchBar({
           }}
           role="search"
           onSubmit={submit}
-          className="flex h-10 w-[min(17.5rem,calc(100vw-9rem))] items-center gap-2 rounded-2xl border border-primary/50 bg-card px-3 text-sm shadow-sm ring-2 ring-primary/15 sm:w-72 md:w-80 lg:w-96 dark:border-input dark:bg-input/30"
+          className="flex h-10 w-[min(17.5rem,calc(100vw-9rem))] items-center gap-2 rounded-xl border border-primary/50 bg-card px-3 text-sm shadow-sm ring-2 ring-primary/15 sm:w-72 md:w-80 lg:w-96 dark:border-input dark:bg-input/30"
         >
           {pending ? (
             <Loader2 className="size-4 shrink-0 animate-spin text-primary" />

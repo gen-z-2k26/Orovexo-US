@@ -113,7 +113,7 @@ export function mapWooProduct(product: WooProduct): Product {
     description,
     images,
     imageAlts,
-    category: categories[0]?.name || "Algemeen",
+    category: categories[0]?.name || "",
     categories,
     featured: Boolean(product.featured),
     averageRating: toNumber(product.average_rating),
@@ -126,11 +126,11 @@ export function mapWooProduct(product: WooProduct): Product {
 export function mapWooCategory(category: WooCategory): Category {
   return {
     id: Number(category.id || 0),
-    name: String(category.name || "Category"),
+    name: String(category.name || ""),
     slug: String(category.slug || ""),
     description: stripHtml(category.description || ""),
     image: category.image?.src || "",
-    imageAlt: category.image?.alt || String(category.name || "Category"),
+    imageAlt: category.image?.alt || String(category.name || ""),
     count: toNumber(category.count),
     parent: toNumber(category.parent),
   };

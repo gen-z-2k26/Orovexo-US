@@ -21,7 +21,7 @@ export const motionByLevel = {
   },
   subtle: {
     duration: durations.base,
-    distance: 16,
+    distance: 12,
     stagger: 0.07,
     scale: 1.03,
   },
@@ -51,7 +51,7 @@ export function shouldAnimate(
 }
 
 export const hoverLiftClass =
-  "motion-safe-only transition-[transform,box-shadow,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[var(--shadow-md)]";
+  "motion-safe-only transition-[transform,box-shadow,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-md hover:border-primary/40";
 
 export const imageZoomClass =
   "motion-safe-only transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]";

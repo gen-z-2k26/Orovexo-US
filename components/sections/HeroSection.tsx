@@ -30,23 +30,20 @@ export function HeroSection({ settings }: { settings: StoreSettings }) {
         )}
       >
         <Reveal className="max-w-3xl space-y-5">
-          <p className="font-display text-2xl font-semibold tracking-tight text-accent sm:text-3xl">
-            Jansen
+          <p className="text-lg tracking-tight text-accent sm:text-xl">
+            {settings.name}
           </p>
-          <h1 className="font-display text-balance text-[length:var(--text-5xl)] font-semibold tracking-tight text-white sm:text-[length:var(--text-6xl)]">
+          <h1 className="font-display text-balance text-5xl tracking-tight text-white sm:text-6xl">
             {settings.hero?.headline || "Shop a wide range of products in one place"}
           </h1>
-          <p className="max-w-xl text-pretty text-[length:var(--text-lg)] leading-relaxed text-white/88">
+          <p className="max-w-xl text-pretty text-lg leading-relaxed text-white/88">
             {settings.hero?.support ||
               "From everyday essentials to standout finds, browse many different items and pick what fits you."}
           </p>
           <div className="flex flex-wrap gap-3 pt-1">
             <Link
               href="/products"
-              className={cn(
-                buttonVariants({ size: "lg" }),
-                "min-w-40 rounded-2xl",
-              )}
+              className={cn(buttonVariants({ size: "lg" }), "min-w-40")}
             >
               Shop now
             </Link>
@@ -54,7 +51,7 @@ export function HeroSection({ settings }: { settings: StoreSettings }) {
               href="/#categories"
               className={cn(
                 buttonVariants({ size: "lg", variant: "outline" }),
-                "min-w-40 rounded-2xl border-white/35 bg-white/10 text-white hover:bg-white/15 hover:text-white",
+                "min-w-40 border-white/35 bg-white/10 text-white hover:bg-white/15 hover:text-white",
               )}
             >
               Browse categories

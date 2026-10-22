@@ -28,7 +28,7 @@ export function CartItemRow({ item }: { item: CartItem }) {
           <div className="min-w-0 space-y-1">
             <p className="truncate text-sm font-medium">{item.name}</p>
             <p className="text-sm text-muted-foreground tabular-nums">
-              {formatPrice(item.price, settings.currency, settings.locale)}
+              {formatPrice(item.price, settings)}
             </p>
           </div>
           <Button
@@ -50,11 +50,7 @@ export function CartItemRow({ item }: { item: CartItem }) {
             onChange={(next) => updateQuantity(item.productId, next)}
           />
           <p className="text-sm font-medium tabular-nums">
-            {formatPrice(
-              item.price * item.quantity,
-              settings.currency,
-              settings.locale,
-            )}
+            {formatPrice(item.price * item.quantity, settings)}
           </p>
         </div>
       </div>

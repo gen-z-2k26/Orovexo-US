@@ -42,8 +42,11 @@ function contrastForeground(hex: string): string {
 
 function fontStack(font: string, fallback: string): string {
   const normalized = font.trim().toLowerCase();
-  if (normalized.includes("bricolage") || normalized.includes("fraunces")) {
-    return "var(--font-display), ui-sans-serif, system-ui, sans-serif";
+  if (normalized.includes("varela")) {
+    return "var(--font-varela), ui-sans-serif, system-ui, sans-serif";
+  }
+  if (normalized.includes("fraunces") || normalized.includes("bricolage")) {
+    return "var(--font-display), ui-serif, Georgia, serif";
   }
   if (
     normalized.includes("dm sans") ||

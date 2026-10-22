@@ -36,18 +36,18 @@ export function SectionHeader({
         )}
       >
         {eyebrow ? (
-          <p className="text-sm font-medium tracking-wide text-primary">
+          <p className="text-base tracking-wide text-primary">
             {eyebrow}
           </p>
         ) : null}
         <h2
           id={titleId}
-          className="font-display text-balance text-[length:var(--text-3xl)] font-semibold leading-tight tracking-tight sm:text-[length:var(--text-4xl)]"
+          className="font-display text-balance text-3xl leading-tight tracking-tight sm:text-4xl"
         >
           {title}
         </h2>
         {subtitle ? (
-          <p className="text-pretty text-[length:var(--text-base)] leading-relaxed text-muted-foreground sm:text-[length:var(--text-lg)]">
+          <p className="text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
             {subtitle}
           </p>
         ) : null}

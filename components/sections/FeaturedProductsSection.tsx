@@ -27,7 +27,7 @@ export function FeaturedProductsSection({
         <SectionHeader
           eyebrow="Featured"
           title="Featured products"
-          subtitle="Products marked as featured in WooCommerce."
+          subtitle="Selected products from the catalog."
           titleId="featured-heading"
           action={
             <Link
@@ -40,7 +40,7 @@ export function FeaturedProductsSection({
         />
 
         {featured.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-border px-6 py-14 text-center">
+          <div className="rounded-2xl border border-dashed border-border px-6 py-14 text-center">
             <p className="font-medium">No products yet</p>
             <p className="mt-2 text-pretty text-sm text-muted-foreground">
               Mark products as featured in WooCommerce, or publish products in

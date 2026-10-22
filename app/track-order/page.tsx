@@ -15,7 +15,7 @@ export default function TrackOrderPage() {
       )}
     >
       <p className="text-sm font-medium text-primary">Track order</p>
-      <h1 className="mt-3 font-display text-balance text-4xl font-semibold sm:text-5xl">
+      <h1 className="mt-3 font-display text-balance text-4xl sm:text-5xl">
         Coming soon
       </h1>
       <p className="mt-4 max-w-md text-pretty text-muted-foreground">

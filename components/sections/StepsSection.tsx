@@ -44,10 +44,10 @@ export function StepsSection() {
           {steps.map((item, index) => (
             <Reveal key={item.title} delay={index * 0.06} as="li">
               <div className="surface-card h-full space-y-4 p-6">
-                <p className="font-display text-3xl font-semibold text-primary/80">
+                <p className="font-display text-3xl text-primary/80">
                   {item.number}
                 </p>
-                <h3 className="text-lg font-semibold">{item.title}</h3>
+                <h3 className="text-lg tracking-tight">{item.title}</h3>
                 <p className="text-sm leading-relaxed text-muted-foreground">
                   {item.text}
                 </p>

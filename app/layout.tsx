@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Bricolage_Grotesque, DM_Sans } from "next/font/google";
+import { Fraunces, Varela_Round } from "next/font/google";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CartDrawer } from "@/components/CartDrawer";
@@ -13,14 +13,16 @@ import { getThemeStyle } from "@/lib/theme";
 import { themeInitScript } from "@/lib/theme-script";
 import "./globals.css";
 
-const dmSans = DM_Sans({
+const varela = Varela_Round({
+  weight: "400",
   subsets: ["latin"],
-  variable: "--font-sans",
+  variable: "--font-varela",
   display: "swap",
 });
 
-const bricolage = Bricolage_Grotesque({
+const fraunces = Fraunces({
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
   variable: "--font-display",
   display: "swap",
 });
@@ -138,7 +140,7 @@ export default async function RootLayout({
   return (
     <html
       lang={settings.locale.startsWith("nl") ? "nl" : "en"}
-      className={`${dmSans.variable} ${bricolage.variable} antialiased`}
+      className={`${varela.variable} ${fraunces.variable} antialiased`}
       style={getThemeStyle(settings)}
       data-store={settings.id}
       data-motion={settings.theme.motion}

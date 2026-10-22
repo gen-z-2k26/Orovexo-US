@@ -1,12 +1,20 @@
 import site from "@/data/site.json";
-import { isWooConfigured, wooGet, wooPost } from "@/lib/api/client";
+import {
+  getWooOrigin,
+  isWooConfigured,
+  wooGet,
+  wooPost,
+} from "@/lib/api/client";
 import { softWooCall, withWooErrorHandling } from "@/lib/api/errors";
 import {
   mapWooCategory,
   mapWooProduct,
   type WooProduct,
 } from "@/lib/api/map-product";
-import { mergeWooStoreIdentity } from "@/lib/api/map-woo-store";
+import {
+  mergeWooStoreIdentity,
+  type WooStoreMoney,
+} from "@/lib/api/map-woo-store";
 import type {
   Category,
   CheckoutPayload,
@@ -120,10 +128,25 @@ async function fetchWpSiteInfo(): Promise<{
   }
 }
 
+async function fetchStoreMoney(): Promise<WooStoreMoney | null> {
+  const origin = getWooOrigin();
+  if (!origin) return null;
+  try {
+    const response = await fetch(`${origin}/wp-json/wc/store/v1/cart`, {
+      next: { revalidate: REVALIDATE_SECONDS, tags: ["woo-money"] },
+      headers: { Accept: "application/json" },
+    });
+    if (!response.ok) return null;
+    const data = (await response.json()) as { totals?: WooStoreMoney };
+    return data.totals ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Design tokens and UI chrome come from Next (data/site.json).
- * Currency (and site URL when present) can be overlaid from WooCommerce.
- * Name, tagline, hero, footer, and contact stay in the design file.
+ * Currency, symbol, and catalog identity overlay from WooCommerce.
  */
 export async function getSiteSettings(): Promise<StoreSettings> {
   if (!isWooConfigured()) {
@@ -131,7 +154,7 @@ export async function getSiteSettings(): Promise<StoreSettings> {
   }
 
   try {
-    const [siteInfo, general] = await Promise.all([
+    const [siteInfo, general, storeMoney] = await Promise.all([
       fetchWpSiteInfo(),
       cachedSoftWooCall(
         "settings/general",
@@ -140,11 +163,13 @@ export async function getSiteSettings(): Promise<StoreSettings> {
         [],
         "settings/general",
       ),
+      fetchStoreMoney(),
     ]);
 
     return mergeWooStoreIdentity(designSettings, {
       generalSettings: general,
       siteInfo,
+      storeMoney,
     });
   } catch (error) {
     console.warn("[storefront] store identity fetch failed:", error);

@@ -20,7 +20,7 @@ export function PaymentStep({ amount, currency, onSuccess }: PaymentStepProps) {
         <p className="text-pretty text-sm text-muted-foreground">
           For {settings.name}, confirm a mock payment of{" "}
           <span className="tabular-nums">
-            {formatPrice(amount, currency, settings.locale)}
+            {formatPrice(amount, settings)}
           </span>
           .
         </p>

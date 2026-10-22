@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 export function ProductGrid({ products }: { products: Product[] }) {
   if (!products.length) {
     return (
-      <div className="rounded-3xl border border-dashed border-border px-6 py-16 text-center">
+      <div className="rounded-2xl border border-dashed border-border px-6 py-16 text-center">
         <p className="font-medium">No products found</p>
         <p className="mt-2 text-pretty text-sm text-muted-foreground">
           Try another category or sort option, or clear your search. New
@@ -17,7 +17,7 @@ export function ProductGrid({ products }: { products: Product[] }) {
           href="/products"
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "mt-5 rounded-2xl",
+            "mt-5",
           )}
         >
           Clear filters

@@ -200,12 +200,7 @@ export function CheckoutModal({
                 ) : null}
               </div>
 
-              <OrderSummary
-                items={items}
-                currency={settings.currency}
-                locale={settings.locale}
-                amount={amount}
-              />
+              <OrderSummary items={items} amount={amount} />
 
               {errors.form ? (
                 <p className="text-sm text-destructive">{errors.form}</p>
@@ -224,12 +219,7 @@ export function CheckoutModal({
 
           {step === "payment" ? (
             <div className="space-y-5">
-              <OrderSummary
-                items={items}
-                currency={settings.currency}
-                locale={settings.locale}
-                amount={amount}
-              />
+              <OrderSummary items={items} amount={amount} />
               {submitting ? (
                 <p className="rounded-2xl border border-border bg-muted/40 px-4 py-5 text-sm text-muted-foreground">
                   Placing order...
@@ -284,12 +274,7 @@ export function CheckoutModal({
                 </div>
               </div>
 
-              <OrderSummary
-                items={order.items}
-                currency={order.currency}
-                locale={settings.locale}
-                amount={order.total}
-              />
+              <OrderSummary items={order.items} amount={order.total} />
 
               <Button
                 type="button"
@@ -312,15 +297,12 @@ export function CheckoutModal({
 
 function OrderSummary({
   items,
-  currency,
-  locale,
   amount,
 }: {
   items: CartItem[] | { name: string; quantity: number; price: number; image?: string }[];
-  currency: string;
-  locale: string;
   amount: number;
 }) {
+  const { settings } = useStore();
   return (
     <div className="space-y-4 rounded-3xl border border-border bg-muted/30 p-4 sm:p-5">
       <div className="flex items-center justify-between gap-3">
@@ -349,7 +331,7 @@ function OrderSummary({
               </p>
             </div>
             <span className="shrink-0 text-sm font-medium tabular-nums">
-              {formatPrice(item.price * item.quantity, currency, locale)}
+              {formatPrice(item.price * item.quantity, settings)}
             </span>
           </li>
         ))}
@@ -357,7 +339,7 @@ function OrderSummary({
       <div className="flex items-center justify-between border-t border-border pt-3 text-sm font-semibold">
         <span>Total</span>
         <span className="tabular-nums">
-          {formatPrice(amount, currency, locale)}
+          {formatPrice(amount, settings)}
         </span>
       </div>
     </div>

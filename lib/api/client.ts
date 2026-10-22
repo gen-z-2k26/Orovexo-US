@@ -15,6 +15,12 @@ export function isWooConfigured() {
   );
 }
 
+export function getWooOrigin() {
+  const raw = process.env.WC_URL?.trim();
+  if (!raw) return null;
+  return raw.replace(/\/$/, "").replace(/^http:\/\//i, "https://");
+}
+
 function requireEnv(name: "WC_URL" | "WC_CONSUMER_KEY" | "WC_CONSUMER_SECRET") {
   const value = process.env[name]?.trim();
   if (!value) {

@@ -38,8 +38,8 @@ export function QuantityPicker({
   return (
     <div
       className={cn(
-        "inline-flex items-center rounded-2xl border border-border bg-background",
-        size === "sm" ? "h-8 px-0.5" : "h-12 px-1.5",
+        "inline-flex items-center rounded-xl border border-border bg-background",
+        size === "sm" ? "h-8 px-0.5" : "h-11 px-1.5",
         className,
       )}
     >
@@ -60,7 +60,7 @@ export function QuantityPicker({
         aria-live="polite"
         aria-atomic="true"
         className={cn(
-          "text-center font-semibold tabular-nums",
+          "text-center tabular-nums",
           size === "sm" ? "w-7 text-xs" : "w-8 text-sm",
         )}
       >

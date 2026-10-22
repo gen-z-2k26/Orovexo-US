@@ -25,7 +25,7 @@ export function TrustStripSection() {
                     aria-hidden
                   />
                   <div className="min-w-0 space-y-0.5">
-                    <p className="text-base font-semibold">{item.title}</p>
+                    <p className="text-base tracking-tight">{item.title}</p>
                     <p className="text-sm text-muted-foreground">{item.text}</p>
                   </div>
                 </div>

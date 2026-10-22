@@ -44,7 +44,7 @@ export function Header() {
   }, [badgeBump, enabled]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/80 bg-background/85 backdrop-blur-xl supports-backdrop-filter:bg-background/75">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-xl supports-backdrop-filter:bg-background/75">
       <PromoBanner />
 
       <div className={pageContainer("flex h-16 items-center gap-3 lg:gap-8")}>
@@ -52,7 +52,7 @@ export function Header() {
           type="button"
           variant="ghost"
           size="icon"
-          className="size-10 rounded-2xl lg:hidden"
+          className="lg:hidden"
           aria-label={menuOpen ? "Close menu" : "Open menu"}
           onClick={() => setMenuOpen((open) => !open)}
         >
@@ -61,20 +61,20 @@ export function Header() {
 
         <Link
           href="/"
-          className="inline-flex items-center gap-2 rounded-2xl font-display text-xl font-bold tracking-tight transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-2xl"
+          className="inline-flex items-center gap-2 rounded-xl text-xl tracking-tight transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-2xl"
         >
-          <span>Jansen</span>
+          <span>{settings.name}</span>
         </Link>
 
         <nav
           aria-label="Main navigation"
-          className="hidden items-center gap-1 text-sm font-medium lg:flex"
+          className="hidden items-center gap-0.5 text-sm lg:flex"
         >
           {navLinks.map((link) => (
             <Link
               key={`${link.href}-${link.label}`}
               href={link.href}
-              className="rounded-xl px-3.5 py-2 text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground"
+              className="rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground"
             >
               {link.label}
             </Link>
@@ -87,7 +87,7 @@ export function Header() {
         >
           <Suspense
             fallback={
-              <div className="size-10 rounded-2xl border border-border bg-background" />
+              <div className="size-10 rounded-xl border border-border bg-background" />
             }
           >
             <SearchBar />
@@ -99,7 +99,7 @@ export function Header() {
             type="button"
             variant="outline"
             size="icon"
-            className="relative size-10 rounded-2xl"
+            className="relative"
             aria-label={`Open cart${count ? `, ${count} items` : ""}`}
             onClick={openCart}
           >
@@ -107,7 +107,7 @@ export function Header() {
             {count > 0 ? (
               <Badge
                 className={cn(
-                  "absolute -top-1.5 -right-1.5 flex size-5 items-center justify-center rounded-full bg-primary px-0 text-[10px] font-bold text-primary-foreground tabular-nums shadow-xs",
+                  "absolute -top-1.5 -right-1.5 flex size-5 items-center justify-center rounded-full bg-primary px-0 text-[10px] text-primary-foreground tabular-nums shadow-xs",
                   enabled && "transition-transform duration-150",
                   bump && "scale-125",
                 )}
@@ -123,7 +123,7 @@ export function Header() {
         <div className="border-t border-border bg-card/95 px-4 py-4 backdrop-blur-lg sm:px-6 lg:hidden lg:px-8">
           <nav
             aria-label="Mobile"
-            className="flex flex-col gap-1 text-base font-medium"
+            className="flex flex-col gap-1 text-sm"
           >
             {navLinks.map((item) => (
               <Link
