@@ -29,13 +29,13 @@ export function CategoriesSection({
       <div className={pageContainer(sectionStackClass)}>
         <SectionHeader
           eyebrow="Catalog"
-          title="For every room and workday"
-          subtitle="Categories from your WooCommerce store, with real products and counts."
+          title="Categories"
+          subtitle="Browse the categories from the store."
           titleId="categories-heading"
         />
 
         {resolved.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-border px-6 py-14 text-center">
+          <div className="rounded-2xl border border-dashed border-border px-6 py-14 text-center">
             <p className="font-medium">No categories yet</p>
             <p className="mt-2 text-pretty text-sm text-muted-foreground">
               Add categories and products in WooCommerce admin to show them
@@ -62,7 +62,7 @@ export function CategoriesSection({
                   href={`/collection/${category.slug}`}
                   aria-label={`Shop ${category.name}, ${category.count} products`}
                   className={cn(
-                    "group relative flex h-full min-h-64 flex-col justify-end overflow-hidden rounded-[calc(var(--radius)*1.8)] border border-border bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                    "group relative flex h-full min-h-64 flex-col justify-end overflow-hidden rounded-2xl border border-border bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                     enabled && hoverLiftClass,
                   )}
                 >
@@ -78,7 +78,7 @@ export function CategoriesSection({
                     <span className="text-xs tabular-nums text-white/75">
                       {category.count} product{category.count === 1 ? "" : "s"}
                     </span>
-                    <span className="font-display text-xl font-semibold text-balance text-white sm:text-2xl">
+                    <span className="font-display text-xl text-balance text-white sm:text-2xl">
                       {category.name}
                     </span>
                     {category.description ? (

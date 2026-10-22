@@ -62,13 +62,19 @@ export interface SiteSeo {
   siteUrl: string;
 }
 
-/** Design chrome from site.json; Woo may overlay currency when available. */
+/** Design chrome from site.json; money and catalog identity come from Woo. */
 export interface StoreSettings {
   id: string;
   name: string;
   tagline: string;
   logo: string;
   currency: string;
+  currencySymbol: string;
+  currencyPrefix: string;
+  currencySuffix: string;
+  priceDecimals: number;
+  thousandSeparator: string;
+  decimalSeparator: string;
   locale: string;
   contact: {
     email: string;

@@ -16,6 +16,7 @@ import { useCartStore } from "@/lib/cart-store";
 import { useStore } from "@/lib/store-context";
 import { formatPrice } from "@/lib/format";
 import type { Product } from "@/lib/types";
+import { ProductStatusBadges } from "@/components/ProductStatusBadges";
 import { cn } from "@/lib/utils";
 
 export function QuickViewModal({
@@ -63,14 +64,14 @@ export function QuickViewModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="max-h-[92dvh] overflow-hidden rounded-3xl border-0 bg-transparent p-0 shadow-xl sm:max-w-5xl"
+        className="max-h-[92dvh] overflow-hidden rounded-2xl border-0 bg-transparent p-0 shadow-lg sm:max-w-5xl"
       >
         <DialogTitle className="sr-only">{active.name}</DialogTitle>
         <DialogDescription className="sr-only">
           Quick view for {active.name}
         </DialogDescription>
 
-        <div className="grid overflow-hidden rounded-3xl bg-muted text-foreground md:grid-cols-2">
+        <div className="grid overflow-hidden rounded-2xl bg-muted text-foreground md:grid-cols-2">
           <div className="relative min-h-72 overflow-hidden md:min-h-[34rem]">
             <ProductImageCarousel
               images={active.images}
@@ -96,12 +97,13 @@ export function QuickViewModal({
             </div>
 
             <div className="space-y-3">
-              <h2 className="text-balance text-2xl font-semibold leading-tight sm:text-3xl">
+              <h2 className="text-balance text-2xl leading-tight tracking-tight sm:text-3xl">
                 {active.name}
               </h2>
-              <p className="text-xl font-semibold tabular-nums">
-                {formatPrice(active.price, settings.currency, settings.locale)}
+              <p className="text-xl tabular-nums tracking-tight">
+                {formatPrice(active.price, settings)}
               </p>
+              <ProductStatusBadges product={active} />
               <p className="text-pretty text-sm leading-relaxed text-muted-foreground">
                 {active.description}
               </p>
@@ -117,9 +119,10 @@ export function QuickViewModal({
 
                 <Button
                   type="button"
+                  size="lg"
                   disabled={!active.inStock}
                   onClick={handleAdd}
-                  className="h-12 flex-1 rounded-2xl text-sm font-semibold"
+                  className="flex-1"
                 >
                   <ShoppingBag className="size-4" />
                   {added ? "Added" : active.inStock ? "Add to cart" : "Unavailable"}
@@ -133,7 +136,7 @@ export function QuickViewModal({
                   aria-pressed={wishlisted}
                   onClick={() => setWishlisted((value) => !value)}
                   className={cn(
-                    "inline-flex size-12 items-center justify-center rounded-2xl border border-border bg-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                    "inline-flex size-11 items-center justify-center rounded-xl border border-border bg-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                     wishlisted
                       ? "text-destructive"
                       : "text-foreground hover:bg-muted",
@@ -148,7 +151,7 @@ export function QuickViewModal({
                 onClick={() => onOpenChange(false)}
                 className={cn(
                   buttonVariants({ variant: "outline" }),
-                  "h-12 w-full rounded-2xl text-sm font-semibold",
+                  "h-12 w-full",
                 )}
               >
                 See detail

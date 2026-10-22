@@ -3,7 +3,13 @@
   "name": "Jansen Home",
   "tagline": "Demo storefront for everyday living",
   "logo": "/stores/jansen-home-logo.svg",
-  "currency": "EUR",
+  "currency": "",
+  "currencySymbol": "",
+  "currencyPrefix": "",
+  "currencySuffix": "",
+  "priceDecimals": 2,
+  "thousandSeparator": ",",
+  "decimalSeparator": ".",
   "locale": "en-US",
   "contact": {
     "email": "hello@demo.jansenhome.store",
@@ -65,30 +71,30 @@
     "siteUrl": ""
   },
   "theme": {
-    "font": "DM Sans",
-    "fontDisplay": "Bricolage Grotesque",
-    "radius": "0.85rem",
+    "font": "Varela Round",
+    "fontDisplay": "Fraunces",
+    "radius": "0.75rem",
     "defaultMode": "system",
     "motion": "subtle",
     "light": {
       "primary": "#8EC8EA",
-      "accent": "#B7D9F2",
-      "background": "#FFFFFF",
-      "foreground": "#0A0A0A",
+      "accent": "#D4B896",
+      "background": "#F6F3EE",
+      "foreground": "#1A1816",
       "card": "#FFFFFF",
-      "muted": "#EEF6FB",
-      "mutedForeground": "#4B5563",
-      "border": "rgba(10, 10, 10, 0.12)"
+      "muted": "#EFE8E0",
+      "mutedForeground": "#6B6560",
+      "border": "rgba(26, 24, 22, 0.10)"
     },
     "dark": {
       "primary": "#8EC8EA",
-      "accent": "#B7D9F2",
-      "background": "#000000",
-      "foreground": "#FFFFFF",
-      "card": "#111111",
-      "muted": "#1A1F24",
-      "mutedForeground": "#A8B0B8",
-      "border": "rgba(255, 255, 255, 0.14)"
+      "accent": "#D4B896",
+      "background": "#0E0D0C",
+      "foreground": "#F6F3EE",
+      "card": "#161412",
+      "muted": "#221F1C",
+      "mutedForeground": "#A8A29C",
+      "border": "rgba(246, 243, 238, 0.12)"
     }
   }
 }

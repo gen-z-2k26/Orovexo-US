@@ -15,16 +15,16 @@ export function ProductGridSkeleton({
         {Array.from({ length: count }).map((_, index) => (
           <div
             key={index}
-            className="flex flex-col rounded-[22px] border border-border/80 bg-card p-2.5"
+            className="flex flex-col rounded-2xl border border-border bg-card p-2.5 shadow-sm"
           >
-            <Skeleton className="aspect-[16/11] w-full rounded-2xl" />
+            <Skeleton className="aspect-[16/11] w-full rounded-xl" />
             <div className="space-y-2.5 px-1.5 pt-3 pb-1">
               <div className="flex items-center justify-between">
                 <Skeleton className="h-3 w-20 rounded-full" />
                 <Skeleton className="h-3 w-14 rounded-full" />
               </div>
               <Skeleton className="h-5 w-3/4 rounded-md" />
-              <div className="flex items-center justify-between border-t border-border/60 pt-2.5">
+              <div className="flex items-center justify-between border-t border-border pt-2.5">
                 <Skeleton className="h-5 w-16 rounded-md" />
                 <Skeleton className="h-8 w-24 rounded-xl" />
               </div>

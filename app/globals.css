@@ -10,10 +10,21 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-heading: var(--font-heading);
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: clamp(1.75rem, 1.4rem + 1.2vw, 2.25rem);
+  --text-4xl: clamp(2.125rem, 1.6rem + 1.8vw, 2.75rem);
+  --text-5xl: clamp(2.5rem, 1.8rem + 2.6vw, 3.5rem);
+  --text-6xl: clamp(3rem, 2rem + 3.4vw, 4.25rem);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-success: var(--success);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -26,12 +37,15 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --shadow-sm: var(--elevation-sm);
+  --shadow-md: var(--elevation-md);
+  --shadow-lg: var(--elevation-lg);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-xl: calc(var(--radius) * 1.15);
+  --radius-2xl: calc(var(--radius) * 1.5);
+  --radius-3xl: calc(var(--radius) * 2);
 }
 
 /*
@@ -58,30 +72,19 @@
   --input: var(--light-input, rgba(10, 10, 10, 0.12));
   --ring: var(--light-ring, #8ec8ea);
   --destructive: #c2410c;
+  --success: #3f7a5a;
 
   /* Layout */
-  --content-width: 72rem;
+  --content-width: 80rem;
   --content-narrow: 42rem;
-  --page-gutter: clamp(1rem, 3vw, 2rem);
-  --section-y: clamp(3.5rem, 6vw, 5.5rem);
+  --page-gutter: clamp(1.25rem, 4vw, 2.5rem);
+  --section-y: clamp(3.75rem, 6.5vw, 6rem);
   --section-gap: clamp(1.75rem, 3vw, 2.5rem);
 
-  /* Fluid type scale — larger base for retail readability */
-  --text-xs: clamp(0.8125rem, 0.78rem + 0.18vw, 0.875rem);
-  --text-sm: clamp(0.9375rem, 0.9rem + 0.2vw, 1rem);
-  --text-base: clamp(1.0625rem, 1.02rem + 0.22vw, 1.125rem);
-  --text-lg: clamp(1.1875rem, 1.1rem + 0.4vw, 1.375rem);
-  --text-xl: clamp(1.375rem, 1.2rem + 0.65vw, 1.625rem);
-  --text-2xl: clamp(1.625rem, 1.4rem + 1vw, 2rem);
-  --text-3xl: clamp(2rem, 1.6rem + 1.5vw, 2.75rem);
-  --text-4xl: clamp(2.5rem, 1.85rem + 2.2vw, 3.5rem);
-  --text-5xl: clamp(3rem, 2.15rem + 3vw, 4.5rem);
-  --text-6xl: clamp(3.5rem, 2.4rem + 3.8vw, 5.5rem);
-
   /* Elevation */
-  --shadow-sm: 0 1px 2px rgba(10, 10, 10, 0.06);
-  --shadow-md: 0 10px 30px rgba(10, 10, 10, 0.08);
-  --shadow-lg: 0 24px 60px rgba(10, 10, 10, 0.12);
+  --elevation-sm: 0 1px 2px rgba(26, 24, 22, 0.05);
+  --elevation-md: 0 12px 28px rgba(26, 24, 22, 0.08);
+  --elevation-lg: 0 24px 48px rgba(26, 24, 22, 0.12);
 
   /* Media */
   --media-hero: 16 / 10;
@@ -110,10 +113,11 @@
   --input: var(--dark-input, rgba(255, 255, 255, 0.14));
   --ring: var(--dark-ring, #8ec8ea);
   --destructive: #f87171;
+  --success: #7dba96;
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.45);
-  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.55);
+  --elevation-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --elevation-md: 0 12px 28px rgba(0, 0, 0, 0.45);
+  --elevation-lg: 0 24px 48px rgba(0, 0, 0, 0.55);
 }
 
 @layer base {
@@ -127,12 +131,14 @@
   body {
     @apply bg-background text-foreground;
     font-size: var(--text-base);
-    line-height: 1.6;
+    line-height: 1.65;
+    letter-spacing: 0.01em;
     text-rendering: optimizeLegibility;
   }
 
   html {
     @apply font-sans;
+    font-size: 100%;
     scroll-behavior: auto;
   }
 
@@ -147,11 +153,18 @@
 
   h1,
   h2,
-  h3,
+  h3 {
+    font-family: var(--font-sans);
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    font-weight: 400;
+  }
+
   .font-display {
     font-family: var(--font-heading);
     letter-spacing: -0.02em;
-    line-height: 1.15;
+    line-height: 1.12;
+    font-weight: 500;
   }
 
   :focus-visible {
@@ -167,9 +180,11 @@
 
 @layer utilities {
   .text-display {
+    font-family: var(--font-heading);
     font-size: var(--text-5xl);
-    font-weight: 600;
-    line-height: 1.05;
+    font-weight: 500;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
   }
 
   .text-lead {
@@ -180,8 +195,8 @@
   .surface-card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: calc(var(--radius) * 1.6);
-    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--elevation-sm);
   }
 
   .marquee-track {
@@ -211,14 +226,17 @@
   }
 
   .motion-safe-only,
-  .marquee-track {
+  .marquee-track,
+  .group:hover,
+  [class*="transition"] {
     animation: none !important;
     transition: none !important;
   }
 }
 
 html[data-motion="none"] .motion-safe-only,
-html[data-motion="none"] .marquee-track {
+html[data-motion="none"] .marquee-track,
+html[data-motion="none"] [class*="transition"] {
   animation: none !important;
   transition: none !important;
 }
@@ -262,7 +280,7 @@ html[data-search-transition]::view-transition-new(root) {
 ::view-transition-new(header-search) {
   height: 100%;
   overflow: clip;
-  border-radius: 1rem;
+  border-radius: var(--radius-xl);
 }
 
 @keyframes theme-circle-reveal {

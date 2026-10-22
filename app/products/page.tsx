@@ -53,7 +53,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         <p className="text-sm font-medium text-primary">
           {settings.name} · Shop
         </p>
-        <h1 className="font-display text-balance text-4xl font-semibold sm:text-5xl">
+        <h1 className="font-display text-balance text-4xl sm:text-5xl">
           All products
         </h1>
         <p className="max-w-2xl text-pretty text-muted-foreground">

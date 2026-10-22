@@ -17,7 +17,7 @@ export function NewsletterSection({ settings }: { settings: StoreSettings }) {
           <div className="space-y-3">
             <h2
               id="newsletter-heading"
-              className="font-display text-balance text-[length:var(--text-3xl)] font-semibold sm:text-[length:var(--text-4xl)]"
+              className="font-display text-balance text-3xl sm:text-4xl"
             >
               Stay in the loop
             </h2>
@@ -35,10 +35,10 @@ export function NewsletterSection({ settings }: { settings: StoreSettings }) {
               name="body"
               required
               placeholder="Your email address"
-              className="h-12 rounded-2xl"
+              className="h-12"
               aria-label="Email address for newsletter"
             />
-            <Button type="submit" size="lg" className="h-12 rounded-2xl sm:px-6">
+            <Button type="submit" size="lg" className="sm:px-6">
               Subscribe
             </Button>
           </form>

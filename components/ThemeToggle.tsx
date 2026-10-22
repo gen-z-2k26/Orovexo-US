@@ -22,7 +22,6 @@ export function ThemeToggle() {
       variant="outline"
       size="icon"
       data-theme-toggle="true"
-      className="size-10 rounded-2xl"
       aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
       onClick={handleClick}
     >

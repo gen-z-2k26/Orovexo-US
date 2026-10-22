@@ -35,7 +35,7 @@ export function StoreLoader({
 
       {label ? (
         <div className="space-y-1">
-          <p className="font-display text-sm font-semibold tracking-tight text-foreground">
+          <p className="text-sm tracking-tight text-foreground">
             {label}
           </p>
           <p className="text-xs text-muted-foreground">

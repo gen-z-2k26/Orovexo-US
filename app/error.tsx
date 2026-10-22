@@ -35,18 +35,17 @@ export default function ErrorPage({
       )}
     >
       <p className="text-sm font-medium text-primary">Something went wrong</p>
-      <h1 className="font-display text-balance text-3xl font-semibold sm:text-4xl">
+      <h1 className="font-display text-balance text-3xl sm:text-4xl">
         Please try again
       </h1>
       <p className="max-w-md text-pretty text-muted-foreground">{message}</p>
       <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
-        <Button type="button" className="rounded-2xl" onClick={reset}>
+        <Button type="button" onClick={reset}>
           Try again
         </Button>
         <Button
           type="button"
           variant="outline"
-          className="rounded-2xl"
           onClick={() => {
             window.location.href = "/";
           }}

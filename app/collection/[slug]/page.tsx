@@ -29,7 +29,7 @@ export async function generateMetadata({
 
   if (!category) {
     return {
-      title: "Collectie niet gevonden",
+      title: "Category not found",
       robots: {
         index: false,
         follow: false,
@@ -39,7 +39,7 @@ export async function generateMetadata({
 
   const description =
     category.description ||
-    `Shop ${category.name} bij ${settings.name}.`;
+    `Shop ${category.name} at ${settings.name}.`;
 
   return {
     title: category.name,
@@ -131,7 +131,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
           <p className="text-sm font-medium text-primary">
             Home / Shop / {category.name}
           </p>
-          <h1 className="font-display text-balance text-4xl font-semibold sm:text-5xl">
+          <h1 className="font-display text-balance text-4xl sm:text-5xl">
             {category.name}
           </h1>
           <p className="max-w-2xl text-pretty text-muted-foreground">

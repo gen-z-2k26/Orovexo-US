@@ -7,6 +7,7 @@ import { StorySection } from "@/components/sections/StorySection";
 import { StepsSection } from "@/components/sections/StepsSection";
 import { TrustSection } from "@/components/sections/TrustSection";
 import { NewsletterSection } from "@/components/sections/NewsletterSection";
+import { CatalogRailSection } from "@/components/sections/CatalogRailSection";
 
 /**
  * Homepage layout is owned by Next.js (design system).
@@ -24,6 +25,7 @@ export function HomeSections({
   return (
     <div>
       <HeroSection settings={settings} />
+      <CatalogRailSection categories={categories} products={products} />
       <TrustStripSection />
       <CategoriesSection settings={settings} categories={categories} />
       <FeaturedProductsSection products={products} />

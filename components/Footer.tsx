@@ -25,7 +25,7 @@ export function Footer({ settings }: { settings: StoreSettings }) {
           }
         >
           <div className="space-y-5">
-            <p className="font-display text-xl font-semibold">Jansen</p>
+            <p className="text-xl tracking-tight">{settings.name}</p>
             <p className="max-w-md text-pretty text-sm leading-relaxed text-muted-foreground">
               {blurb}
             </p>
@@ -61,7 +61,7 @@ export function Footer({ settings }: { settings: StoreSettings }) {
 
           {columns.map((column) => (
             <div key={column.title} className="space-y-3">
-              <p className="text-sm font-semibold">{column.title}</p>
+              <p className="text-sm tracking-tight">{column.title}</p>
               <ul className="space-y-2.5 text-sm text-muted-foreground">
                 {column.links.map((link) => (
                   <li key={`${column.title}-${link.label}`}>

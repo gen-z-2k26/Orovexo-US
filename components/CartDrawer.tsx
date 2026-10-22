@@ -54,7 +54,7 @@ export function CartDrawer() {
                   onClick={() => setOpen(false)}
                   className={cn(
                     buttonVariants({ variant: "outline" }),
-                    "mt-5 rounded-2xl",
+                    "mt-5",
                   )}
                 >
                   Browse products
@@ -72,14 +72,17 @@ export function CartDrawer() {
           <SheetFooter className="gap-3 border-t border-border">
             <div className="flex w-full items-center justify-between text-sm">
               <span className="text-muted-foreground">Subtotal</span>
-              <span className="text-base font-semibold tabular-nums">
-                {formatPrice(subtotal, settings.currency, settings.locale)}
+              <span className="text-base tabular-nums tracking-tight">
+                {formatPrice(subtotal, settings)}
               </span>
             </div>
+            <p className="w-full text-xs text-muted-foreground">
+              {settings.footer?.trustLine ||
+                "Free shipping · 30-day returns · Secure checkout"}
+            </p>
             <Button
               type="button"
               size="lg"
-              className="rounded-2xl"
               disabled={items.length === 0}
               onClick={() => {
                 setOpen(false);
