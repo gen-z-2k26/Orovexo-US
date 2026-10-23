@@ -10,7 +10,6 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { flushSync } from "react-dom";
 import type { ColorMode } from "@/lib/types";
 import { THEME_STORAGE_KEY } from "@/lib/theme-script";
 
@@ -48,6 +47,19 @@ function applyResolved(resolved: ResolvedMode) {
   root.style.colorScheme = resolved;
 }
 
+function revealRadius(x: number, y: number) {
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  return (
+    Math.max(
+      Math.hypot(x, y),
+      Math.hypot(width - x, y),
+      Math.hypot(x, height - y),
+      Math.hypot(width - x, height - y),
+    ) + 32
+  );
+}
+
 function canUseViewTransition(): boolean {
   if (typeof document === "undefined" || typeof window === "undefined") {
     return false;
@@ -67,6 +79,7 @@ export function ThemeModeProvider({
   const [mode, setModeState] = useState<ColorMode>(defaultMode);
   const [resolved, setResolved] = useState<ResolvedMode>("light");
   const hydratedRef = useRef(false);
+  const transitioningRef = useRef(false);
 
   useEffect(() => {
     let activeMode = mode;
@@ -84,6 +97,9 @@ export function ThemeModeProvider({
     }
 
     const next = resolveMode(activeMode);
+    if (transitioningRef.current) {
+      return;
+    }
     setResolved(next);
     applyResolved(next);
 
@@ -112,29 +128,28 @@ export function ThemeModeProvider({
       }
 
       const root = document.documentElement;
+      transitioningRef.current = true;
       if (coords) {
-        const endRadius = Math.hypot(
-          Math.max(coords.x, window.innerWidth - coords.x),
-          Math.max(coords.y, window.innerHeight - coords.y),
-        );
         root.style.setProperty("--vt-x", `${coords.x}px`);
         root.style.setProperty("--vt-y", `${coords.y}px`);
-        root.style.setProperty("--vt-r", `${endRadius}px`);
+        root.style.setProperty("--vt-r", `${revealRadius(coords.x, coords.y)}px`);
         root.dataset.themeTransition = "circle";
       } else {
         root.dataset.themeTransition = "fade";
       }
 
       const transition = document.startViewTransition(() => {
-        flushSync(() => {
-          setModeState(next);
-          setResolved(nextResolved);
-          applyResolved(nextResolved);
-        });
+        applyResolved(nextResolved);
       });
+      setModeState(next);
+      setResolved(nextResolved);
 
       transition.finished.finally(() => {
+        transitioningRef.current = false;
         delete root.dataset.themeTransition;
+        root.style.removeProperty("--vt-x");
+        root.style.removeProperty("--vt-y");
+        root.style.removeProperty("--vt-r");
       });
     },
     [resolved],
