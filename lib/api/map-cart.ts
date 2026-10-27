@@ -267,8 +267,13 @@ export function mapGuestOrder(
   const billing = cart.billingAddress;
   return {
     orderId: String(raw.id ?? ""),
-    orderKey: raw.order_key || orderKey,
-    status: raw.status || "",
+    orderKey: String(raw.order_key || orderKey),
+    status:
+      typeof raw.status === "string"
+        ? raw.status
+        : raw.status
+          ? String(raw.status)
+          : "",
     paid: raw.status === "processing" || raw.status === "completed",
     email: billing.email,
     name: [billing.firstName, billing.lastName].filter(Boolean).join(" ").trim(),

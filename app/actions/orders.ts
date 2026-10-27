@@ -29,6 +29,37 @@ function rateLimited(key: string) {
   return current.count > MAX_HITS;
 }
 
+function isOrderKey(value: string) {
+  return /^wc_order_/i.test(value);
+}
+
+function isOrderNumber(value: string) {
+  return /^\d+$/.test(value);
+}
+
+/** Accepts swapped number/key fields from the track-order form. */
+function normalizeLookup(orderId: string, orderKey: string) {
+  const id = orderId.trim();
+  const key = orderKey.trim();
+  if (isOrderKey(id) && isOrderNumber(key)) {
+    return { orderId: key, orderKey: id };
+  }
+  return { orderId: id, orderKey: key };
+}
+
+function toPlainOrder(order: GuestOrder): GuestOrder {
+  return JSON.parse(JSON.stringify(order)) as GuestOrder;
+}
+
+function statusText(value: unknown) {
+  if (typeof value === "string") return value;
+  if (!value || typeof value !== "object") return "";
+  if ("status" in value && typeof (value as { status?: unknown }).status === "string") {
+    return (value as { status: string }).status;
+  }
+  return "";
+}
+
 export async function lookupGuestOrderAction(input: {
   orderId: string;
   orderKey: string;
@@ -39,15 +70,20 @@ export async function lookupGuestOrderAction(input: {
     throw new Error("Too many attempts. Please wait a minute and try again.");
   }
 
-  const orderId = input.orderId.trim();
-  const orderKey = input.orderKey.trim();
+  const { orderId, orderKey } = normalizeLookup(input.orderId, input.orderKey);
   const email = input.email.trim();
   if (!orderId || !orderKey || !email) {
     throw new Error("Order not found.");
   }
 
   try {
-    return await getGuestStoreOrder({ orderId, orderKey, email });
+    const guest = await getGuestStoreOrder({ orderId, orderKey, email });
+    return toPlainOrder({
+      ...guest,
+      orderId: String(guest.orderId),
+      orderKey: String(guest.orderKey || orderKey),
+      status: statusText(guest.status),
+    });
   } catch {
     try {
       const order = await getOrder(orderId);
@@ -59,7 +95,7 @@ export async function lookupGuestOrderAction(input: {
         throw new Error("Order not found.");
       }
       const mapped = mapWooOrder(order);
-      return {
+      const mappedGuest = {
         orderId: mapped.orderId,
         orderKey: mapped.orderKey || orderKey,
         status: mapped.status,
@@ -98,6 +134,10 @@ export async function lookupGuestOrderAction(input: {
         coupons: [],
         createdAt: mapped.createdAt,
       } satisfies GuestOrder;
+      return toPlainOrder({
+        ...mappedGuest,
+        status: statusText(mappedGuest.status),
+      });
     } catch {
       throw new Error("Order not found.");
     }

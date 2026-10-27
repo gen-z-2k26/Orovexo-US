@@ -36,7 +36,11 @@ export function TrackOrderForm() {
         description: `Order ${found.orderId} is ${found.status || "on file"}.`,
       });
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Order not found.";
+      const raw = err instanceof Error ? err.message : "";
+      const message =
+        !raw || raw.includes("Minified React error")
+          ? "Order not found. Check the order number, order key, and email."
+          : raw;
       setError(message);
       toast({ title: "Order not found", description: message, variant: "error" });
     } finally {
@@ -53,8 +57,11 @@ export function TrackOrderForm() {
             id="track-id"
             value={orderId}
             onChange={(event) => setOrderId(event.target.value)}
+            placeholder="124"
+            autoComplete="off"
             required
           />
+          <p className="text-xs text-muted-foreground">WooCommerce order number, like 124.</p>
         </div>
         <div className="space-y-2">
           <Label htmlFor="track-key">Order key</Label>
@@ -62,8 +69,13 @@ export function TrackOrderForm() {
             id="track-key"
             value={orderKey}
             onChange={(event) => setOrderKey(event.target.value)}
+            placeholder="wc_order_..."
+            autoComplete="off"
             required
           />
+          <p className="text-xs text-muted-foreground">
+            Starts with wc_order_, from the confirmation email or URL.
+          </p>
         </div>
         <div className="space-y-2">
           <Label htmlFor="track-email">Billing email</Label>
@@ -83,9 +95,9 @@ export function TrackOrderForm() {
 
       {order ? (
         <div className="space-y-3 rounded-2xl border border-border bg-card p-5 text-left">
-          <p className="font-medium">Order {order.orderId}</p>
+          <p className="font-medium">Order {String(order.orderId)}</p>
           <p className="text-sm text-muted-foreground">
-            {order.status}
+            {typeof order.status === "string" ? order.status : "Order"}
             {order.paid ? " · Paid" : ""}
           </p>
           <ul className="space-y-2 text-sm">
