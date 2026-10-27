@@ -21,6 +21,25 @@ const ZERO_DECIMAL = new Set([
 
 let stripe: Stripe | null = null;
 
+function envYes(value: string | undefined) {
+  const normalized = value?.trim().toLowerCase();
+  return normalized === "yes" || normalized === "true" || normalized === "1";
+}
+
+/** Local-only. Skips Stripe charge; Woo order is still created and set paid. */
+export function isMockPaymentEnabled() {
+  if (process.env.NODE_ENV === "production") return false;
+  return envYes(process.env.SKIP_STRIPE_PAYMENT);
+}
+
+export function mockPaymentIntentId(orderId: string) {
+  return `dev_mock_${orderId.trim()}`;
+}
+
+export function isMockPaymentIntentId(id: string) {
+  return id.startsWith("dev_mock_");
+}
+
 export function isStripeConfigured() {
   return Boolean(process.env.STRIPE_SECRET_KEY?.trim());
 }

@@ -5,7 +5,30 @@ import axios, {
 } from "axios";
 import { toWooCommerceApiError, WooCommerceApiError } from "@/lib/api/errors";
 
-const TIMEOUT_MS = 25_000;
+export const WOO_TIMEOUT_MS = 6_000;
+const WOO_DOWN_MS = 45_000;
+
+let wooDownUntil = 0;
+
+export function isWooUnreachable() {
+  return Date.now() < wooDownUntil;
+}
+
+export function markWooUnreachable() {
+  wooDownUntil = Date.now() + WOO_DOWN_MS;
+}
+
+export function markWooReachable() {
+  wooDownUntil = 0;
+}
+
+function throwIfWooDown() {
+  if (!isWooUnreachable()) return;
+  throw new WooCommerceApiError(
+    "The store server is unreachable right now. Please try again shortly.",
+    { code: "ECONNABORTED" },
+  );
+}
 
 export function isWooConfigured() {
   return Boolean(
@@ -90,7 +113,7 @@ export function getWooClient(): AxiosInstance {
 
   const client = axios.create({
     baseURL,
-    timeout: TIMEOUT_MS,
+    timeout: WOO_TIMEOUT_MS,
     auth: {
       username: consumerKey,
       password: consumerSecret,
@@ -107,11 +130,23 @@ export function getWooClient(): AxiosInstance {
 
   client.interceptors.response.use(
     (response) => {
+      markWooReachable();
       assertJsonPayload(response);
       return response;
     },
     (error) => {
-      throw toWooCommerceApiError(error);
+      const mapped = toWooCommerceApiError(error);
+      if (
+        mapped.code === "ETIMEDOUT" ||
+        mapped.code === "ECONNABORTED" ||
+        mapped.code === "ENETUNREACH" ||
+        mapped.code === "ECONNREFUSED" ||
+        mapped.code === "ENOTFOUND" ||
+        mapped.code === "ERR_NETWORK"
+      ) {
+        markWooUnreachable();
+      }
+      throw mapped;
     },
   );
 
@@ -150,6 +185,7 @@ export async function wooGet<T>(
       { code: "missing_env" },
     );
   }
+  throwIfWooDown();
 
   const response = await getWooClient().get<T>(path.replace(/^\//, ""), {
     ...config,
@@ -170,6 +206,7 @@ export async function wooPost<T>(
       { code: "missing_env" },
     );
   }
+  throwIfWooDown();
 
   const response = await getWooClient().post<T>(
     path.replace(/^\//, ""),
@@ -191,6 +228,7 @@ export async function wooPut<T>(
       { code: "missing_env" },
     );
   }
+  throwIfWooDown();
 
   const response = await getWooClient().put<T>(
     path.replace(/^\//, ""),

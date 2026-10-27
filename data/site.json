@@ -19,7 +19,9 @@
     "legalName": "Jansen Home Demo LLC",
     "vatNumber": "DEMO-VAT-00000"
   },
-  "promoBanner": "Demo offer: 10% off with code WELCOME10",
+  "promoBanner": "",
+  "promoId": "",
+  "promoCoupon": "",
   "hero": {
     "headline": "Shop a wide range of products in one place",
     "support": "From everyday essentials to standout finds, browse many different items and pick what fits you."

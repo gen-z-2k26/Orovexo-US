@@ -7,11 +7,12 @@ alwaysApply: true
 
 ## Product
 - One Next.js storefront for one WooCommerce / WordPress shop.
-- Backend is WooCommerce REST API (`wc/v3`) via Axios in `lib/api/client.ts`.
+- Catalog uses WooCommerce REST API (`wc/v3`) via Axios in `lib/api/client.ts`.
+- Cart, shipping, tax, and coupons use WooCommerce Store API (`wc/store/v1`) through server actions and `lib/api/store-api.ts`. Never call Store API from the browser.
 - Design (layout, theme, motion, UI copy) lives in Next.js.
 - Catalog data (products, categories, prices, stock, featured) comes only from WooCommerce admin via the API. Do not hardcode products.
 - If Woo credentials are unset or the API fails, product lists render empty and design fallbacks in `data/site.json` still apply for theme/chrome.
-- Scope: home, product listing, collection, product detail, cart, checkout. No signup, onboarding, or admin UI in this app. No ACF.
+- Scope: home, product listing, collection, product detail, cart, checkout, guest order tracking. No signup, onboarding, or admin UI in this app. No ACF.
 
 ## Design system
 - Theme tokens live in `data/site.json` under `theme.light` and `theme.dark`.
@@ -21,6 +22,7 @@ alwaysApply: true
 
 ## Architecture boundaries
 - `getSiteSettings()` uses Next design config (`data/site.json`) for branding, hero, footer, and contact. Currency (and site URL) may be overlaid from Woo when available.
-- Components receive data via props or `useStore()`. Only pages, the provider, and the cart store talk to `lib/api`.
-- Keep consumer keys server-side. Never import the Woo client into client components.
+- Components receive data via props or `useStore()`. Only pages, the provider, server actions, and the cart store talk to `lib/api`.
+- Keep consumer keys server-side. Never import the Woo REST or Store API clients into client components.
+- Cart-Token and pending-order cookies are httpOnly. Payments use Stripe Payment Element in Next.js, then REST `set_paid` on the Woo order. Do not install WooPayments or the official Stripe plugin for this flow.
 - Keep UI text and comments free of em dashes.

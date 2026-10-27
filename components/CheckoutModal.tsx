@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { StoreImage } from "@/components/StoreImage";
-import { motion } from "motion/react";
-import { Check } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -14,23 +13,38 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SelectField } from "@/components/SelectField";
 import { PaymentStep } from "@/components/PaymentStep";
-import { getCartSubtotal, useCartStore } from "@/lib/cart-store";
+import { useCartStore } from "@/lib/cart-store";
 import { useStore } from "@/lib/store-context";
 import { formatPrice } from "@/lib/format";
-import { useMotionEnabled } from "@/lib/use-motion-enabled";
-import { durations, easings } from "@/lib/motion";
-import { createCheckoutSessionAction } from "@/app/actions/checkout";
-import type { CartItem, CheckoutSessionResult, CreateOrderResult } from "@/lib/types";
+import { emptyAddress, emptyStoreCart } from "@/lib/api/map-cart";
+import {
+  createCheckoutSessionAction,
+  getCheckoutOptionsAction,
+} from "@/app/actions/checkout";
+import {
+  selectShippingRateAction,
+  updateCustomerAction,
+} from "@/app/actions/cart";
+import type {
+  Address,
+  CheckoutSessionResult,
+  CountryOption,
+  StoreCart,
+} from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { toast } from "@/lib/toast-store";
 
-type Step = "details" | "payment" | "success";
+type Step = "details" | "payment";
 
-const steps: { id: Step; label: string }[] = [
-  { id: "details", label: "Details" },
-  { id: "payment", label: "Payment" },
-  { id: "success", label: "Done" },
-];
+function addressFromCart(source: Address, fallbackCountry: string): Address {
+  return {
+    ...emptyAddress(),
+    ...source,
+    country: source.country || fallbackCountry,
+  };
+}
 
 export function CheckoutModal({
   open,
@@ -39,83 +53,135 @@ export function CheckoutModal({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const router = useRouter();
   const { settings } = useStore();
-  const items = useCartStore((state) => state.items);
-  const clearCart = useCartStore((state) => state.clearCart);
-  const { enabled } = useMotionEnabled();
-
+  const cart = useCartStore((state) => state.cart);
+  const setCart = useCartStore((state) => state.setCart);
   const [step, setStep] = useState<Step>("details");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [address, setAddress] = useState("");
+  const [shipping, setShipping] = useState<Address>(emptyAddress());
+  const [billing, setBilling] = useState<Address>(emptyAddress());
+  const [same, setSame] = useState(true);
+  const [countries, setCountries] = useState<CountryOption[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
-  const [order, setOrder] = useState<CreateOrderResult | null>(null);
   const [session, setSession] = useState<CheckoutSessionResult | null>(null);
   const [sessionError, setSessionError] = useState("");
+  const [mockPayment, setMockPayment] = useState(false);
 
-  const amount = useMemo(() => getCartSubtotal(items), [items]);
-  const activeStepIndex = steps.findIndex((entry) => entry.id === step);
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    getCheckoutOptionsAction()
+      .then((options) => {
+        if (cancelled) return;
+        setCart(options.cart);
+        setCountries(options.countries);
+        setMockPayment(options.mockPayment);
+        setShipping(addressFromCart(options.cart.shippingAddress, options.defaultCountry));
+        setBilling(addressFromCart(options.cart.billingAddress, options.defaultCountry));
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setErrors({
+            form: error instanceof Error ? error.message : "Could not load checkout.",
+          });
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, setCart]);
 
   function reset() {
     setStep("details");
-    setName("");
-    setEmail("");
-    setAddress("");
     setErrors({});
     setSubmitting(false);
-    setOrder(null);
     setSession(null);
     setSessionError("");
   }
 
   function validate() {
     const next: Record<string, string> = {};
-    if (!name.trim()) next.name = "Name is required.";
-    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    if (!shipping.firstName.trim()) next.firstName = "First name is required.";
+    if (!shipping.lastName.trim()) next.lastName = "Last name is required.";
+    if (!shipping.address1.trim()) next.address1 = "Street address is required.";
+    if (!shipping.city.trim()) next.city = "City is required.";
+    if (!shipping.postcode.trim()) next.postcode = "Postcode is required.";
+    if (!shipping.country.trim()) next.country = "Country is required.";
+    const email = (same ? shipping.email : billing.email).trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       next.email = "Enter a valid email.";
-    }
-    if (!address.trim() || address.trim().length < 8) {
-      next.address = "Enter a full delivery address.";
     }
     setErrors(next);
     return Object.keys(next).length === 0;
   }
 
-  useEffect(() => {
-    if (step !== "payment" || session) return;
+  async function syncAddress() {
+    const nextBilling = same
+      ? { ...shipping, email: shipping.email || billing.email, phone: shipping.phone || billing.phone }
+      : billing;
+    const next = await updateCustomerAction({
+      shipping,
+      billing: nextBilling,
+    });
+    setCart(next);
+    return next;
+  }
 
-    let cancelled = false;
+  async function continueToPayment() {
+    if (!cart.items.length || !validate()) return;
     setSubmitting(true);
     setSessionError("");
-
-    createCheckoutSessionAction({
-      name: name.trim(),
-      email: email.trim(),
-      address: address.trim(),
-      items,
-    })
-      .then((next) => {
-        if (!cancelled) setSession(next);
-      })
-      .catch((error: unknown) => {
-        const message =
-          error instanceof Error
-            ? error.message
-            : "Could not start checkout. Please try again.";
-        if (!cancelled) {
-          setSessionError(message);
-          setErrors({ form: message });
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setSubmitting(false);
+    try {
+      const nextCart = await syncAddress();
+      if (nextCart.needsShipping && !nextCart.shippingRates.some((rate) => rate.selected)) {
+        setErrors({ form: "Select a shipping method." });
+        toast({
+          title: "Select a shipping method",
+          variant: "error",
+        });
+        setSubmitting(false);
+        return;
+      }
+      const nextSession = await createCheckoutSessionAction({
+        shipping,
+        billing: same ? { ...shipping, email: shipping.email } : billing,
+        billingSameAsShipping: same,
       });
+      setCart(nextSession.cart);
+      setSession(nextSession);
+      setStep("payment");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Could not start checkout.";
+      setSessionError(message);
+      setErrors({ form: message });
+      toast({ title: "Could not start checkout", description: message, variant: "error" });
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
-    return () => {
-      cancelled = true;
-    };
-  }, [address, email, items, name, session, step]);
+  async function chooseRate(packageId: number, rateId: string) {
+    try {
+      setCart(await selectShippingRateAction({ packageId, rateId }));
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Could not select shipping.";
+      setErrors({ form: message });
+      toast({ title: "Could not select shipping", description: message, variant: "error" });
+    }
+  }
+
+  const countryOptions = countries.map((country) => ({
+    value: country.code,
+    label: country.name,
+  }));
+  const selectedCountry = countries.find((country) => country.code === shipping.country);
+  const stateOptions = (selectedCountry?.states ?? []).map((state) => ({
+    value: state.code,
+    label: state.name,
+  }));
 
   return (
     <Dialog
@@ -131,95 +197,148 @@ export function CheckoutModal({
       >
         <div className="space-y-6 p-5 sm:p-7">
           <DialogHeader className="space-y-3 text-left">
-            <DialogTitle className="font-display text-2xl">
-              {step === "success" ? "Order confirmed" : "Checkout"}
-            </DialogTitle>
+            <DialogTitle className="font-display text-2xl">Checkout</DialogTitle>
             <DialogDescription className="text-pretty">
-              {step === "success"
-                ? "Your payment was received and the order is confirmed."
-                : "Enter your details, review the summary, then pay with card."}
+              {mockPayment
+                ? "Enter your delivery details, then place a development order (no Stripe charge)."
+                : "Enter your delivery details, then pay with card."}
             </DialogDescription>
           </DialogHeader>
-
-          <ol className="grid grid-cols-3 gap-2" aria-label="Checkout progress">
-            {steps.map((entry, index) => {
-              const complete = index < activeStepIndex || step === "success";
-              const current = entry.id === step;
-              return (
-                <li
-                  key={entry.id}
-                  className={cn(
-                    "rounded-xl border px-3 py-2.5 text-center text-xs",
-                    current || complete
-                      ? "border-primary/40 bg-primary/10 text-foreground"
-                      : "border-border bg-muted/40 text-muted-foreground",
-                  )}
-                >
-                  <span className="tabular-nums">{index + 1}. </span>
-                  {entry.label}
-                </li>
-              );
-            })}
-          </ol>
 
           {step === "details" ? (
             <form
               className="space-y-5"
               onSubmit={(event) => {
                 event.preventDefault();
-                if (!items.length) return;
-                if (validate()) setStep("payment");
+                void continueToPayment();
               }}
             >
               <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2 sm:col-span-1">
-                  <Label htmlFor="checkout-name">Full name</Label>
-                  <Input
-                    id="checkout-name"
-                    value={name}
-                    onChange={(event) => setName(event.target.value)}
-                    autoComplete="name"
-                    aria-invalid={Boolean(errors.name)}
-                    placeholder="Jane Cooper"
-                  />
-                  {errors.name ? (
-                    <p className="text-xs text-destructive">{errors.name}</p>
-                  ) : null}
-                </div>
-
-                <div className="space-y-2 sm:col-span-1">
-                  <Label htmlFor="checkout-email">Email</Label>
-                  <Input
-                    id="checkout-email"
-                    type="email"
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                    autoComplete="email"
-                    aria-invalid={Boolean(errors.email)}
-                    placeholder="jane@example.com"
-                  />
-                  {errors.email ? (
-                    <p className="text-xs text-destructive">{errors.email}</p>
-                  ) : null}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="checkout-address">Delivery address</Label>
-                <Input
-                  id="checkout-address"
-                  value={address}
-                  onChange={(event) => setAddress(event.target.value)}
-                  autoComplete="street-address"
-                  aria-invalid={Boolean(errors.address)}
-                  placeholder="Street, city, postal code"
+                <Field
+                  id="first-name"
+                  label="First name"
+                  value={shipping.firstName}
+                  error={errors.firstName}
+                  onChange={(value) => setShipping({ ...shipping, firstName: value })}
                 />
-                {errors.address ? (
-                  <p className="text-xs text-destructive">{errors.address}</p>
-                ) : null}
+                <Field
+                  id="last-name"
+                  label="Last name"
+                  value={shipping.lastName}
+                  error={errors.lastName}
+                  onChange={(value) => setShipping({ ...shipping, lastName: value })}
+                />
+                <Field
+                  id="email"
+                  label="Email"
+                  type="email"
+                  value={same ? shipping.email : billing.email}
+                  error={errors.email}
+                  onChange={(value) => {
+                    if (same) setShipping({ ...shipping, email: value });
+                    else setBilling({ ...billing, email: value });
+                  }}
+                />
+                <Field
+                  id="phone"
+                  label="Phone"
+                  value={shipping.phone}
+                  onChange={(value) => setShipping({ ...shipping, phone: value })}
+                />
+                <Field
+                  className="sm:col-span-2"
+                  id="address1"
+                  label="Address"
+                  value={shipping.address1}
+                  error={errors.address1}
+                  onChange={(value) => setShipping({ ...shipping, address1: value })}
+                />
+                <Field
+                  id="city"
+                  label="City"
+                  value={shipping.city}
+                  error={errors.city}
+                  onChange={(value) => setShipping({ ...shipping, city: value })}
+                />
+                <Field
+                  id="postcode"
+                  label="Postcode"
+                  value={shipping.postcode}
+                  error={errors.postcode}
+                  onChange={(value) => setShipping({ ...shipping, postcode: value })}
+                />
+                {countryOptions.length ? (
+                  <SelectField
+                    id="country"
+                    label="Country"
+                    value={shipping.country}
+                    options={countryOptions}
+                    onChange={(value) =>
+                      setShipping({ ...shipping, country: value, state: "" })
+                    }
+                  />
+                ) : (
+                  <Field
+                    id="country"
+                    label="Country"
+                    value={shipping.country}
+                    error={errors.country}
+                    onChange={(value) => setShipping({ ...shipping, country: value })}
+                  />
+                )}
+                {stateOptions.length ? (
+                  <SelectField
+                    id="state"
+                    label="State"
+                    value={shipping.state}
+                    options={stateOptions}
+                    onChange={(value) => setShipping({ ...shipping, state: value })}
+                  />
+                ) : (
+                  <Field
+                    id="state"
+                    label="State / region"
+                    value={shipping.state}
+                    onChange={(value) => setShipping({ ...shipping, state: value })}
+                  />
+                )}
               </div>
 
-              <OrderSummary items={items} amount={amount} />
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={same}
+                  onChange={(event) => setSame(event.target.checked)}
+                />
+                Billing address is the same as shipping
+              </label>
+
+              {cart.needsShipping && cart.shippingRates.length > 0 ? (
+                <fieldset className="space-y-2">
+                  <legend className="text-sm font-medium">Shipping</legend>
+                  {cart.shippingRates.map((rate) => (
+                    <label
+                      key={`${rate.packageId}-${rate.rateId}`}
+                      className="flex items-center justify-between gap-3 rounded-xl border border-border px-3 py-2 text-sm"
+                    >
+                      <span className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="shipping-rate"
+                          checked={rate.selected}
+                          onChange={() => void chooseRate(rate.packageId, rate.rateId)}
+                        />
+                        {rate.name}
+                      </span>
+                      <span className="tabular-nums">
+                        {formatPrice(rate.price, settings)}
+                      </span>
+                    </label>
+                  ))}
+                </fieldset>
+              ) : null}
+
+              <CartTotalsSummary cart={cart} />
 
               {errors.form ? (
                 <p className="text-sm text-destructive">{errors.form}</p>
@@ -229,21 +348,22 @@ export function CheckoutModal({
                 type="submit"
                 size="lg"
                 className="w-full"
-                disabled={!items.length}
+                disabled={!cart.items.length || submitting}
               >
-                Continue to payment
+                {submitting
+                  ? mockPayment
+                    ? "Preparing order..."
+                    : "Preparing payment..."
+                  : mockPayment
+                    ? "Continue (dev, no charge)"
+                    : "Continue to payment"}
               </Button>
             </form>
           ) : null}
 
           {step === "payment" ? (
             <div className="space-y-5">
-              <OrderSummary items={items} amount={session?.amount ?? amount} />
-              {submitting && !session ? (
-                <p className="rounded-xl border border-border bg-muted/40 px-4 py-5 text-sm text-muted-foreground">
-                  Preparing secure payment...
-                </p>
-              ) : null}
+              <CartTotalsSummary cart={session?.cart ?? cart} />
               {sessionError && !session ? (
                 <p className="text-sm text-destructive">{sessionError}</p>
               ) : null}
@@ -253,13 +373,29 @@ export function CheckoutModal({
                   currency={session.currency}
                   clientSecret={session.clientSecret}
                   orderId={session.orderId}
-                  email={email.trim()}
+                  orderKey={session.orderKey}
+                  email={session.email}
+                  mockPayment={session.mockPayment}
                   onPaid={(result) => {
-                    setOrder(result);
-                    clearCart();
-                    setStep("success");
+                    setCart(emptyStoreCart());
+                    onOpenChange(false);
+                    reset();
+                    toast({
+                      title: "Order placed",
+                      description: `Order ${result.orderId} is confirmed.`,
+                    });
+                    router.push(
+                      `/order/${result.orderId}?key=${encodeURIComponent(result.orderKey)}&email=${encodeURIComponent(result.email)}`,
+                    );
                   }}
-                  onError={(message) => setErrors({ form: message })}
+                  onError={(message) => {
+                    setErrors({ form: message });
+                    toast({
+                      title: "Payment could not be completed",
+                      description: message,
+                      variant: "error",
+                    });
+                  }}
                 />
               ) : null}
               {errors.form && session ? (
@@ -274,56 +410,9 @@ export function CheckoutModal({
                   setSessionError("");
                   setStep("details");
                 }}
-                disabled={submitting && !sessionError}
+                disabled={submitting}
               >
                 Back to details
-              </Button>
-            </div>
-          ) : null}
-
-          {step === "success" && order ? (
-            <div className="space-y-5">
-              <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-muted/30 px-4 py-6 text-center">
-                {enabled ? (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.85 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{
-                      duration: Math.min(durations.base, 0.2),
-                      ease: easings.standard,
-                    }}
-                    className="flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground"
-                  >
-                    <Check className="size-7" />
-                  </motion.div>
-                ) : (
-                  <div className="flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                    <Check className="size-7" />
-                  </div>
-                )}
-                <div className="space-y-1">
-                  <p className="text-lg tracking-tight">Thanks, {order.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    Order{" "}
-                    <span className="font-medium text-foreground tabular-nums">
-                      {order.orderId}
-                    </span>
-                  </p>
-                </div>
-              </div>
-
-              <OrderSummary items={order.items} amount={order.total} />
-
-              <Button
-                type="button"
-                size="lg"
-                className="w-full"
-                onClick={() => {
-                  onOpenChange(false);
-                  reset();
-                }}
-              >
-                Done
               </Button>
             </div>
           ) : null}
@@ -333,36 +422,49 @@ export function CheckoutModal({
   );
 }
 
-function OrderSummary({
-  items,
-  amount,
+function Field({
+  id,
+  label,
+  value,
+  onChange,
+  error,
+  type = "text",
+  className,
 }: {
-  items: CartItem[] | { name: string; quantity: number; price: number; image?: string }[];
-  amount: number;
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+  type?: string;
+  className?: string;
 }) {
+  return (
+    <div className={cn("space-y-2", className)}>
+      <Label htmlFor={id}>{label}</Label>
+      <Input
+        id={id}
+        type={type}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        aria-invalid={Boolean(error)}
+      />
+      {error ? <p className="text-xs text-destructive">{error}</p> : null}
+    </div>
+  );
+}
+
+function CartTotalsSummary({ cart }: { cart: StoreCart }) {
   const { settings } = useStore();
   return (
     <div className="space-y-4 rounded-2xl border border-border bg-muted/30 p-4 sm:p-5">
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-sm tracking-tight">Order summary</p>
-        <p className="text-xs text-muted-foreground tabular-nums">
-          {items.length} item{items.length === 1 ? "" : "s"}
-        </p>
-      </div>
       <ul className="max-h-48 space-y-3 overflow-y-auto pr-1">
-        {items.map((item, index) => (
-          <li
-            key={`${item.name}-${item.quantity}-${item.price}-${index}`}
-            className="flex items-center gap-3"
-          >
-            {"image" in item && item.image ? (
-              <div className="relative size-12 shrink-0 overflow-hidden rounded-xl bg-background">
-                <StoreImage src={item.image} alt="" sizes="48px" />
-              </div>
-            ) : (
-              <div className="size-12 shrink-0 rounded-xl bg-background" />
-            )}
-            <div className="min-w-0 flex-1 space-y-0.5">
+        {cart.items.map((item) => (
+          <li key={item.key} className="flex items-center gap-3">
+            <div className="relative size-12 shrink-0 overflow-hidden rounded-xl bg-background">
+              <StoreImage src={item.image} alt="" sizes="48px" />
+            </div>
+            <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium">{item.name}</p>
               <p className="text-xs text-muted-foreground tabular-nums">
                 Qty {item.quantity}
@@ -374,11 +476,33 @@ function OrderSummary({
           </li>
         ))}
       </ul>
-      <div className="flex items-center justify-between border-t border-border pt-3 text-sm tracking-tight">
-        <span>Total</span>
-        <span className="tabular-nums">
-          {formatPrice(amount, settings)}
-        </span>
+      <div className="space-y-1 border-t border-border pt-3 text-sm">
+        <div className="flex justify-between">
+          <span>Subtotal</span>
+          <span className="tabular-nums">{formatPrice(cart.totals.subtotal, settings)}</span>
+        </div>
+        {cart.totals.discount > 0 ? (
+          <div className="flex justify-between">
+            <span>Discount</span>
+            <span className="tabular-nums">
+              -{formatPrice(cart.totals.discount, settings)}
+            </span>
+          </div>
+        ) : null}
+        <div className="flex justify-between">
+          <span>Shipping</span>
+          <span className="tabular-nums">{formatPrice(cart.totals.shipping, settings)}</span>
+        </div>
+        {cart.totals.tax > 0 ? (
+          <div className="flex justify-between">
+            <span>Tax</span>
+            <span className="tabular-nums">{formatPrice(cart.totals.tax, settings)}</span>
+          </div>
+        ) : null}
+        <div className="flex justify-between pt-1">
+          <span>Total</span>
+          <span className="tabular-nums">{formatPrice(cart.totals.total, settings)}</span>
+        </div>
       </div>
     </div>
   );

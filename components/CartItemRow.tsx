@@ -2,7 +2,7 @@
 
 import { StoreImage } from "@/components/StoreImage";
 import { motion } from "motion/react";
-import type { CartItem } from "@/lib/types";
+import type { StoreCartItem } from "@/lib/types";
 import { formatPrice } from "@/lib/format";
 import { useStore } from "@/lib/store-context";
 import { useCartStore } from "@/lib/cart-store";
@@ -10,13 +10,41 @@ import { useMotionEnabled } from "@/lib/use-motion-enabled";
 import { motionByLevel, easings } from "@/lib/motion";
 import { Button } from "@/components/ui/button";
 import { QuantityPicker } from "@/components/QuantityPicker";
+import {
+  removeCartItemAction,
+  updateCartItemAction,
+} from "@/app/actions/cart";
+import { toast } from "@/lib/toast-store";
 
-export function CartItemRow({ item }: { item: CartItem }) {
+export function CartItemRow({ item }: { item: StoreCartItem }) {
   const { settings } = useStore();
-  const updateQuantity = useCartStore((state) => state.updateQuantity);
-  const removeItem = useCartStore((state) => state.removeItem);
+  const setCart = useCartStore((state) => state.setCart);
+  const setError = useCartStore((state) => state.setError);
   const { enabled, level } = useMotionEnabled();
   const motionTokens = motionByLevel[level];
+
+  async function changeQty(next: number) {
+    try {
+      const cart = await updateCartItemAction({ key: item.key, quantity: next });
+      setCart(cart);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Could not update quantity.";
+      setError(message);
+      toast({ title: "Could not update quantity", description: message, variant: "error" });
+    }
+  }
+
+  async function remove() {
+    try {
+      const cart = await removeCartItemAction(item.key);
+      setCart(cart);
+      toast({ title: "Removed from cart", description: item.name });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Could not remove item.";
+      setError(message);
+      toast({ title: "Could not remove item", description: message, variant: "error" });
+    }
+  }
 
   const content = (
     <div className="flex gap-3.5 rounded-2xl border border-border bg-card p-3.5">
@@ -36,7 +64,7 @@ export function CartItemRow({ item }: { item: CartItem }) {
             variant="ghost"
             size="sm"
             className="shrink-0"
-            onClick={() => removeItem(item.productId)}
+            onClick={() => void remove()}
             aria-label={`Remove ${item.name} from cart`}
           >
             Remove
@@ -46,8 +74,10 @@ export function CartItemRow({ item }: { item: CartItem }) {
           <QuantityPicker
             size="sm"
             value={item.quantity}
+            min={item.quantityMin}
+            max={item.quantityMax}
             aria-label={`Quantity for ${item.name}`}
-            onChange={(next) => updateQuantity(item.productId, next)}
+            onChange={(next) => void changeQty(next)}
           />
           <p className="text-sm font-medium tabular-nums">
             {formatPrice(item.price * item.quantity, settings)}

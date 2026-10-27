@@ -29,7 +29,9 @@ export type PaymentStepProps = {
   currency: string;
   clientSecret: string;
   orderId: string;
+  orderKey: string;
   email: string;
+  mockPayment?: boolean;
   onPaid: (order: CreateOrderResult) => void;
   onError: (message: string) => void;
 };
@@ -37,6 +39,7 @@ export type PaymentStepProps = {
 function PaymentForm({
   amount,
   orderId,
+  orderKey,
   email,
   onPaid,
   onError,
@@ -50,6 +53,7 @@ function PaymentForm({
   async function finalize(paymentIntentId: string) {
     const result = await completeCheckoutAction({
       orderId,
+      orderKey,
       paymentIntentId,
     });
     onPaid(result);
@@ -69,7 +73,7 @@ function PaymentForm({
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${window.location.origin}/?order=${orderId}`,
+          return_url: `${window.location.origin}/order/${orderId}?key=${encodeURIComponent(orderKey)}&email=${encodeURIComponent(email)}`,
           receipt_email: email,
         },
         redirect: "if_required",
@@ -127,12 +131,76 @@ function PaymentForm({
   );
 }
 
+function MockPaymentForm({
+  amount,
+  orderId,
+  orderKey,
+  clientSecret,
+  onPaid,
+  onError,
+}: Pick<
+  PaymentStepProps,
+  "amount" | "orderId" | "orderKey" | "clientSecret" | "onPaid" | "onError"
+>) {
+  const { settings } = useStore();
+  const [submitting, setSubmitting] = useState(false);
+
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    setSubmitting(true);
+    try {
+      const result = await completeCheckoutAction({
+        orderId,
+        orderKey,
+        paymentIntentId: clientSecret,
+      });
+      onPaid(result);
+    } catch (submitError) {
+      const message =
+        submitError instanceof Error
+          ? submitError.message
+          : "Could not complete the development checkout.";
+      onError(message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <form className="space-y-4" onSubmit={handleSubmit}>
+      <p className="rounded-xl border border-dashed border-border bg-muted/40 px-4 py-5 text-sm text-muted-foreground">
+        Stripe is skipped for local development. This places the WooCommerce
+        order as paid with no charge.
+      </p>
+      <Button type="submit" size="lg" className="w-full" disabled={submitting}>
+        {submitting
+          ? "Confirming order..."
+          : `Place order ${formatPrice(amount, settings)} (dev)`}
+      </Button>
+    </form>
+  );
+}
+
 export function PaymentStep(props: PaymentStepProps) {
+  if (props.mockPayment) {
+    return (
+      <MockPaymentForm
+        amount={props.amount}
+        orderId={props.orderId}
+        orderKey={props.orderKey}
+        clientSecret={props.clientSecret}
+        onPaid={props.onPaid}
+        onError={props.onError}
+      />
+    );
+  }
+
   const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.trim();
   if (!publishableKey) {
     return (
       <p className="rounded-xl border border-dashed border-border bg-muted/40 px-4 py-5 text-sm text-muted-foreground">
-        Stripe is not configured. Set NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY.
+        Stripe is not configured. Set NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY or set
+        SKIP_STRIPE_PAYMENT=yes in .env.local for local checkout.
       </p>
     );
   }
@@ -148,6 +216,7 @@ export function PaymentStep(props: PaymentStepProps) {
       <PaymentForm
         amount={props.amount}
         orderId={props.orderId}
+        orderKey={props.orderKey}
         email={props.email}
         onPaid={props.onPaid}
         onError={props.onError}

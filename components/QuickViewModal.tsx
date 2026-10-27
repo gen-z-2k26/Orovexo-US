@@ -12,6 +12,7 @@ import {
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ProductImageCarousel } from "@/components/ProductImageCarousel";
 import { QuantityPicker } from "@/components/QuantityPicker";
+import { addProductToCart } from "@/lib/add-to-cart";
 import { useCartStore } from "@/lib/cart-store";
 import { useStore } from "@/lib/store-context";
 import { formatPrice } from "@/lib/format";
@@ -29,10 +30,11 @@ export function QuickViewModal({
   onOpenChange: (open: boolean) => void;
 }) {
   const { settings } = useStore();
-  const addItem = useCartStore((state) => state.addItem);
+  const setError = useCartStore((state) => state.setError);
   const [active, setActive] = useState<Product | null>(product);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const [busy, setBusy] = useState(false);
   const [wishlisted, setWishlisted] = useState(false);
 
   useEffect(() => {
@@ -46,18 +48,18 @@ export function QuickViewModal({
 
   if (!active) return null;
 
-  function handleAdd() {
-    if (!active?.inStock) return;
-    addItem({
-      productId: active.id,
-      slug: active.slug,
-      name: active.name,
-      price: active.price,
-      image: active.images[0] ?? settings.logo,
-      quantity,
-    });
-    setAdded(true);
-    window.setTimeout(() => setAdded(false), 1200);
+  async function handleAdd() {
+    if (!active?.inStock || busy) return;
+    setBusy(true);
+    try {
+      await addProductToCart(active, quantity);
+      setAdded(true);
+      window.setTimeout(() => setAdded(false), 1200);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Could not add to cart.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -120,8 +122,8 @@ export function QuickViewModal({
                 <Button
                   type="button"
                   size="lg"
-                  disabled={!active.inStock}
-                  onClick={handleAdd}
+                  disabled={!active.inStock || busy}
+                  onClick={() => void handleAdd()}
                   className="flex-1"
                 >
                   <ShoppingBag className="size-4" />

@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { getOrder, markOrderPaid } from "@/lib/api";
+import {
+  cancelUnpaidOrder,
+  failUnpaidOrder,
+  getOrder,
+  markOrderPaid,
+} from "@/lib/api";
 import { getStripe, stripeAmountMatches } from "@/lib/stripe";
 
 export const dynamic = "force-dynamic";
@@ -26,7 +31,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid Stripe signature." }, { status: 400 });
   }
 
-  if (event.type !== "payment_intent.succeeded") {
+  if (
+    event.type !== "payment_intent.succeeded" &&
+    event.type !== "payment_intent.payment_failed" &&
+    event.type !== "payment_intent.canceled"
+  ) {
     return NextResponse.json({ received: true });
   }
 
@@ -37,23 +46,28 @@ export async function POST(request: Request) {
   }
 
   try {
-    const order = await getOrder(orderId);
-    if (
-      !stripeAmountMatches(
-        order.total || 0,
-        order.currency || "",
-        intent.amount,
-        intent.currency,
-      )
-    ) {
-      console.warn("[stripe webhook] amount mismatch", {
-        orderId,
-        intentId: intent.id,
-      });
-      return NextResponse.json({ error: "Amount mismatch." }, { status: 409 });
+    if (event.type === "payment_intent.succeeded") {
+      const order = await getOrder(orderId);
+      if (
+        !stripeAmountMatches(
+          order.total || 0,
+          order.currency || "",
+          intent.amount,
+          intent.currency,
+        )
+      ) {
+        console.warn("[stripe webhook] amount mismatch", {
+          orderId,
+          intentId: intent.id,
+        });
+        return NextResponse.json({ error: "Amount mismatch." }, { status: 409 });
+      }
+      await markOrderPaid(orderId, intent.id);
+    } else if (event.type === "payment_intent.payment_failed") {
+      await failUnpaidOrder(orderId);
+    } else {
+      await cancelUnpaidOrder(orderId);
     }
-
-    await markOrderPaid(orderId, intent.id);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Webhook failed.";
     console.warn("[stripe webhook]", message, { orderId, intentId: intent.id });

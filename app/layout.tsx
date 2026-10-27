@@ -4,6 +4,8 @@ import { Fraunces, Varela_Round } from "next/font/google";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CartDrawer } from "@/components/CartDrawer";
+import { CartHydrator } from "@/components/CartHydrator";
+import { Toaster } from "@/components/Toaster";
 import { JsonLd } from "@/components/JsonLd";
 import { StoreProvider } from "@/lib/store-context";
 import { SmoothScroll } from "@/components/SmoothScroll";
@@ -165,7 +167,9 @@ export default async function RootLayout({
                 {children}
               </main>
               <Footer settings={settings} />
+              <CartHydrator />
               <CartDrawer />
+              <Toaster />
             </SmoothScroll>
           </StoreProvider>
         </ThemeModeProvider>

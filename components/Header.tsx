@@ -24,7 +24,7 @@ const fallbackNav = [
 
 export function Header() {
   const { settings } = useStore();
-  const items = useCartStore((state) => state.items);
+  const items = useCartStore((state) => state.cart.items);
   const openCart = useCartStore((state) => state.openCart);
   const badgeBump = useCartStore((state) => state.badgeBump);
   const { enabled } = useMotionEnabled();

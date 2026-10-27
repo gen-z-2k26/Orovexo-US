@@ -6,6 +6,7 @@ import { ArrowUpRight, Check, Eye, ShoppingBag } from "lucide-react";
 import type { Product } from "@/lib/types";
 import { formatPrice } from "@/lib/format";
 import { useStore } from "@/lib/store-context";
+import { addProductToCart } from "@/lib/add-to-cart";
 import { useCartStore } from "@/lib/cart-store";
 import { useMotionEnabled } from "@/lib/use-motion-enabled";
 import { hoverLiftClass } from "@/lib/motion";
@@ -17,25 +18,26 @@ import { cn } from "@/lib/utils";
 
 export function ProductCard({ product }: { product: Product }) {
   const { settings } = useStore();
-  const addItem = useCartStore((state) => state.addItem);
+  const setError = useCartStore((state) => state.setError);
   const { enabled } = useMotionEnabled();
   const [added, setAdded] = useState(false);
+  const [busy, setBusy] = useState(false);
   const [quickOpen, setQuickOpen] = useState(false);
 
-  function handleAdd(event: React.MouseEvent) {
+  async function handleAdd(event: React.MouseEvent) {
     event.preventDefault();
     event.stopPropagation();
-    if (!product.inStock) return;
-    addItem({
-      productId: product.id,
-      slug: product.slug,
-      name: product.name,
-      price: product.price,
-      image: product.images[0] ?? settings.logo,
-      quantity: 1,
-    });
-    setAdded(true);
-    window.setTimeout(() => setAdded(false), 1400);
+    if (!product.inStock || busy) return;
+    setBusy(true);
+    try {
+      await addProductToCart(product, 1);
+      setAdded(true);
+      window.setTimeout(() => setAdded(false), 1400);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Could not add to cart.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   function handleQuickView(event: React.MouseEvent) {
@@ -131,7 +133,7 @@ export function ProductCard({ product }: { product: Product }) {
             <Button
               type="button"
               size="sm"
-              disabled={!product.inStock}
+              disabled={!product.inStock || busy}
               onClick={handleAdd}
               aria-label={
                 product.inStock

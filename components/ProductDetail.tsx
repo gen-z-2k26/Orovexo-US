@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { Product } from "@/lib/types";
 import { formatPrice } from "@/lib/format";
 import { useStore } from "@/lib/store-context";
+import { addProductToCart } from "@/lib/add-to-cart";
 import { useCartStore } from "@/lib/cart-store";
 import { ProductStatusBadges } from "@/components/ProductStatusBadges";
 import { Button } from "@/components/ui/button";
@@ -14,22 +15,23 @@ import { pageContainer } from "@/lib/layout";
 
 export function ProductDetail({ product }: { product: Product }) {
   const { settings } = useStore();
-  const addItem = useCartStore((state) => state.addItem);
+  const setError = useCartStore((state) => state.setError);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-  function handleAdd() {
-    if (!product.inStock) return;
-    addItem({
-      productId: product.id,
-      slug: product.slug,
-      name: product.name,
-      price: product.price,
-      image: product.images[0] ?? settings.logo,
-      quantity,
-    });
-    setAdded(true);
-    window.setTimeout(() => setAdded(false), 1200);
+  async function handleAdd() {
+    if (!product.inStock || busy) return;
+    setBusy(true);
+    try {
+      await addProductToCart(product, quantity);
+      setAdded(true);
+      window.setTimeout(() => setAdded(false), 1200);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Could not add to cart.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -89,10 +91,10 @@ export function ProductDetail({ product }: { product: Product }) {
             type="button"
             size="lg"
             className="sm:min-w-56"
-            disabled={!product.inStock}
-            onClick={handleAdd}
+            disabled={!product.inStock || busy}
+            onClick={() => void handleAdd()}
           >
-            {added ? "Added" : "Add to cart"}
+            {added ? "Added" : busy ? "Adding..." : "Add to cart"}
           </Button>
         </div>
       </div>

@@ -85,6 +85,8 @@ export interface StoreSettings {
     vatNumber: string;
   };
   promoBanner: string;
+  promoCoupon: string;
+  promoId: string;
   hero: {
     headline: string;
     support: string;
@@ -147,27 +149,105 @@ export interface CartItem {
   quantity: number;
 }
 
-export interface CheckoutPayload {
+export interface Address {
+  firstName: string;
+  lastName: string;
+  company: string;
+  address1: string;
+  address2: string;
+  city: string;
+  state: string;
+  postcode: string;
+  country: string;
   email: string;
+  phone: string;
+}
+
+export interface ShippingRate {
+  packageId: number;
+  rateId: string;
+  methodId: string;
   name: string;
-  address: string;
-  items: CartItem[];
+  price: number;
+  selected: boolean;
+}
+
+export interface AppliedCoupon {
+  code: string;
+  discount: number;
+}
+
+export interface StoreCartItem {
+  key: string;
+  productId: string;
+  slug: string;
+  name: string;
+  price: number;
+  image: string;
+  quantity: number;
+  quantityMin: number;
+  quantityMax: number;
+}
+
+export interface CartTotals {
+  subtotal: number;
+  discount: number;
+  shipping: number;
+  tax: number;
+  total: number;
+  currency: string;
+  minorUnit: number;
+  totalMinor: string;
+}
+
+export interface StoreCart {
+  items: StoreCartItem[];
+  coupons: AppliedCoupon[];
+  totals: CartTotals;
+  shippingAddress: Address;
+  billingAddress: Address;
+  needsShipping: boolean;
+  needsPayment: boolean;
+  hasCalculatedShipping: boolean;
+  shippingRates: ShippingRate[];
+  errors: string[];
+  itemsCount: number;
+  cartHash: string;
+}
+
+export interface CountryOption {
+  code: string;
+  name: string;
+  states: { code: string; name: string }[];
+}
+
+export interface CheckoutDetails {
+  shipping: Address;
+  billing: Address;
+  billingSameAsShipping: boolean;
+  customerNote?: string;
 }
 
 export interface CheckoutSessionResult {
   orderId: string;
+  orderKey: string;
   clientSecret: string;
   amount: number;
   currency: string;
+  email: string;
+  cart: StoreCart;
+  mockPayment?: boolean;
 }
 
 export interface CompleteCheckoutPayload {
   orderId: string;
+  orderKey: string;
   paymentIntentId: string;
 }
 
 export interface CreateOrderResult {
   orderId: string;
+  orderKey: string;
   total: number;
   currency: string;
   email: string;
@@ -176,5 +256,21 @@ export interface CreateOrderResult {
   items: CartItem[];
   createdAt: string;
   paid: boolean;
+  status: string;
   transactionId?: string;
+}
+
+export interface GuestOrder {
+  orderId: string;
+  orderKey: string;
+  status: string;
+  paid: boolean;
+  email: string;
+  name: string;
+  totals: CartTotals;
+  items: StoreCartItem[];
+  shippingAddress: Address;
+  billingAddress: Address;
+  coupons: AppliedCoupon[];
+  createdAt: string;
 }

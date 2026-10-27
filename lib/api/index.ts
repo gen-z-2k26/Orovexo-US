@@ -2,9 +2,10 @@ import site from "@/data/site.json";
 import {
   getWooOrigin,
   isWooConfigured,
+  isWooUnreachable,
+  markWooUnreachable,
   wooGet,
-  wooPost,
-  wooPut,
+  WOO_TIMEOUT_MS,
 } from "@/lib/api/client";
 import { softWooCall, withWooErrorHandling } from "@/lib/api/errors";
 import {
@@ -16,14 +17,23 @@ import {
   mergeWooStoreIdentity,
   type WooStoreMoney,
 } from "@/lib/api/map-woo-store";
+import { getLivePromo } from "@/lib/api/promo";
 import type {
-  CartItem,
   Category,
-  CheckoutPayload,
-  CreateOrderResult,
+  CountryOption,
   Product,
   StoreSettings,
 } from "@/lib/types";
+
+export {
+  cancelUnpaidOrder,
+  createPendingOrderFromCart,
+  failUnpaidOrder,
+  getOrder,
+  markOrderPaid,
+  mapWooOrder,
+  type WooOrder,
+} from "@/lib/api/orders";
 
 const designSettings = site as StoreSettings;
 const REVALIDATE_SECONDS = 60;
@@ -112,13 +122,11 @@ async function fetchWpSiteInfo(): Promise<{
       /^http:\/\//i,
       "https://",
     );
-    const response = await fetch(
-      `${wpOrigin}/wp-json`,
-      {
-        next: { revalidate: REVALIDATE_SECONDS, tags: ["wp-site"] },
-        headers: { Accept: "application/json" },
-      },
-    );
+    const response = await fetch(`${wpOrigin}/wp-json`, {
+      next: { revalidate: REVALIDATE_SECONDS, tags: ["wp-site"] },
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(WOO_TIMEOUT_MS),
+    });
     if (!response.ok) return null;
     return (await response.json()) as {
       name?: string;
@@ -126,6 +134,7 @@ async function fetchWpSiteInfo(): Promise<{
       url?: string;
     };
   } catch {
+    markWooUnreachable();
     return null;
   }
 }
@@ -137,11 +146,13 @@ async function fetchStoreMoney(): Promise<WooStoreMoney | null> {
     const response = await fetch(`${origin}/wp-json/wc/store/v1/cart`, {
       next: { revalidate: REVALIDATE_SECONDS, tags: ["woo-money"] },
       headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(WOO_TIMEOUT_MS),
     });
     if (!response.ok) return null;
     const data = (await response.json()) as { totals?: WooStoreMoney };
     return data.totals ?? null;
   } catch {
+    markWooUnreachable();
     return null;
   }
 }
@@ -151,7 +162,7 @@ async function fetchStoreMoney(): Promise<WooStoreMoney | null> {
  * Currency, symbol, and catalog identity overlay from WooCommerce.
  */
 export async function getSiteSettings(): Promise<StoreSettings> {
-  if (!isWooConfigured()) {
+  if (!isWooConfigured() || isWooUnreachable()) {
     return designSettings;
   }
 
@@ -168,11 +179,26 @@ export async function getSiteSettings(): Promise<StoreSettings> {
       fetchStoreMoney(),
     ]);
 
-    return mergeWooStoreIdentity(designSettings, {
+    const merged = mergeWooStoreIdentity(designSettings, {
       generalSettings: general,
       siteInfo,
       storeMoney,
     });
+    const promo = isWooUnreachable()
+      ? { promoBanner: "", promoCoupon: "", promoId: "" }
+      : await cachedSoftWooCall(
+          "promo:live",
+          () => getLivePromo(merged),
+          { promoBanner: "", promoCoupon: "", promoId: "" },
+          "getLivePromo",
+        );
+
+    return {
+      ...merged,
+      promoBanner: promo.promoBanner,
+      promoId: promo.promoId,
+      promoCoupon: promo.promoCoupon,
+    };
   } catch (error) {
     console.warn("[storefront] store identity fetch failed:", error);
     return designSettings;
@@ -192,7 +218,7 @@ export async function getProducts(options?: {
   perPage?: number;
   page?: number;
 }): Promise<Product[]> {
-  if (!isWooConfigured()) {
+  if (!isWooConfigured() || isWooUnreachable()) {
     return [];
   }
 
@@ -371,190 +397,51 @@ export async function getProduct(slug: string): Promise<Product | null> {
   );
 }
 
-type WooOrderLineItem = {
-  product_id?: number;
-  name?: string;
-  quantity?: number;
-  price?: number | string;
-  image?: { src?: string } | string;
-};
-
-export type WooOrder = {
-  id: number | string;
-  status?: string;
-  total?: string;
-  currency?: string;
-  date_created?: string;
-  transaction_id?: string;
-  billing?: {
-    first_name?: string;
-    last_name?: string;
-    address_1?: string;
-    email?: string;
-  };
-  line_items?: WooOrderLineItem[];
-};
-
-function splitName(name: string) {
-  const [firstName, ...rest] = name.trim().split(/\s+/);
-  return {
-    firstName: firstName || name,
-    lastName: rest.join(" ") || "-",
-  };
+export async function getCountries(): Promise<CountryOption[]> {
+  if (!isWooConfigured()) return [];
+  return cachedSoftWooCall(
+    "data/countries",
+    async () => {
+      const data = await wooGet<
+        Array<{
+          code?: string;
+          name?: string;
+          states?: Array<{ code?: string; name?: string }>;
+        }>
+      >("data/countries");
+      return data
+        .filter((row) => row.code && row.name)
+        .map((row) => ({
+          code: String(row.code),
+          name: String(row.name),
+          states: (row.states ?? [])
+            .filter((state) => state.code && state.name)
+            .map((state) => ({
+              code: String(state.code),
+              name: String(state.name),
+            })),
+        }));
+    },
+    [],
+    "getCountries",
+  );
 }
 
-function lineItemImage(item: WooOrderLineItem) {
-  if (typeof item.image === "string") return item.image;
-  return item.image?.src || "";
-}
-
-function mapWooOrder(order: WooOrder, fallback?: CheckoutPayload): CreateOrderResult {
-  const billing = order.billing;
-  const name =
-    fallback?.name ||
-    [billing?.first_name, billing?.last_name].filter(Boolean).join(" ").trim();
-  const items: CartItem[] =
-    fallback?.items ??
-    (order.line_items ?? []).map((item) => ({
-      productId: String(item.product_id ?? ""),
-      slug: "",
-      name: item.name || "Item",
-      price: Number(item.price) || 0,
-      image: lineItemImage(item),
-      quantity: Number(item.quantity) || 1,
-    }));
-  const paid =
-    order.status === "processing" ||
-    order.status === "completed" ||
-    Boolean(order.transaction_id);
-
-  return {
-    orderId: String(order.id),
-    total: Number(order.total) || 0,
-    currency: order.currency || "EUR",
-    email: fallback?.email || billing?.email || "",
-    name,
-    address: fallback?.address || billing?.address_1 || "",
-    items,
-    createdAt: order.date_created || new Date().toISOString(),
-    paid,
-    transactionId: order.transaction_id || undefined,
-  };
-}
-
-async function fetchLiveCheckoutProducts(ids: number[]): Promise<Product[]> {
-  const unique = [...new Set(ids)];
-  const data = await wooGet<WooProduct[]>("products", {
-    include: unique.join(","),
-    per_page: unique.length,
-    status: "publish",
-    _fields: `${PRODUCT_FIELDS},purchasable`,
-  });
-  return data.map(mapWooProduct);
-}
-
-export async function createPendingOrder(
-  payload: CheckoutPayload,
-): Promise<CreateOrderResult> {
-  if (!payload.email || !payload.name || !payload.address) {
-    throw new Error("Checkout payload is incomplete.");
-  }
-  if (!payload.items.length) {
-    throw new Error("Checkout requires at least one item.");
-  }
-
-  return withWooErrorHandling(async () => {
-    const ids = payload.items.map((item) => Number(item.productId));
-    if (ids.some((id) => !Number.isFinite(id) || id <= 0)) {
-      throw new Error("Cart contains an invalid product.");
-    }
-
-    const products = await fetchLiveCheckoutProducts(ids);
-    const byId = new Map(products.map((product) => [product.id, product]));
-
-    for (const item of payload.items) {
-      const product = byId.get(item.productId);
-      if (!product) {
-        throw new Error(`${item.name} is no longer available.`);
-      }
-      if (!product.inStock) {
-        throw new Error(`${product.name} is out of stock.`);
-      }
-    }
-
-    const { firstName, lastName } = splitName(payload.name);
-    const order = await wooPost<WooOrder>("orders", {
-      payment_method: "stripe",
-      payment_method_title: "Credit card (Stripe)",
-      status: "pending",
-      set_paid: false,
-      billing: {
-        first_name: firstName,
-        last_name: lastName,
-        address_1: payload.address,
-        email: payload.email,
-        country: "NL",
-      },
-      shipping: {
-        first_name: firstName,
-        last_name: lastName,
-        address_1: payload.address,
-        country: "NL",
-      },
-      line_items: payload.items.map((item) => ({
-        product_id: Number(item.productId),
-        quantity: item.quantity,
-      })),
-      meta_data: [{ key: "_created_via_storefront", value: "next-stripe" }],
-    });
-
-    const pricedItems = payload.items.map((item) => {
-      const product = byId.get(item.productId);
-      return {
-        ...item,
-        name: product?.name || item.name,
-        price: product?.price ?? item.price,
-        image: product?.images[0] || item.image,
-      };
-    });
-
-    return mapWooOrder(order, { ...payload, items: pricedItems });
-  });
-}
-
-export async function getOrder(orderId: string): Promise<WooOrder> {
-  return withWooErrorHandling(async () => {
-    return wooGet<WooOrder>(`orders/${orderId}`);
-  });
-}
-
-export async function markOrderPaid(
-  orderId: string,
-  transactionId: string,
-): Promise<CreateOrderResult> {
-  return withWooErrorHandling(async () => {
-    const existing = await wooGet<WooOrder>(`orders/${orderId}`);
-    const alreadyPaid =
-      existing.status === "processing" || existing.status === "completed";
-    if (alreadyPaid) {
-      if (
-        existing.transaction_id &&
-        existing.transaction_id !== transactionId
-      ) {
-        throw new Error("This order was already paid with a different payment.");
-      }
-      return mapWooOrder(existing);
-    }
-
-    const order = await wooPut<WooOrder>(`orders/${orderId}`, {
-      payment_method: "stripe",
-      payment_method_title: "Credit card (Stripe)",
-      set_paid: true,
-      transaction_id: transactionId,
-    });
-
-    return mapWooOrder(order);
-  });
+export async function getDefaultCountry(): Promise<string> {
+  if (!isWooConfigured()) return "";
+  return cachedSoftWooCall(
+    "default-country",
+    async () => {
+      const general = await wooGet<Array<{ id?: string; value?: string }>>(
+        "settings/general",
+      );
+      const row = general.find((entry) => entry.id === "woocommerce_default_country");
+      const value = row?.value || "";
+      return value.split(":")[0] || "";
+    },
+    "",
+    "getDefaultCountry",
+  );
 }
 
 export function getSiteUrl(settings?: StoreSettings) {

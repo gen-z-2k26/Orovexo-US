@@ -1,76 +1,43 @@
-# ElbertJansens storefront
+# Ecom Builder storefront
 
-Single-store Next.js storefront for one WooCommerce shop.
+Next.js storefront for one WooCommerce shop. Products, cart, shipping, tax, and coupons come from WooCommerce. Stripe charges the Woo order total. You do not create products in Stripe.
 
-- **Design** lives in this Next.js app (components, theme tokens, layout, motion).
-- **Catalog and store data** come from WordPress / WooCommerce admin via the REST API (Axios client against `wc/v3`).
-- No ACF. No hardcoded products.
-
-## Data flow
-
-| Source | What |
-| --- | --- |
-| WooCommerce REST (`wc/v3`) | Products, categories, featured flags, prices, stock, orders |
-| WooCommerce settings | Currency, store address, from-email |
-| WordPress `/wp-json` | Site name and tagline |
-| `data/site.json` | Design tokens, nav chrome, fallback contact if Woo is unreachable |
-
-Server components and `lib/api` fetch on the server. Consumer keys and the Stripe secret key never ship to the browser.
-
-Checkout is headless: this app creates a pending Woo order, collects the card with Stripe Payment Element, then verifies the PaymentIntent on the Next.js server and marks the Woo order paid (`set_paid` + `transaction_id`). Do not install the WooCommerce Stripe plugin or WooPayments for this flow.
-
-## Run locally
+## Local
 
 ```bash
+cp env.example .env.local
 pnpm install
-cp .env.example .env.local
-# Set WC_*, NEXT_PUBLIC_SITE_URL, and Stripe keys
-pnpm run dev
+pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Fill `.env.local`:
 
-In WooCommerce admin, mark products as **Featured** and assign category images so the homepage fills in automatically.
+- `WC_URL`, `WC_CONSUMER_KEY`, `WC_CONSUMER_SECRET` from Woo REST API
+- `STRIPE_SECRET_KEY` and `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (test keys: `sk_test_` / `pk_test_`)
+- `NEXT_PUBLIC_SITE_URL=http://localhost:3000`
 
-## Environment
+Leave `SKIP_STRIPE_PAYMENT=no` so checkout uses Stripe. `yes` is local-only and skips the card charge; Woo still creates the order.
 
-| Variable | Purpose |
-| --- | --- |
-| `WC_URL` | WordPress / WooCommerce site URL |
-| `WC_CONSUMER_KEY` | Woo REST consumer key (Read/Write) |
-| `WC_CONSUMER_SECRET` | Woo REST consumer secret |
-| `NEXT_PUBLIC_SITE_URL` | Public storefront origin for SEO |
-| `STRIPE_SECRET_KEY` | Stripe secret key (server only) |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key (browser) |
-| `STRIPE_WEBHOOK_SECRET` | Signing secret for `POST /api/stripe/webhook` |
+## Checkout flow
 
-Point Stripe webhooks at `{NEXT_PUBLIC_SITE_URL}/api/stripe/webhook` for `payment_intent.succeeded`.
+1. Catalog and cart use Woo REST and Store API.
+2. Checkout creates a pending Woo order, then a Stripe PaymentIntent for that total.
+3. The shopper pays with Stripe Payment Element.
+4. The app (or the webhook) marks the Woo order paid with `set_paid` and the PaymentIntent id.
 
-## WooCommerce admin (cart and payments)
+Do not install WooPayments or the official Stripe plugin for this path.
 
-This storefront does **not** use the Woo cart page. The drawer cart is local. Woo still owns catalog, stock, tax, and the order record.
+## Webhook (deployed site)
 
-Required:
+Local Stripe CLI is optional. For Vercel, add a **Test mode** webhook:
 
-- **Settings > Advanced > REST API**: keys with Read/Write. Permalinks not Plain. SSL on `WC_URL`.
-- **Settings > General**: store address, currency matching the Stripe account, selling locations.
-- **Settings > Products > Inventory**: stock management if you want stock reduced when the order is marked paid. Set **Hold stock** so pending unpaid orders expire.
-- **Products**: purchasable, priced, in stock. Line items use Woo product IDs.
+- URL: `https://YOUR-PROJECT.vercel.app/api/stripe/webhook`
+- Events: `payment_intent.succeeded`, `payment_intent.payment_failed`, `payment_intent.canceled`
+- Set `STRIPE_WEBHOOK_SECRET` on Vercel to the endpoint `whsec_...`
+- Set `NEXT_PUBLIC_SITE_URL` to the same Vercel origin
 
-Payments:
+Redeploy after changing env vars. Test with card `4242 4242 4242 4242`.
 
-- Do **not** enable the official Stripe / WooPayments gateway. This app writes `payment_method: stripe` on the order itself.
-- Optional: disable Cash on delivery on the WordPress checkout so guests cannot place unpaid COD orders there.
-- After a test card payment, **WooCommerce > Orders** should show **Processing**, transaction ID `pi_...`, and a paid date.
+## Vercel env
 
-Cart-related Woo settings that still apply: inventory, hold stock, taxes. Abandoned-cart plugins will not see the Next.js cart.
-
-Recommended: **Settings > Tax**, **Settings > Shipping** (v1 does not send shipping lines), **Settings > Emails** for processing-order mail, guest checkout (`customer_id` 0).
-
-## Scripts
-
-```bash
-pnpm run build
-pnpm run start
-pnpm run lint
-```
+Same Woo and Stripe test keys as local. Do not set `SKIP_STRIPE_PAYMENT` on Vercel.
