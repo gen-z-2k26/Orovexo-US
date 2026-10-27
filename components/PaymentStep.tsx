@@ -9,10 +9,12 @@ import {
 } from "@stripe/react-stripe-js";
 import { loadStripe, type Stripe } from "@stripe/stripe-js";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { completeCheckoutAction } from "@/app/actions/checkout";
 import { formatPrice } from "@/lib/format";
 import { useStore } from "@/lib/store-context";
 import type { CreateOrderResult } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 let stripePromise: Promise<Stripe | null> | null = null;
 
@@ -36,6 +38,21 @@ export type PaymentStepProps = {
   onError: (message: string) => void;
 };
 
+export function PaymentFormSkeleton() {
+  return (
+    <div className="space-y-3" aria-busy="true" aria-label="Loading payment form">
+      <Skeleton className="h-10 w-full rounded-xl" />
+      <Skeleton className="h-12 w-full rounded-xl" />
+      <Skeleton className="h-12 w-full rounded-xl" />
+      <div className="grid grid-cols-2 gap-3">
+        <Skeleton className="h-12 rounded-xl" />
+        <Skeleton className="h-12 rounded-xl" />
+      </div>
+      <Skeleton className="h-12 w-full rounded-xl" />
+    </div>
+  );
+}
+
 function PaymentForm({
   amount,
   orderId,
@@ -49,6 +66,8 @@ function PaymentForm({
   const { settings } = useStore();
   const [submitting, setSubmitting] = useState(false);
   const [pendingIntentId, setPendingIntentId] = useState<string | null>(null);
+  const [elementReady, setElementReady] = useState(false);
+  const formReady = Boolean(stripe && elements && elementReady);
 
   async function finalize(paymentIntentId: string) {
     const result = await completeCheckoutAction({
@@ -112,21 +131,37 @@ function PaymentForm({
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
-      <PaymentElement options={{ layout: "tabs" }} />
-      <Button
-        type="submit"
-        size="lg"
-        className="w-full"
-        disabled={!stripe || !elements || submitting}
-      >
-        {submitting
-          ? pendingIntentId
-            ? "Confirming order..."
-            : "Processing payment..."
-          : pendingIntentId
-            ? "Retry order confirmation"
-            : `Pay ${formatPrice(amount, settings)}`}
-      </Button>
+      <div className="relative min-h-[220px]">
+        {!formReady ? (
+          <div className="absolute inset-0 z-10">
+            <PaymentFormSkeleton />
+          </div>
+        ) : null}
+        <div className={cn(!formReady && "pointer-events-none invisible")}>
+          <PaymentElement
+            options={{ layout: "tabs" }}
+            onReady={() => setElementReady(true)}
+          />
+        </div>
+      </div>
+      {formReady ? (
+        <Button
+          type="submit"
+          size="lg"
+          className="w-full"
+          disabled={!stripe || !elements || submitting}
+        >
+          {submitting
+            ? pendingIntentId
+              ? "Confirming order..."
+              : "Processing payment..."
+            : pendingIntentId
+              ? "Retry order confirmation"
+              : `Pay ${formatPrice(amount, settings)}`}
+        </Button>
+      ) : (
+        <Skeleton className="h-11 w-full rounded-xl" />
+      )}
     </form>
   );
 }

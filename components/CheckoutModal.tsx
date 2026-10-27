@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SelectField } from "@/components/SelectField";
-import { PaymentStep } from "@/components/PaymentStep";
+import { PaymentFormSkeleton, PaymentStep } from "@/components/PaymentStep";
 import { useCartStore } from "@/lib/cart-store";
 import { useStore } from "@/lib/store-context";
 import { formatPrice } from "@/lib/format";
@@ -132,6 +132,8 @@ export function CheckoutModal({
     if (!cart.items.length || !validate()) return;
     setSubmitting(true);
     setSessionError("");
+    setSession(null);
+    setStep("payment");
     try {
       const nextCart = await syncAddress();
       if (nextCart.needsShipping && !nextCart.shippingRates.some((rate) => rate.selected)) {
@@ -140,6 +142,7 @@ export function CheckoutModal({
           title: "Select a shipping method",
           variant: "error",
         });
+        setStep("details");
         setSubmitting(false);
         return;
       }
@@ -150,12 +153,12 @@ export function CheckoutModal({
       });
       setCart(nextSession.cart);
       setSession(nextSession);
-      setStep("payment");
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Could not start checkout.";
       setSessionError(message);
       setErrors({ form: message });
+      setStep("details");
       toast({ title: "Could not start checkout", description: message, variant: "error" });
     } finally {
       setSubmitting(false);
@@ -197,12 +200,21 @@ export function CheckoutModal({
       >
         <div className="space-y-6 p-5 sm:p-7">
           <DialogHeader className="space-y-3 text-left">
-            <DialogTitle className="font-display text-2xl">Checkout</DialogTitle>
+            <DialogTitle className="font-display text-2xl">
+              {step === "payment" ? "Payment" : "Checkout"}
+            </DialogTitle>
             <DialogDescription className="text-pretty">
-              {mockPayment
-                ? "Enter your delivery details, then place a development order (no Stripe charge)."
-                : "Enter your delivery details, then pay with card."}
+              {step === "payment"
+                ? mockPayment
+                  ? "Confirm the order. No Stripe charge in local skip mode."
+                  : "Enter your card details to pay this order."
+                : mockPayment
+                  ? "Enter your delivery details, then continue to the next step."
+                  : "Enter your delivery details, then continue to card payment."}
             </DialogDescription>
+            <p className="text-xs font-medium tracking-wide text-muted-foreground">
+              {step === "details" ? "Step 1 of 2 · Delivery" : "Step 2 of 2 · Payment"}
+            </p>
           </DialogHeader>
 
           {step === "details" ? (
@@ -363,11 +375,21 @@ export function CheckoutModal({
 
           {step === "payment" ? (
             <div className="space-y-5">
-              <CartTotalsSummary cart={session?.cart ?? cart} />
+              <div className="flex items-center justify-between rounded-2xl border border-border bg-muted/30 px-4 py-3 text-sm">
+                <span>Order total</span>
+                <span className="tabular-nums font-medium">
+                  {formatPrice(
+                    session?.amount ?? cart.totals.total,
+                    settings,
+                  )}
+                </span>
+              </div>
               {sessionError && !session ? (
                 <p className="text-sm text-destructive">{sessionError}</p>
               ) : null}
-              {session ? (
+              {!session ? (
+                <PaymentFormSkeleton />
+              ) : (
                 <PaymentStep
                   amount={session.amount}
                   currency={session.currency}
@@ -397,7 +419,7 @@ export function CheckoutModal({
                     });
                   }}
                 />
-              ) : null}
+              )}
               {errors.form && session ? (
                 <p className="text-sm text-destructive">{errors.form}</p>
               ) : null}
