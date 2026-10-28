@@ -30,7 +30,8 @@ export function CartDrawer() {
   const setOpen = useCartStore((state) => state.setOpen);
   const setCart = useCartStore((state) => state.setCart);
   const setError = useCartStore((state) => state.setError);
-  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const checkoutOpen = useCartStore((state) => state.checkoutOpen);
+  const setCheckoutOpen = useCartStore((state) => state.setCheckoutOpen);
   const [coupon, setCoupon] = useState("");
   const [couponBusy, setCouponBusy] = useState(false);
   const items = cart.items;
@@ -193,8 +194,7 @@ export function CartDrawer() {
               size="lg"
               disabled={items.length === 0}
               onClick={() => {
-                setOpen(false);
-                setCheckoutOpen(true);
+                useCartStore.getState().openCheckout();
               }}
             >
               Checkout

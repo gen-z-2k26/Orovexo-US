@@ -1,8 +1,8 @@
 {
-  "id": "jansen-home",
-  "name": "Jansen Home",
-  "tagline": "Demo storefront for everyday living",
-  "logo": "/stores/jansen-home-logo.svg",
+  "id": "orvexo",
+  "name": "Orvexo",
+  "tagline": "Shop a wide range of products in one place",
+  "logo": "/stores/orvexo-logo.svg",
   "currency": "",
   "currencySymbol": "",
   "currencyPrefix": "",
@@ -12,11 +12,11 @@
   "decimalSeparator": ".",
   "locale": "en-US",
   "contact": {
-    "email": "hello@demo.jansenhome.store",
+    "email": "hello@orvexo.com",
     "phone": "+1 555 010 2244",
     "address": "100 Demo Lane, Sample City, SC 29000",
     "openingHours": "Mon-Fri: 09:00-17:00",
-    "legalName": "Jansen Home Demo LLC",
+    "legalName": "Orvexo",
     "vatNumber": "DEMO-VAT-00000"
   },
   "promoBanner": "",
@@ -30,9 +30,10 @@
     "header": [
       { "label": "Home", "href": "/" },
       { "label": "Shop", "href": "/products" },
-      { "label": "Track order", "href": "/track-order" },
-      { "label": "Categories", "href": "/#categories" },
-      { "label": "Contact", "href": "/#newsletter" }
+      { "label": "About", "href": "/about" },
+      { "label": "Reviews", "href": "/reviews" },
+      { "label": "FAQ", "href": "/faq" },
+      { "label": "Contact", "href": "/contact" }
     ],
     "footerColumns": [
       {
@@ -40,8 +41,11 @@
         "links": [
           { "label": "Home", "href": "/" },
           { "label": "Shop", "href": "/products" },
-          { "label": "Categories", "href": "/#categories" },
-          { "label": "FAQ", "href": "/#trust" }
+          { "label": "Reviews", "href": "/reviews" },
+          { "label": "About", "href": "/about" },
+          { "label": "FAQ", "href": "/faq" },
+          { "label": "Contact", "href": "/contact" },
+          { "label": "Track order", "href": "/track-order" }
         ]
       },
       {
@@ -56,20 +60,18 @@
     ]
   },
   "footer": {
-    "blurb": "This is placeholder store info for the Jansen Home demo. Contact details below are fake sample data, not a live business address.",
+    "blurb": "Orvexo is your place to browse, compare, and check out with a clear total before you pay.",
     "trustLine": "Free shipping · 30-day returns · Secure checkout"
   },
   "seo": {
-    "title": "Jansen Home | Demo storefront",
-    "description": "Demo ecommerce storefront for Jansen Home. Sample catalog, placeholder contact details, and English UI copy.",
+    "title": "Orvexo | Online store",
+    "description": "Shop Orvexo. Browse products, read reviews, and check out with encrypted payments.",
     "keywords": [
-      "Jansen Home",
-      "demo store",
+      "Orvexo",
       "online store",
-      "household appliances",
-      "computers"
+      "shop"
     ],
-    "ogImage": "/stores/jansen-home-logo.svg",
+    "ogImage": "/stores/orvexo-logo.svg",
     "siteUrl": ""
   },
   "theme": {
@@ -97,6 +99,226 @@
       "muted": "#221F1C",
       "mutedForeground": "#A8A29C",
       "border": "rgba(246, 243, 238, 0.12)"
+    }
+  },
+  "productPage": {
+    "enableShopNow": true,
+    "shopNowLabel": "Buy Now",
+    "shopNowEmptyCart": false,
+    "enableRatingRow": true,
+    "enableSecureBlock": true,
+    "enableAffirmMsg": true,
+    "enableAfterpayMsg": true,
+    "stripeCardBrands": [
+      "visa",
+      "mastercard",
+      "amex",
+      "unionpay"
+    ],
+    "genericReviews": [
+      {
+        "reviewer": "Amina K.",
+        "rating": 5,
+        "title": "Better than the photos",
+        "content": "Packaging was careful and the item looked even better in person. Checkout was quick and tracking updates were clear.",
+        "date": "2026-09-18",
+        "verified": true,
+        "location": "United States"
+      },
+      {
+        "reviewer": "James R.",
+        "rating": 5,
+        "title": "Would order again",
+        "content": "Arrived on time and matched the description. The whole process from cart to delivery felt straightforward.",
+        "date": "2026-09-02",
+        "verified": true,
+        "location": "United Kingdom"
+      },
+      {
+        "reviewer": "Sofia M.",
+        "rating": 4,
+        "title": "Great value",
+        "content": "Solid quality for the price. Support answered my question the same day, which made the purchase easy.",
+        "date": "2026-08-21",
+        "verified": true,
+        "location": "Spain"
+      },
+      {
+        "reviewer": "Daniel P.",
+        "rating": 5,
+        "title": "Well made and well packed",
+        "content": "Easy to buy, clear tracking, and the product feels well made. I would shop here again without hesitation.",
+        "date": "2026-08-09",
+        "verified": true,
+        "location": "Canada"
+      },
+      {
+        "reviewer": "Priya S.",
+        "rating": 5,
+        "title": "Exactly as described",
+        "content": "Exactly what I needed. The photos were accurate and shipping was smooth from start to finish.",
+        "date": "2026-07-28",
+        "verified": true,
+        "location": "India"
+      },
+      {
+        "reviewer": "Noah L.",
+        "rating": 4,
+        "title": "Happy overall",
+        "content": "Happy with the purchase. Quality is good. Delivery took a little longer than I hoped, but the item was worth the wait.",
+        "date": "2026-07-14",
+        "verified": true,
+        "location": "Australia"
+      },
+      {
+        "reviewer": "Elena V.",
+        "rating": 5,
+        "title": "Perfect as a gift",
+        "content": "Gifted this and they loved it. Simple process from cart to door, and the packaging looked ready to give.",
+        "date": "2026-06-30",
+        "verified": true,
+        "location": "Italy"
+      },
+      {
+        "reviewer": "Omar H.",
+        "rating": 5,
+        "title": "Clean store, fair prices",
+        "content": "Clean store, fair prices, and the item was packed securely. No surprises, which is what I want from an online order.",
+        "date": "2026-06-11",
+        "verified": true,
+        "location": "United Arab Emirates"
+      },
+      {
+        "reviewer": "Maya T.",
+        "rating": 5,
+        "title": "Fast and careful shipping",
+        "content": "Ordered in the evening and had tracking the next morning. Everything arrived undamaged and ready to use.",
+        "date": "2026-05-22",
+        "verified": true,
+        "location": "Netherlands"
+      },
+      {
+        "reviewer": "Chris B.",
+        "rating": 4,
+        "title": "Would recommend",
+        "content": "Good quality and a fair price. The site was easy to use. I would recommend it to a friend.",
+        "date": "2026-05-04",
+        "verified": true,
+        "location": "Germany"
+      },
+      {
+        "reviewer": "Lina W.",
+        "rating": 3,
+        "title": "Fine, not perfect",
+        "content": "The item is fine and does the job. Sizing notes on the page could be a bit clearer, but support helped quickly.",
+        "date": "2026-04-16",
+        "verified": true,
+        "location": "Sweden"
+      },
+      {
+        "reviewer": "Theo A.",
+        "rating": 5,
+        "title": "Smooth checkout",
+        "content": "Checkout was simple, the total was clear before I paid, and the order showed up when promised.",
+        "date": "2026-03-29",
+        "verified": true,
+        "location": "France"
+      }
+    ]
+  },
+  "pages": {
+    "about": {
+      "eyebrow": "About us",
+      "title": "Thoughtful products, a clear shopping path",
+      "intro": "We built this shop so you can browse, compare, and check out without noise. Catalog details come from our store; the pages around them are here to explain how we work.",
+      "body": "From the first product photo to the order confirmation, we keep the flow simple: honest descriptions, a locked-in total before you pay, and packing that is ready to gift or keep. If something is unclear, write to us and we will help.",
+      "image": "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "values": [
+        {
+          "title": "Careful packing",
+          "text": "Orders leave in protective packaging so items arrive ready to use or give."
+        },
+        {
+          "title": "Clear totals",
+          "text": "Shipping, tax, and discounts show before you pay. No last-minute surprises."
+        },
+        {
+          "title": "Real support",
+          "text": "Reach us by email or phone during opening hours. We reply to order questions first."
+        }
+      ]
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "title": "Questions, answered",
+      "intro": "Shipping, returns, payments, and tracking. If you still need a hand, send us a message.",
+      "groups": [
+        {
+          "title": "Orders",
+          "items": [
+            {
+              "question": "How do I place an order?",
+              "answer": "Add items to your cart, go to checkout, and pay with a card. You will get an order number, order key, and email you can use to track the order."
+            },
+            {
+              "question": "Can I track a guest order?",
+              "answer": "Yes. Open Track order and enter the order number, order key, and billing email from your confirmation."
+            },
+            {
+              "question": "I need to change an order. What now?",
+              "answer": "Write to us as soon as you can with the order number. If the parcel has not shipped, we will do what we can to update it."
+            }
+          ]
+        },
+        {
+          "title": "Shipping",
+          "items": [
+            {
+              "question": "Do you offer free shipping?",
+              "answer": "Eligible orders include free standard shipping. Delivery windows show at checkout once you enter an address."
+            },
+            {
+              "question": "How long does delivery take?",
+              "answer": "Most orders ship within a few business days. Tracking appears as soon as the carrier has the parcel."
+            }
+          ]
+        },
+        {
+          "title": "Returns",
+          "items": [
+            {
+              "question": "What is the return window?",
+              "answer": "You can request a return within 30 days of delivery. Items should be unused and in original packaging where possible."
+            },
+            {
+              "question": "How do I start a return?",
+              "answer": "Contact us with your order number and the items you want to send back. We will share the next step."
+            }
+          ]
+        },
+        {
+          "title": "Payments",
+          "items": [
+            {
+              "question": "Which cards do you accept?",
+              "answer": "Checkout is encrypted and processed with Stripe. Visa, Mastercard, American Express, and UnionPay are supported on eligible cards, along with wallets Stripe enables for your region."
+            },
+            {
+              "question": "Can I pay over time with Affirm or Afterpay?",
+              "answer": "If Affirm or Afterpay is offered on a product page, you can use that pay-over-time option on eligible orders. Messaging on the product shows the installment example when those methods are active."
+            },
+            {
+              "question": "Is checkout secure?",
+              "answer": "Yes. Card details go through Stripe. We never store full card numbers on this site."
+            }
+          ]
+        }
+      ]
+    },
+    "contact": {
+      "eyebrow": "Contact",
+      "title": "Talk to us",
+      "intro": "Questions about an order, a product, or a return? Send a note and we will get back during opening hours."
     }
   }
 }

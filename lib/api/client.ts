@@ -179,6 +179,16 @@ export async function wooGet<T>(
   params?: WooQuery,
   config?: AxiosRequestConfig,
 ): Promise<T> {
+  const { data } = await wooGetWithHeaders<T>(path, params, config);
+  return data;
+}
+
+/** GET helper that also returns response headers (pagination totals). */
+export async function wooGetWithHeaders<T>(
+  path: string,
+  params?: WooQuery,
+  config?: AxiosRequestConfig,
+): Promise<{ data: T; headers: AxiosResponse["headers"] }> {
   if (!isWooConfigured()) {
     throw new WooCommerceApiError(
       "WooCommerce is not configured. Set WC_URL, WC_CONSUMER_KEY, and WC_CONSUMER_SECRET.",
@@ -191,7 +201,7 @@ export async function wooGet<T>(
     ...config,
     params: cleanParams(params),
   });
-  return response.data;
+  return { data: response.data, headers: response.headers };
 }
 
 /** POST helper that returns response.data and maps Axios errors. */

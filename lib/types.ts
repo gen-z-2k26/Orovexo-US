@@ -62,6 +62,134 @@ export interface SiteSeo {
   siteUrl: string;
 }
 
+export type PaymentIconSlug =
+  | "visa"
+  | "mastercard"
+  | "amex"
+  | "discover"
+  | "jcb"
+  | "diners"
+  | "unionpay"
+  | "paypal"
+  | "apple-pay"
+  | "google-pay"
+  | "affirm"
+  | "afterpay"
+  | "klarna"
+  | "link";
+
+export interface GenericReview {
+  reviewer: string;
+  rating: number;
+  title?: string;
+  content: string;
+  date: string;
+  verified?: boolean;
+  location?: string;
+}
+
+export interface ProductPageSettings {
+  enableShopNow: boolean;
+  shopNowLabel: string;
+  shopNowEmptyCart: boolean;
+  enableRatingRow: boolean;
+  enableSecureBlock: boolean;
+  enableAffirmMsg: boolean;
+  enableAfterpayMsg: boolean;
+  stripeCardBrands: PaymentIconSlug[];
+  genericReviews: GenericReview[];
+}
+
+export interface ProductPaymentDisplay {
+  icons: PaymentMethodIcon[];
+  stripeEnabled: boolean;
+  affirmEnabled: boolean;
+  afterpayEnabled: boolean;
+}
+
+export const defaultProductPage: ProductPageSettings = {
+  enableShopNow: true,
+  shopNowLabel: "Buy Now",
+  shopNowEmptyCart: false,
+  enableRatingRow: true,
+  enableSecureBlock: true,
+  enableAffirmMsg: true,
+  enableAfterpayMsg: true,
+  stripeCardBrands: [
+    "visa",
+    "mastercard",
+    "amex",
+    "unionpay",
+  ],
+  genericReviews: [],
+};
+
+export interface AboutValue {
+  title: string;
+  text: string;
+}
+
+export interface AboutPageContent {
+  eyebrow: string;
+  title: string;
+  intro: string;
+  body: string;
+  image: string;
+  values: AboutValue[];
+}
+
+export interface FaqItem {
+  question: string;
+  answer: string;
+}
+
+export interface FaqGroup {
+  title: string;
+  items: FaqItem[];
+}
+
+export interface FaqPageContent {
+  eyebrow: string;
+  title: string;
+  intro: string;
+  groups: FaqGroup[];
+}
+
+export interface ContactPageContent {
+  eyebrow: string;
+  title: string;
+  intro: string;
+}
+
+export interface SitePages {
+  about: AboutPageContent;
+  faq: FaqPageContent;
+  contact: ContactPageContent;
+}
+
+export const defaultPages: SitePages = {
+  about: {
+    eyebrow: "About us",
+    title: "A simple place to shop well",
+    intro: "",
+    body: "",
+    image:
+      "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    values: [],
+  },
+  faq: {
+    eyebrow: "FAQ",
+    title: "Questions, answered",
+    intro: "",
+    groups: [],
+  },
+  contact: {
+    eyebrow: "Contact",
+    title: "We are here to help",
+    intro: "",
+  },
+};
+
 /** Design chrome from site.json; money and catalog identity come from Woo. */
 export interface StoreSettings {
   id: string;
@@ -101,6 +229,45 @@ export interface StoreSettings {
   };
   seo: SiteSeo;
   theme: StoreTheme;
+  productPage: ProductPageSettings;
+  pages: SitePages;
+}
+
+export interface ProductReview {
+  id: number;
+  productId: string;
+  productName: string;
+  productSlug: string;
+  reviewer: string;
+  dateCreated: string;
+  rating: number;
+  content: string;
+  verified: boolean;
+}
+
+export interface ProductReviewsPage {
+  reviews: ProductReview[];
+  page: number;
+  perPage: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface ReviewCatalogStats {
+  averageRating: number;
+  reviewCount: number;
+}
+
+export interface PaymentMethodIcon {
+  slug: PaymentIconSlug;
+  label: string;
+}
+
+export interface BnplPublicConfig {
+  affirmPublicKey: string;
+  affirmEnv: "sandbox" | "live";
+  afterpayMpid: string;
+  afterpayPlacementId: string;
 }
 
 export interface ProductCategoryRef {

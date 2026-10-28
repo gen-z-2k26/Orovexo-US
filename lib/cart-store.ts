@@ -8,12 +8,15 @@ import type { StoreCart, StoreCartItem } from "@/lib/types";
 type CartState = {
   cart: StoreCart;
   isOpen: boolean;
+  checkoutOpen: boolean;
   badgeBump: number;
   error: string;
   hydrated: boolean;
   openCart: () => void;
   closeCart: () => void;
   setOpen: (open: boolean) => void;
+  openCheckout: () => void;
+  setCheckoutOpen: (open: boolean) => void;
   setCart: (cart: StoreCart, options?: { open?: boolean; bump?: boolean }) => void;
   setError: (error: string) => void;
   setHydrated: (hydrated: boolean) => void;
@@ -28,12 +31,15 @@ export const useCartStore = create<CartState>()(
     (set) => ({
       cart: emptyStoreCart(),
       isOpen: false,
+      checkoutOpen: false,
       badgeBump: 0,
       error: "",
       hydrated: false,
       openCart: () => set({ isOpen: true }),
       closeCart: () => set({ isOpen: false }),
       setOpen: (open) => set({ isOpen: open }),
+      openCheckout: () => set({ isOpen: false, checkoutOpen: true }),
+      setCheckoutOpen: (open) => set({ checkoutOpen: open }),
       setError: (error) => set({ error }),
       setHydrated: (hydrated) => set({ hydrated }),
       setCart: (cart, options) =>

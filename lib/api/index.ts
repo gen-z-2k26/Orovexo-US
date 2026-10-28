@@ -5,6 +5,7 @@ import {
   isWooUnreachable,
   markWooUnreachable,
   wooGet,
+  wooGetWithHeaders,
   WOO_TIMEOUT_MS,
 } from "@/lib/api/client";
 import { softWooCall, withWooErrorHandling } from "@/lib/api/errors";
@@ -21,9 +22,16 @@ import { getLivePromo } from "@/lib/api/promo";
 import type {
   Category,
   CountryOption,
+  PaymentIconSlug,
+  PaymentMethodIcon,
+  ProductPaymentDisplay,
   Product,
+  ProductReview,
+  ProductReviewsPage,
+  ReviewCatalogStats,
   StoreSettings,
 } from "@/lib/types";
+import { defaultPages, defaultProductPage } from "@/lib/types";
 
 export {
   cancelUnpaidOrder,
@@ -35,7 +43,39 @@ export {
   type WooOrder,
 } from "@/lib/api/orders";
 
-const designSettings = site as StoreSettings;
+const designSettings: StoreSettings = {
+  ...(site as StoreSettings),
+  productPage: {
+    ...defaultProductPage,
+    ...(site as StoreSettings).productPage,
+    stripeCardBrands:
+      (site as StoreSettings).productPage?.stripeCardBrands?.length
+        ? (site as StoreSettings).productPage.stripeCardBrands
+        : defaultProductPage.stripeCardBrands,
+  },
+  pages: {
+    about: {
+      ...defaultPages.about,
+      ...(site as StoreSettings).pages?.about,
+      values:
+        (site as StoreSettings).pages?.about?.values?.length
+          ? (site as StoreSettings).pages.about.values
+          : defaultPages.about.values,
+    },
+    faq: {
+      ...defaultPages.faq,
+      ...(site as StoreSettings).pages?.faq,
+      groups:
+        (site as StoreSettings).pages?.faq?.groups?.length
+          ? (site as StoreSettings).pages.faq.groups
+          : defaultPages.faq.groups,
+    },
+    contact: {
+      ...defaultPages.contact,
+      ...(site as StoreSettings).pages?.contact,
+    },
+  },
+};
 const REVALIDATE_SECONDS = 60;
 const CACHE_TTL_MS = REVALIDATE_SECONDS * 1000;
 
@@ -450,4 +490,257 @@ export function getSiteUrl(settings?: StoreSettings) {
   const fromSettings = settings?.seo.siteUrl?.replace(/\/$/, "");
   if (fromSettings) return fromSettings;
   return "";
+}
+
+type WooReview = {
+  id?: number;
+  product_id?: number;
+  product_name?: string;
+  reviewer?: string;
+  date_created?: string;
+  review?: string;
+  rating?: number;
+  verified?: boolean;
+  status?: string;
+};
+
+type WooGateway = {
+  id?: string;
+  enabled?: string;
+  title?: string;
+  method_title?: string;
+};
+
+function headerNumber(
+  headers: Record<string, unknown>,
+  name: string,
+  fallback: number,
+) {
+  const raw = headers[name] ?? headers[name.toLowerCase()];
+  const value = Number(Array.isArray(raw) ? raw[0] : raw);
+  return Number.isFinite(value) ? value : fallback;
+}
+
+function stripReviewHtml(html: string) {
+  return html
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+export async function getProductReviewsPage(options?: {
+  page?: number;
+  perPage?: number;
+}): Promise<ProductReviewsPage> {
+  const page = Math.max(1, options?.page ?? 1);
+  const perPage = Math.min(50, Math.max(1, options?.perPage ?? 20));
+  const empty: ProductReviewsPage = {
+    reviews: [],
+    page,
+    perPage,
+    total: 0,
+    totalPages: 0,
+  };
+
+  if (!isWooConfigured() || isWooUnreachable()) {
+    return empty;
+  }
+
+  const [payload, catalog] = await Promise.all([
+    cachedSoftWooCall(
+      `reviews:${page}:${perPage}`,
+      async () => {
+        const { data, headers } = await wooGetWithHeaders<WooReview[]>(
+          "products/reviews",
+          {
+            page,
+            per_page: perPage,
+            status: "approved",
+            order: "desc",
+            orderby: "date",
+          },
+        );
+        return {
+          data,
+          total: headerNumber(headers, "x-wp-total", data.length),
+          totalPages: headerNumber(headers, "x-wp-totalpages", 1),
+        };
+      },
+      { data: [] as WooReview[], total: 0, totalPages: 0 },
+      "getProductReviewsPage",
+    ),
+    getProducts({ perPage: 100 }),
+  ]);
+
+  const slugById = new Map(
+    catalog.map((product) => [Number(product.id), product.slug]),
+  );
+
+  const reviews: ProductReview[] = payload.data.map((row) => ({
+    id: Number(row.id) || 0,
+    productId: String(row.product_id ?? ""),
+    productName: String(row.product_name || "Product"),
+    productSlug: slugById.get(Number(row.product_id)) || "",
+    reviewer: String(row.reviewer || "Customer"),
+    dateCreated: String(row.date_created || ""),
+    rating: Math.min(5, Math.max(0, Number(row.rating) || 0)),
+    content: stripReviewHtml(String(row.review || "")),
+    verified: Boolean(row.verified),
+  }));
+
+  return {
+    reviews,
+    page,
+    perPage,
+    total: payload.total,
+    totalPages: payload.totalPages,
+  };
+}
+
+export async function getReviewCatalogStats(): Promise<ReviewCatalogStats> {
+  const products = await getProducts({ perPage: 100 });
+  let reviewCount = 0;
+  let weighted = 0;
+  for (const product of products) {
+    const count = Number(product.ratingCount) || 0;
+    if (count <= 0) continue;
+    reviewCount += count;
+    weighted += (Number(product.averageRating) || 0) * count;
+  }
+  return {
+    reviewCount,
+    averageRating: reviewCount > 0 ? weighted / reviewCount : 0,
+  };
+}
+
+const GATEWAY_ICON_MAP: Record<string, PaymentIconSlug[]> = {
+  paypal: ["paypal"],
+  ppec_paypal: ["paypal"],
+  "ppcp-gateway": ["paypal"],
+  "woocommerce-paypal-payments": ["paypal"],
+  affirm: ["affirm"],
+  afterpay: ["afterpay"],
+  "afterpay-clearpay": ["afterpay"],
+  klarna: ["klarna"],
+  stripe_klarna: ["klarna"],
+  link: ["link"],
+  stripe_link: ["link"],
+};
+
+const ICON_LABELS: Record<PaymentIconSlug, string> = {
+  visa: "Visa",
+  mastercard: "Mastercard",
+  amex: "American Express",
+  discover: "Discover",
+  jcb: "JCB",
+  diners: "Diners Club",
+  unionpay: "UnionPay",
+  paypal: "PayPal",
+  "apple-pay": "Apple Pay",
+  "google-pay": "Google Pay",
+  affirm: "Affirm",
+  afterpay: "Afterpay",
+  klarna: "Klarna",
+  link: "Link",
+};
+
+const ICON_ORDER: PaymentIconSlug[] = [
+  "visa",
+  "mastercard",
+  "amex",
+  "unionpay",
+  "discover",
+  "jcb",
+  "diners",
+  "paypal",
+  "apple-pay",
+  "google-pay",
+  "affirm",
+  "afterpay",
+  "klarna",
+  "link",
+];
+
+function stripeCardBrands(settings: StoreSettings): PaymentIconSlug[] {
+  const allowed = new Set<PaymentIconSlug>([
+    "visa",
+    "mastercard",
+    "amex",
+    "discover",
+    "jcb",
+    "diners",
+    "unionpay",
+  ]);
+  return settings.productPage.stripeCardBrands.filter((slug) => allowed.has(slug));
+}
+
+function classifyGateway(id: string) {
+  const key = id.toLowerCase();
+  return {
+    stripe: /stripe|woocommerce_payments/.test(key),
+    affirm: /affirm/.test(key),
+    afterpay: /afterpay|clearpay/.test(key),
+  };
+}
+
+export async function getProductPaymentDisplay(
+  settings: StoreSettings,
+): Promise<ProductPaymentDisplay> {
+  const slugs = new Set<PaymentIconSlug>();
+  let stripeEnabled = false;
+  let affirmEnabled = false;
+  let afterpayEnabled = false;
+  let sawEnabledGateway = false;
+
+  if (isWooConfigured() && !isWooUnreachable()) {
+    const gateways = await cachedSoftWooCall(
+      "payment-gateways",
+      () => wooGet<WooGateway[]>("payment_gateways"),
+      [] as WooGateway[],
+      "payment_gateways",
+    );
+    for (const gateway of gateways) {
+      if (gateway.enabled !== "yes" || !gateway.id) continue;
+      sawEnabledGateway = true;
+      const kind = classifyGateway(gateway.id);
+      if (kind.stripe) stripeEnabled = true;
+      if (kind.affirm) affirmEnabled = true;
+      if (kind.afterpay) afterpayEnabled = true;
+      const mapped = GATEWAY_ICON_MAP[gateway.id] ?? [];
+      for (const slug of mapped) slugs.add(slug);
+    }
+  }
+
+  const stripeLive = Boolean(
+    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.trim(),
+  );
+  if (stripeLive || stripeEnabled || !sawEnabledGateway) {
+    stripeEnabled = true;
+    for (const slug of stripeCardBrands(settings)) slugs.add(slug);
+  }
+  if (affirmEnabled) slugs.add("affirm");
+  if (afterpayEnabled) slugs.add("afterpay");
+
+  return {
+    stripeEnabled,
+    affirmEnabled,
+    afterpayEnabled,
+    icons: ICON_ORDER.filter((slug) => slugs.has(slug)).map((slug) => ({
+      slug,
+      label: ICON_LABELS[slug],
+    })),
+  };
+}
+
+/** @deprecated Use getProductPaymentDisplay */
+export async function getSecurePaymentIcons(settings: StoreSettings) {
+  const display = await getProductPaymentDisplay(settings);
+  return display.icons;
 }

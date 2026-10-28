@@ -6,7 +6,7 @@ export default function HomeLoading() {
   return (
     <div aria-busy="true" aria-label="Loading storefront">
       <div className="relative flex min-h-[72dvh] items-center justify-center overflow-hidden border-b border-border bg-muted/40">
-        <StoreLoader label="Preparing Jansen storefront..." />
+        <StoreLoader label="Preparing Orvexo..." />
       </div>
       <div className={pageContainer("space-y-8 py-14 sm:py-16")}>
         <div className="space-y-3">

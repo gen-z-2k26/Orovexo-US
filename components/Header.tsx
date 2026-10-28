@@ -17,9 +17,10 @@ import { cn } from "@/lib/utils";
 const fallbackNav = [
   { href: "/", label: "Home" },
   { href: "/products", label: "Shop" },
-  { href: "/track-order", label: "Track order" },
-  { href: "/#categories", label: "Categories" },
-  { href: "/#newsletter", label: "Contact" },
+  { href: "/about", label: "About" },
+  { href: "/reviews", label: "Reviews" },
+  { href: "/faq", label: "FAQ" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export function Header() {
@@ -68,13 +69,13 @@ export function Header() {
 
         <nav
           aria-label="Main navigation"
-          className="hidden items-center gap-0.5 text-sm lg:flex"
+          className="hidden items-center gap-0 text-sm lg:flex"
         >
           {navLinks.map((link) => (
             <Link
               key={`${link.href}-${link.label}`}
               href={link.href}
-              className="rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground"
+              className="rounded-lg px-2.5 py-2 text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground xl:px-3"
             >
               {link.label}
             </Link>

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductDetail } from "@/components/ProductDetail";
 import { JsonLd } from "@/components/JsonLd";
-import { getProduct, getSiteSettings, getSiteUrl } from "@/lib/api";
+import { getProduct, getProductPaymentDisplay, getSiteSettings, getSiteUrl } from "@/lib/api";
+import { getBnplPublicConfig } from "@/lib/bnpl";
 
 export const revalidate = 60;
 
@@ -140,7 +141,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
     <>
       <JsonLd data={productLd} />
       <JsonLd data={breadcrumbLd} />
-      <ProductDetail product={product} />
+      <ProductDetail
+        product={product}
+        payment={await getProductPaymentDisplay(settings)}
+        bnpl={getBnplPublicConfig()}
+      />
     </>
   );
 }

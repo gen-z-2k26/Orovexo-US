@@ -40,6 +40,22 @@ export async function addItemToCartAction(input: {
   }
 }
 
+export async function shopNowAction(input: {
+  id: number;
+  quantity?: number;
+  emptyCart?: boolean;
+}): Promise<StoreCart> {
+  const quantity = Math.max(1, Number(input.quantity) || 1);
+  try {
+    if (input.emptyCart) {
+      await clearStoreCart();
+    }
+    return await addStoreCartItem({ id: input.id, quantity });
+  } catch (error) {
+    throw new Error(actionError(error));
+  }
+}
+
 export async function updateCartItemAction(input: {
   key: string;
   quantity: number;
