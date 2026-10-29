@@ -45,6 +45,72 @@ function decodeEntities(value: string) {
     .replace(/&amp;/gi, "&");
 }
 
+function formatWooStoreAddress(general: Record<string, string>) {
+  const line1 = general.woocommerce_store_address?.trim();
+  const line2 = general.woocommerce_store_address_2?.trim();
+  const city = general.woocommerce_store_city?.trim();
+  const postcode = general.woocommerce_store_postcode?.trim();
+  const rawCountry = general.woocommerce_default_country?.trim() || "";
+  const [countryCode, stateCode] = rawCountry.split(":");
+  const locality = [city, stateCode, postcode].filter(Boolean).join(" ");
+  const country =
+    countryCode === "US" ? "USA" : countryCode ? countryCode : "";
+  const parts = [line1, line2, locality, country].filter(Boolean);
+  return parts.join(", ");
+}
+
+function replaceBrand(text: string, from: string, to: string) {
+  if (!text || !from || from === to) return text;
+  return text.split(from).join(to);
+}
+
+function applyWpBrand(
+  design: StoreSettings,
+  name: string,
+  tagline: string,
+): StoreSettings {
+  const from = design.name;
+  const brand = (value: string) => replaceBrand(value, from, name);
+
+  return {
+    ...design,
+    name,
+    tagline,
+    contact: {
+      ...design.contact,
+      legalName: brand(design.contact.legalName) || name,
+    },
+    hero: {
+      headline: brand(design.hero.headline),
+      support: brand(design.hero.support),
+    },
+    navigation: {
+      header: design.navigation.header,
+      footerColumns: design.navigation.footerColumns.map((column) => ({
+        ...column,
+        title: brand(column.title),
+      })),
+    },
+    footer: {
+      ...design.footer,
+      blurb: brand(design.footer.blurb),
+      trustLine: brand(design.footer.trustLine),
+      contactTitle: design.footer.contactTitle
+        ? brand(design.footer.contactTitle)
+        : design.footer.contactTitle,
+      chatLine: design.footer.chatLine
+        ? brand(design.footer.chatLine)
+        : design.footer.chatLine,
+    },
+    seo: {
+      ...design.seo,
+      title: brand(design.seo.title),
+      description: brand(design.seo.description),
+      keywords: design.seo.keywords.map((keyword) => brand(keyword)),
+    },
+  };
+}
+
 function prefixSuffixFromPosition(symbol: string, position: string) {
   switch (position) {
     case "right":
@@ -103,8 +169,21 @@ export function mergeWooStoreIdentity(
     general.woocommerce_price_decimal_sep ??
     design.decimalSeparator;
 
+  const address = formatWooStoreAddress(general) || design.contact.address;
+  const wpName = decodeEntities(site.name || "").trim();
+  const wpTagline = decodeEntities(site.description || "").trim();
+  const branded = applyWpBrand(
+    design,
+    wpName || design.name,
+    wpTagline || design.tagline,
+  );
+
   return {
-    ...design,
+    ...branded,
+    contact: {
+      ...branded.contact,
+      address,
+    },
     currency,
     currencySymbol: symbol,
     currencyPrefix: prefix,
@@ -113,8 +192,8 @@ export function mergeWooStoreIdentity(
     thousandSeparator,
     decimalSeparator,
     seo: {
-      ...design.seo,
-      siteUrl: design.seo.siteUrl || site.url || "",
+      ...branded.seo,
+      siteUrl: branded.seo.siteUrl || site.url || "",
     },
   };
 }

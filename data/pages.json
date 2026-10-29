@@ -1,0 +1,721 @@
+{
+  "about": {
+    "eyebrow": "About Orvexo Electronics",
+    "title": "Technology for Everyday Living. Confidence in Every Purchase.",
+    "intro": "At Orvexo Electronics, we believe technology should make life easier, more connected, and more enjoyable. From electronics that support your everyday routine to accessories that enhance your home, work, and entertainment, our goal is to make shopping for technology simple, convenient, and accessible.",
+    "body": "Operated by Universal Lighting Technologies, Orvexo Electronics is a US-focused online electronics store built around a straightforward idea: great technology deserves a better shopping experience. We bring together product information, flexible payment options, free standard shipping, and accessible customer support to help you shop with greater confidence.",
+    "image": "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    "values": [
+      {
+        "title": "Transparency",
+        "text": "Customers deserve clear information about products, prices, payments, shipping, and returns."
+      },
+      {
+        "title": "Customer focus",
+        "text": "We aim to make every stage of the shopping journey easier to understand and navigate."
+      },
+      {
+        "title": "Accessibility",
+        "text": "Useful technology and convenient purchasing options should be available to more customers."
+      },
+      {
+        "title": "Continuous improvement",
+        "text": "We strive to improve our product selection, website experience, and support processes over time."
+      },
+      {
+        "title": "Accountability",
+        "text": "When you contact us with a concern, we review it carefully, communicate clearly, and work toward an appropriate resolution."
+      }
+    ],
+    "sections": [
+      {
+        "title": "Our story",
+        "paragraphs": [
+          "Built around a better way to shop. Technology is constantly evolving. New devices, smarter accessories, and innovative solutions are changing how people live and work. Finding the right product should not feel complicated.",
+          "Orvexo Electronics was created to offer a more straightforward online shopping experience, one where customers can explore electronics, compare features, understand their options, and make informed purchasing decisions.",
+          "A good electronics store should offer more than a product catalog. It should provide clarity, convenience, and dependable support throughout the customer journey. That is the experience we are working to build at Orvexo."
+        ]
+      },
+      {
+        "title": "What we offer",
+        "paragraphs": [
+          "Our store focuses on electronics, electronic accessories, and technology-related products designed to support modern lifestyles. Whether you are upgrading your setup, discovering useful technology, or shopping for something that makes everyday tasks more convenient, we aim to help you find products that suit your needs.",
+          "As our product selection evolves, our commitment to a clear and dependable shopping experience remains the same."
+        ],
+        "bullets": [
+          "Product discovery: Clear product listings that help you explore features and specifications.",
+          "Everyday convenience: A shopping experience designed to be simple from browsing to checkout.",
+          "Flexible payments: Access to eligible Buy Now, Pay Later options.",
+          "Delivery transparency: Published shipping timelines and free standard domestic shipping.",
+          "Customer support: Help with product questions, orders, deliveries, and returns."
+        ]
+      },
+      {
+        "title": "Our mission",
+        "paragraphs": [
+          "To make technology shopping more accessible, transparent, and convenient for customers across the United States.",
+          "We work toward this mission by focusing on three essentials: useful product information, a straightforward purchasing process, and responsive customer assistance. We want customers to feel informed before ordering, supported while their order is on its way, and confident about the options available if something does not go as expected."
+        ]
+      },
+      {
+        "title": "Our vision",
+        "paragraphs": [
+          "To become a trusted destination for electronics and accessories by putting clarity, convenience, and customer experience at the center of online shopping.",
+          "We see Orvexo Electronics as more than a place to purchase products. Our vision is to create a shopping destination where technology feels approachable, product choices are easier to understand, and customers know where to turn when they need help."
+        ]
+      },
+      {
+        "title": "Why shop with Orvexo Electronics?",
+        "items": [
+          {
+            "title": "Free standard shipping",
+            "text": "Enjoy free standard shipping on eligible orders within the United States, with no minimum purchase requirement. Typical processing is 1-2 business days, followed by an estimated 3-7 business days in transit."
+          },
+          {
+            "title": "Flexible ways to pay",
+            "text": "Eligible Buy Now, Pay Later options include Afterpay as a primary payment service. Affirm, PayPal, or card payments may be available depending on checkout configuration and provider eligibility."
+          },
+          {
+            "title": "A clear 30-day return policy",
+            "text": "We offer a 30-calendar-day return window for eligible products, along with a $0 restocking fee on approved returns."
+          },
+          {
+            "title": "Customer support when you need it",
+            "text": "24/7 live chat is a convenient way to reach out. Our customer support team is also available through email and phone."
+          },
+          {
+            "title": "Transparent shopping information",
+            "text": "We publish information about product specifications, shipping timelines, payment options, return conditions, and store policies so you can make informed decisions."
+          }
+        ]
+      },
+      {
+        "title": "A shopping experience designed around you",
+        "paragraphs": [
+          "From the moment you begin browsing to the day your order arrives, we want the process to feel straightforward. Discover. Choose. Order. Enjoy.",
+          "Explore product information, select your preferred available payment method, and follow your shipment with carrier tracking information. If you need assistance, our customer support team is here to help with questions about your order or the next steps for an eligible return."
+        ]
+      },
+      {
+        "title": "Proudly serving customers across the United States",
+        "paragraphs": [
+          "Orvexo Electronics is operated under Universal Lighting Technologies, with a business address in Madison, Alabama. Our online store focuses on serving eligible delivery addresses throughout the United States.",
+          "Whether you are shopping for everyday electronics or exploring your next technology upgrade, we aim to make the experience convenient wherever you are located within our supported delivery area."
+        ]
+      }
+    ],
+    "ctaTitle": "Your next technology discovery starts here",
+    "ctaBody": "Whether you are looking for something practical, exploring new electronics, or upgrading the technology you use every day, Orvexo Electronics is here to make the shopping experience simpler. Explore technology. Shop with confidence. Experience Orvexo."
+  },
+  "contact": {
+    "eyebrow": "Contact us",
+    "title": "We're here to help",
+    "intro": "Welcome to Orvexo Electronics. Whether you have a question about a product, need assistance with an existing order, or want to learn more about our shipping, payment, and return policies, our customer support team is here to help. We believe great customer service is an essential part of a great shopping experience.",
+    "channels": [
+      {
+        "title": "Email support",
+        "detail": "info@orvexo.us",
+        "text": "For product inquiries, order updates, returns, refunds, payment questions, and general customer assistance."
+      },
+      {
+        "title": "Phone support",
+        "detail": "+1 (256) 772-8820",
+        "text": "Business hours: Monday-Friday, 9:00 AM-5:00 PM Central Time (CT)."
+      },
+      {
+        "title": "24/7 live chat",
+        "detail": "Available 24 hours a day, 7 days a week",
+        "text": "Need help outside regular business hours? Use the chat option on our website to start a conversation whenever you need assistance."
+      }
+    ],
+    "businessNote": "Our listed address is a business contact address, not a designated customer returns facility. Do not send products to this address without prior authorization.",
+    "helpTopics": [
+      {
+        "title": "Product questions",
+        "text": "Need more information before making a purchase? Contact us for assistance understanding product features, specifications, compatibility information, or available options."
+      },
+      {
+        "title": "Order status and tracking",
+        "text": "Already placed an order? Our team can help you review your order status, locate available tracking information, and investigate delivery concerns. Please include your order number when contacting us."
+      },
+      {
+        "title": "Shipping and delivery",
+        "text": "We offer free standard shipping on eligible domestic orders, with an estimated total delivery timeframe of 4-9 business days."
+      },
+      {
+        "title": "Returns and refunds",
+        "text": "We offer a 30-calendar-day return window and no restocking fees on approved returns. Please contact us before sending any item back so we can provide the correct return instructions."
+      },
+      {
+        "title": "Payment and Buy Now, Pay Later",
+        "text": "Afterpay is one of our primary payment services. Affirm and other payment options may also be available, depending on eligibility and the options displayed at checkout. For installment schedules, financing approvals, or payment collection questions, please contact the relevant financing provider."
+      }
+    ],
+    "formNote": "Have a question or need assistance? Use this form or email us directly. Please provide as much relevant information as possible so our team can understand your request.",
+    "securityNote": "For your security, do not include passwords, full payment card numbers, card security codes, or other sensitive financial credentials in your message.",
+    "hours": [
+      { "channel": "Live chat", "availability": "24/7" },
+      { "channel": "Email", "availability": "info@orvexo.us" },
+      { "channel": "Phone", "availability": "Monday-Friday, 9 AM-5 PM CT" },
+      { "channel": "Business office hours", "availability": "Monday-Friday, 9 AM-5 PM CT" }
+    ],
+    "faqs": [
+      {
+        "question": "How can I track my order?",
+        "answer": "Once your order ships, tracking information will typically be sent to your email address. You can use the tracking details to monitor delivery progress."
+      },
+      {
+        "question": "Do you offer free shipping?",
+        "answer": "Yes. We offer free standard shipping on eligible orders within our supported United States delivery area, with no minimum order requirement."
+      },
+      {
+        "question": "Can I cancel my order?",
+        "answer": "You may request cancellation before your order enters fulfillment. Please contact us immediately so we can review its status."
+      },
+      {
+        "question": "How do I request a return?",
+        "answer": "Email info@orvexo.us or contact our live chat within the applicable return window. Our team will review your request and provide return instructions."
+      },
+      {
+        "question": "Can I visit your business address to return an item?",
+        "answer": "Our listed address is for business correspondence. Returns must be authorized and sent to the designated return location provided by our support team."
+      },
+      {
+        "question": "Which payment methods do you accept?",
+        "answer": "Afterpay is a primary payment option. Other methods, including Affirm, PayPal, or card payments, may be available. The checkout page displays the payment methods currently supported for your purchase."
+      }
+    ]
+  },
+  "commitment": {
+    "eyebrow": "Our commitment",
+    "title": "Better technology. Clearer choices. A shopping experience built around you.",
+    "intro": "At Orvexo Electronics, we believe purchasing technology should be simple, transparent, and convenient. Every product you explore, every order you place, and every question you ask matters to us.",
+    "body": "Operated by Universal Lighting Technologies, Orvexo Electronics is committed to creating an online shopping experience where customers can make informed decisions, understand their purchasing options, and access support when they need it. Our commitment goes beyond offering electronics and accessories. It is about building customer confidence through clear information, straightforward policies, and a consistent focus on service. Because great technology deserves a shopping experience you can feel confident about.",
+    "sections": [
+      {
+        "title": "1. Our promise to you",
+        "paragraphs": [
+          "We believe a positive shopping experience begins with transparency and continues through delivery and after-sales support. Our commitments are built around six principles. These principles guide how we aim to serve our customers every day."
+        ],
+        "bullets": [
+          "Transparency: Clear information about products, pricing, shipping, and policies.",
+          "Convenience: A straightforward online shopping experience.",
+          "Payment flexibility: Eligible installment payment options.",
+          "Customer support: Accessible assistance throughout the purchasing journey.",
+          "Fair returns: Clearly explained return and refund procedures.",
+          "Continuous improvement: Ongoing attention to the quality of our customer experience."
+        ]
+      },
+      {
+        "title": "2. Transparency at every step",
+        "paragraphs": [
+          "Know what you are buying. Electronics can involve important purchasing decisions. Product specifications, compatibility, features, and intended uses can influence whether a product is right for you. We aim to present useful product information that helps customers understand their options before ordering.",
+          "We encourage every customer to review product descriptions, specifications, and compatibility requirements carefully. If something is unclear, our support team is available to assist with questions before you purchase.",
+          "Clear pricing and checkout information: product prices are displayed in United States Dollars (USD), with applicable taxes and final order totals presented during checkout. Where financing is available, the payment provider will disclose the relevant repayment terms before you accept a financing agreement."
+        ]
+      },
+      {
+        "title": "3. Free shipping without a minimum purchase",
+        "paragraphs": [
+          "Eligible domestic orders receive free standard shipping, with no minimum purchase requirement.",
+          "Standard shipping cost: free. Minimum order requirement: none. Order processing: 1-2 business days. Estimated transit: 3-7 business days. Estimated total delivery: 4-9 business days. Order cut-off: 4:00 PM Central Time.",
+          "Delivery estimates may vary because of carrier conditions, holidays, weather, or other circumstances outside our control. We aim to communicate shipping expectations clearly so customers can plan accordingly."
+        ]
+      },
+      {
+        "title": "4. Flexible payment options",
+        "paragraphs": [
+          "Orvexo Electronics offers eligible Buy Now, Pay Later services, with Afterpay as one of our primary payment options. Other payment methods, including Affirm, PayPal, and supported card payments, may be available depending on checkout configuration and provider eligibility.",
+          "Financing approval, installment schedules, interest rates, and fees are determined by the financing provider. Customers should always review the full repayment terms before selecting a financing option."
+        ]
+      },
+      {
+        "title": "5. A clear and fair return experience",
+        "paragraphs": [
+          "We understand that sometimes a product may not meet your expectations or an order may arrive with an issue. That is why we provide a clearly documented return process.",
+          "For change-of-mind returns, customers generally cover the return shipping cost and must meet the applicable product-condition requirements. Approved refunds for returned products are typically processed within 10 business days after receipt, inspection, and approval."
+        ],
+        "bullets": [
+          "A 30-calendar-day return window for eligible products.",
+          "A $0.00 restocking fee.",
+          "Prepaid return shipping for verified damaged, defective, or incorrect products when a return is required.",
+          "Clear return instructions through our support team.",
+          "Approved refunds processed through the original payment method."
+        ]
+      },
+      {
+        "title": "6. Support beyond checkout",
+        "paragraphs": [
+          "We believe customer service should remain accessible after an order has been placed. Whether you are checking an order, asking about a product, or requesting return assistance, our team is available through multiple contact channels.",
+          "Live chat is available 24/7. Email info@orvexo.us. Phone +1 (256) 772-8820. Business hours Monday-Friday, 9:00 AM-5:00 PM Central Time. Response times and resolution requirements may vary depending on the issue."
+        ]
+      },
+      {
+        "title": "7. Honest product and warranty information",
+        "paragraphs": [
+          "Some products may include manufacturer warranty coverage, while others may have different terms or no manufacturer warranty. We do not promise a universal warranty period across every product.",
+          "Instead, we aim to help customers identify applicable product-specific coverage and available claim procedures. For products that arrive damaged, defective, or incorrect, customers may also qualify for assistance under our return and refund policy."
+        ]
+      },
+      {
+        "title": "8. Respect for your privacy",
+        "paragraphs": [
+          "When you shop online, you may share information such as your name, email address, shipping details, and order information. We recognize the importance of handling this information responsibly. Payments are handled through participating third-party payment providers."
+        ],
+        "bullets": [
+          "Processing orders",
+          "Arranging delivery",
+          "Providing customer assistance",
+          "Supporting secure checkout",
+          "Maintaining website functionality",
+          "Meeting applicable legal obligations"
+        ]
+      },
+      {
+        "title": "9. Responsible and informed shopping",
+        "paragraphs": [
+          "We want customers to make purchasing decisions that suit their needs. Buy Now, Pay Later services can offer flexibility, but they also create financial commitments. We encourage customers to select payment arrangements they understand and can manage responsibly. Our goal is not simply to help customers complete a purchase, but to support informed choices."
+        ],
+        "bullets": [
+          "Product specifications and compatibility",
+          "Total purchase costs",
+          "Shipping estimates",
+          "Warranty availability",
+          "Return eligibility",
+          "Financing terms and repayment obligations"
+        ]
+      },
+      {
+        "title": "10. Accountability when things go wrong",
+        "paragraphs": [
+          "Even with careful processes, unexpected issues can occur. An order may be delayed, a product may arrive damaged, or a customer may need additional assistance. Resolutions depend on the circumstances, applicable policies, and legal requirements. We believe accountability means addressing concerns thoughtfully rather than leaving customers uncertain about what happens next."
+        ],
+        "bullets": [
+          "Review the customer's information and order details.",
+          "Understand the issue and any supporting documentation.",
+          "Explain the applicable policy or available options.",
+          "Coordinate appropriate next steps.",
+          "Communicate the outcome as clearly as possible."
+        ]
+      },
+      {
+        "title": "11. Continuously improving the Orvexo experience",
+        "paragraphs": [
+          "Technology evolves, and so do customer expectations. We aim to keep improving how customers discover products, navigate our website, complete checkout, and receive support. We believe trust is built through consistent effort and clear communication."
+        ],
+        "items": [
+          {
+            "title": "Shopping experience",
+            "text": "Making product discovery and website navigation more convenient."
+          },
+          {
+            "title": "Product information",
+            "text": "Improving clarity around specifications, features, and compatibility."
+          },
+          {
+            "title": "Customer communication",
+            "text": "Providing understandable information about orders, delivery, and policies."
+          },
+          {
+            "title": "Payment convenience",
+            "text": "Maintaining appropriate payment choices as provider availability changes."
+          },
+          {
+            "title": "Support experience",
+            "text": "Learning from customer questions and concerns to identify areas for improvement."
+          }
+        ]
+      },
+      {
+        "title": "12. The values that guide us",
+        "items": [
+          {
+            "title": "Customer focus",
+            "text": "We aim to consider the customer's experience in the decisions we make."
+          },
+          {
+            "title": "Integrity",
+            "text": "We believe information should be accurate, understandable, and not misleading."
+          },
+          {
+            "title": "Transparency",
+            "text": "We aim to explain important purchasing conditions before customers commit to an order."
+          },
+          {
+            "title": "Responsibility",
+            "text": "We take customer concerns seriously and seek appropriate resolutions."
+          },
+          {
+            "title": "Accessibility",
+            "text": "We want our website and shopping information to be easier for customers to navigate and understand."
+          },
+          {
+            "title": "Progress",
+            "text": "We recognize that improvement is an ongoing process and that customer feedback can help us identify opportunities to do better."
+          }
+        ]
+      },
+      {
+        "title": "13. Your feedback matters",
+        "paragraphs": [
+          "We welcome questions, suggestions, and constructive feedback about your shopping experience. Whether you have an idea for improving our website, need clarification about a product, or want to share a concern, you can contact our team. Customer feedback can help us understand what is working and where improvement may be needed.",
+          "Email: info@orvexo.us. Phone: +1 (256) 772-8820. Live chat: available 24/7."
+        ]
+      },
+      {
+        "title": "14. Our commitment to the future",
+        "paragraphs": [
+          "We want Orvexo Electronics to become a shopping destination customers associate with clarity, convenience, and helpful service. We understand that customer trust must be earned through actions and consistency. That is the standard we aim to work toward."
+        ],
+        "bullets": [
+          "Useful technology",
+          "Transparent product information",
+          "Straightforward purchasing",
+          "Accessible support",
+          "Clear customer policies",
+          "Responsible business practices"
+        ]
+      }
+    ],
+    "ctaTitle": "More than electronics. A commitment to your experience.",
+    "ctaBody": "At Orvexo Electronics, our commitment is simple: make technology easier to discover, purchasing easier to understand, and customer support easier to access. We appreciate the opportunity to be part of your technology shopping journey."
+  },
+  "faq": {
+    "eyebrow": "Help Center",
+    "title": "Everything you need to know about shopping at Orvexo Electronics",
+    "intro": "We've answered common questions about our products, orders, shipping, payments, Buy Now Pay Later options, returns, refunds, and warranty support. Can't find what you're looking for? Email info@orvexo.us, call +1 (256) 772-8820, or use live chat, available 24/7.",
+    "groups": [
+      {
+        "title": "General questions",
+        "items": [
+          {
+            "question": "What is Orvexo Electronics?",
+            "answer": "Orvexo Electronics is an online store offering electronics, electronic accessories, and technology-related products to customers across our supported delivery areas in the United States. Our store is operated by Universal Lighting Technologies."
+          },
+          {
+            "question": "Where is Orvexo Electronics located?",
+            "answer": "Our business address is 1430 Wall Triana Hwy SW, Madison, AL 35756, United States. We operate an online shopping website at https://orvexo.us. Our business address should not be treated as a retail showroom or an authorized return location."
+          },
+          {
+            "question": "Do you have a physical store?",
+            "answer": "Orvexo Electronics operates as an online store. We do not currently advertise a public retail showroom or in-person shopping service."
+          },
+          {
+            "question": "Is Orvexo Electronics available to customers outside the USA?",
+            "answer": "No. We currently focus on orders delivered to eligible addresses within the United States."
+          },
+          {
+            "question": "How can I contact customer support?",
+            "answer": "You can reach us through email, phone, or our website's live chat. Email: info@orvexo.us. Phone: +1 (256) 772-8820. Live chat: available 24/7. Business hours: Monday-Friday, 9 AM-5 PM Central Time."
+          }
+        ]
+      },
+      {
+        "title": "Products and availability",
+        "items": [
+          {
+            "question": "What types of products do you sell?",
+            "answer": "We offer electronics, accessories, and technology-related products. Browse our website to see our current product selection."
+          },
+          {
+            "question": "Are your products new?",
+            "answer": "Product condition should be identified on the relevant product listing. Unless a listing expressly identifies an item as refurbished, open-box, or otherwise, contact support if the condition is unclear before ordering."
+          },
+          {
+            "question": "How do I know whether a product is in stock?",
+            "answer": "Product availability is generally displayed on the product page. Availability may change before an order is confirmed."
+          },
+          {
+            "question": "What if a product becomes unavailable after I order?",
+            "answer": "If we cannot fulfill your order because a product is unavailable, we will contact you regarding the available options, including an appropriate refund."
+          },
+          {
+            "question": "Can I get help choosing a product?",
+            "answer": "Yes. Contact our support team with the product name or link and your questions about specifications or compatibility."
+          },
+          {
+            "question": "Do your products include manufacturer warranties?",
+            "answer": "Some products may include manufacturer warranty coverage. The terms and duration depend on the specific product and manufacturer."
+          }
+        ]
+      },
+      {
+        "title": "Placing and managing orders",
+        "items": [
+          {
+            "question": "How do I place an order?",
+            "answer": "Browse orvexo.us, select your products, add them to your cart, and proceed to checkout. Enter your shipping details, select an available payment method, review the total, and complete your purchase."
+          },
+          {
+            "question": "Will I receive an order confirmation?",
+            "answer": "After a successful order, an order confirmation is normally sent to the email address entered during checkout. If you don't receive it, check your spam or junk folder and contact our support team."
+          },
+          {
+            "question": "Can I change my order after placing it?",
+            "answer": "You may request changes before fulfillment begins. Changes cannot be guaranteed once processing is underway."
+          },
+          {
+            "question": "Can I cancel an order?",
+            "answer": "Yes, you may request cancellation before fulfillment begins. Once an order enters fulfillment or ships, cancellation may no longer be possible. Cancellation fee: $0.00."
+          },
+          {
+            "question": "Can I change my shipping address?",
+            "answer": "Contact us immediately with your order number and corrected address. We will review whether the change can be made before dispatch."
+          },
+          {
+            "question": "What happens if I entered the wrong email address?",
+            "answer": "Contact our customer support team and provide your order details so we can review your request."
+          }
+        ]
+      },
+      {
+        "title": "Shipping and delivery",
+        "items": [
+          {
+            "question": "Do you offer free shipping?",
+            "answer": "Yes. We offer free standard shipping on eligible domestic orders within our supported United States delivery area, with no minimum order amount."
+          },
+          {
+            "question": "How long does shipping take?",
+            "answer": "Order processing is typically 1-2 business days. Shipping transit is typically 3-7 business days. Total estimated delivery is 4-9 business days. These are estimates, not guaranteed delivery dates."
+          },
+          {
+            "question": "What is your daily order cut-off time?",
+            "answer": "Our standard order cut-off is 4:00 PM Central Time, Monday through Friday, excluding applicable holidays. Orders placed after the cut-off generally begin processing the next business day."
+          },
+          {
+            "question": "Which shipping carriers do you use?",
+            "answer": "We may use USPS, UPS, FedEx, DHL, or other appropriate shipping services depending on the order and destination."
+          },
+          {
+            "question": "Do you ship internationally?",
+            "answer": "No. We currently serve eligible delivery addresses in the United States."
+          },
+          {
+            "question": "Can I track my order?",
+            "answer": "Yes. Once tracking information becomes available, it will generally be sent to your email address. Carrier tracking may take approximately 24-48 hours after pickup to display initial updates."
+          },
+          {
+            "question": "What if my package is delayed?",
+            "answer": "Check your tracking information first. If the package is significantly delayed or tracking is not progressing, contact us so we can investigate."
+          },
+          {
+            "question": "What if my tracking says delivered but I haven't received my package?",
+            "answer": "Check the delivery location, nearby entrances, household members, and neighbors. If the package is still missing, contact our support team with your order number and tracking details so we can review the issue."
+          },
+          {
+            "question": "Can my order arrive in multiple packages?",
+            "answer": "Yes. Orders containing multiple items may be shipped separately, with different tracking numbers."
+          }
+        ]
+      },
+      {
+        "title": "Payments and checkout",
+        "items": [
+          {
+            "question": "What currency do you accept?",
+            "answer": "Prices and checkout payments are displayed in United States Dollars (USD)."
+          },
+          {
+            "question": "What payment methods do you accept?",
+            "answer": "Afterpay is one of our primary payment options. Other methods, including Affirm, PayPal, and supported card payments, may be available at different times. The payment methods displayed at checkout are the options currently available for your purchase."
+          },
+          {
+            "question": "Can I pay using a credit or debit card?",
+            "answer": "Card payments may be available when supported by our active checkout providers. Please review the available options at checkout."
+          },
+          {
+            "question": "Is my payment information secure?",
+            "answer": "Payments are processed through participating third-party payment services using their security and authentication systems. For your protection, never send full card numbers, security codes, or payment passwords to our customer support team."
+          },
+          {
+            "question": "Will I be charged sales tax?",
+            "answer": "Applicable sales tax, if any, will be calculated and displayed during checkout based on the order and relevant tax requirements."
+          },
+          {
+            "question": "Why was my payment declined?",
+            "answer": "Payment declines may occur because of insufficient funds, incorrect details, verification requirements, provider restrictions, or financing eligibility decisions. Contact your payment provider for more information or choose another available payment method."
+          }
+        ]
+      },
+      {
+        "title": "Buy Now, Pay Later (BNPL)",
+        "items": [
+          {
+            "question": "What is Buy Now, Pay Later?",
+            "answer": "Buy Now, Pay Later allows eligible customers to purchase products and pay according to an installment or deferred payment arrangement offered by a third-party provider."
+          },
+          {
+            "question": "Does Orvexo Electronics accept Afterpay?",
+            "answer": "Yes. Afterpay is one of our primary payment options, subject to availability and provider approval."
+          },
+          {
+            "question": "Do you offer Affirm?",
+            "answer": "Affirm may be available for eligible transactions when displayed during checkout."
+          },
+          {
+            "question": "How does Afterpay work?",
+            "answer": "Depending on the plan offered, Afterpay may allow qualifying purchases to be divided into installments. For example, an eligible Pay in 4 arrangement may divide the purchase into four payments over approximately six weeks. Actual payment dates, eligibility, and terms are determined by Afterpay."
+          },
+          {
+            "question": "Is Buy Now, Pay Later interest-free?",
+            "answer": "Not all financing plans are interest-free. Some plans may offer 0% APR, while others may involve interest or fees. Review the provider's complete terms before confirming the agreement."
+          },
+          {
+            "question": "Can my BNPL application be declined?",
+            "answer": "Yes. Financing approval is determined independently by the provider."
+          },
+          {
+            "question": "Can I return an order purchased with Afterpay or Affirm?",
+            "answer": "Yes. Eligible purchases remain subject to our standard return and refund policy. Approved refunds are processed through the original financing provider, which handles the resulting installment adjustments."
+          },
+          {
+            "question": "Should I keep paying installments while waiting for a refund?",
+            "answer": "Follow your financing provider's instructions until the refund or repayment adjustment has been confirmed."
+          }
+        ]
+      },
+      {
+        "title": "Returns and exchanges",
+        "items": [
+          {
+            "question": "What is your return policy?",
+            "answer": "We offer a 30-calendar-day return window for eligible products, starting from the date of delivery."
+          },
+          {
+            "question": "Can I return a product if I change my mind?",
+            "answer": "Yes, eligible products may be returned within the return window if they meet our return conditions. For standard change-of-mind returns, products generally must be unused, uninstalled, and in their original condition with required packaging and accessories."
+          },
+          {
+            "question": "Do you charge restocking fees?",
+            "answer": "No. Our restocking fee is $0.00."
+          },
+          {
+            "question": "Who pays return shipping?",
+            "answer": "For approved change-of-mind returns, the customer generally pays return shipping. For verified damaged, defective, or incorrectly supplied products, we provide a prepaid return label when a return is required."
+          },
+          {
+            "question": "How do I start a return?",
+            "answer": "Email info@orvexo.us or contact our live chat with your order number and reason for return. Our team will review the request and provide the appropriate return instructions."
+          },
+          {
+            "question": "Can I send a return to your business address?",
+            "answer": "No. Do not send returns to our Madison, Alabama business address unless our team specifically authorizes that destination."
+          },
+          {
+            "question": "Do you offer exchanges?",
+            "answer": "We generally recommend returning an eligible product and placing a new order. For verified seller errors or defective items, replacement options may be available."
+          },
+          {
+            "question": "What if my product arrives damaged?",
+            "answer": "Contact us as soon as possible, preferably within 48 hours of delivery, with your order number and photographs of the product and packaging. This preferred reporting timeframe does not limit your applicable legal rights."
+          }
+        ]
+      },
+      {
+        "title": "Refunds",
+        "items": [
+          {
+            "question": "How long do refunds take?",
+            "answer": "For approved returned products, refunds are typically processed within 10 business days after the returned item has been received, inspected, and approved. Additional time may be required for the payment provider or bank to credit your account."
+          },
+          {
+            "question": "How will I receive my refund?",
+            "answer": "Refunds are generally issued to the original payment method."
+          },
+          {
+            "question": "Can I receive a refund through a different payment method?",
+            "answer": "Refunds are normally returned through the original payment provider. Alternative arrangements are not guaranteed."
+          },
+          {
+            "question": "What happens if my order is canceled before shipping?",
+            "answer": "If cancellation is approved and payment was collected, we will initiate the applicable refund promptly after cancellation confirmation."
+          },
+          {
+            "question": "What happens to my Afterpay installments after a refund?",
+            "answer": "Afterpay determines how the approved refund affects your remaining installments and amounts already paid."
+          },
+          {
+            "question": "Will I receive a refund for a discounted product?",
+            "answer": "An approved refund generally reflects the amount actually paid for the returned product, subject to applicable adjustments and legal requirements."
+          }
+        ]
+      },
+      {
+        "title": "Warranty and product support",
+        "items": [
+          {
+            "question": "Do all electronics come with a warranty?",
+            "answer": "No. Warranty availability varies by product and manufacturer."
+          },
+          {
+            "question": "Does Orvexo Electronics provide a universal one-year warranty?",
+            "answer": "No. We do not promise a blanket one-year warranty on all products."
+          },
+          {
+            "question": "What if my product stops working after the return window?",
+            "answer": "Contact our support team. We can help identify any applicable manufacturer warranty or other available remedy."
+          },
+          {
+            "question": "Do I need proof of purchase for warranty support?",
+            "answer": "A receipt, order number, or other proof of purchase may be required."
+          },
+          {
+            "question": "Can you repair my product?",
+            "answer": "Repair services depend on the applicable manufacturer warranty and authorized service arrangements. We do not guarantee direct repair services for every product."
+          }
+        ]
+      },
+      {
+        "title": "Accounts, privacy, and security",
+        "items": [
+          {
+            "question": "Do I need an account to shop?",
+            "answer": "Account requirements depend on the checkout options available on our website. Follow the instructions shown during checkout."
+          },
+          {
+            "question": "How is my personal information used?",
+            "answer": "We may use customer information to process orders, provide support, arrange shipping, maintain website functionality, and perform other activities described in our Privacy Policy."
+          },
+          {
+            "question": "Do you use cookies?",
+            "answer": "Yes. Essential cookies may support shopping carts, checkout, security, and other website functions. Additional cookies depend on the services enabled."
+          },
+          {
+            "question": "Can I request information about my personal data?",
+            "answer": "You may contact info@orvexo.us with a privacy-related request. Applicable rights depend on relevant privacy laws."
+          },
+          {
+            "question": "Will you ask for my payment password?",
+            "answer": "No. Our customer support team does not need your payment account password, full card number, or card security code."
+          }
+        ]
+      },
+      {
+        "title": "Customer support",
+        "items": [
+          {
+            "question": "What are your customer support hours?",
+            "answer": "Our business support hours are Monday through Friday, 9:00 AM-5:00 PM Central Time. Our website also offers 24/7 live chat."
+          },
+          {
+            "question": "What is your customer support email?",
+            "answer": "info@orvexo.us"
+          },
+          {
+            "question": "What is your customer support phone number?",
+            "answer": "+1 (256) 772-8820"
+          },
+          {
+            "question": "What information should I provide when contacting support?",
+            "answer": "For order-related requests, please provide your order number, email address used during checkout, and a brief description of the issue. For product concerns, include relevant photos or videos where helpful."
+          },
+          {
+            "question": "Can I contact you about an order outside business hours?",
+            "answer": "Yes. You can send an email at any time or use our 24/7 live chat. Response times may vary."
+          }
+        ]
+      }
+    ]
+  }
+}

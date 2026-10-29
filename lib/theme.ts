@@ -41,24 +41,10 @@ function contrastForeground(hex: string): string {
 }
 
 function fontStack(font: string, fallback: string): string {
-  const normalized = font.trim().toLowerCase();
-  if (normalized.includes("varela")) {
-    return "var(--font-varela), ui-sans-serif, system-ui, sans-serif";
-  }
-  if (normalized.includes("fraunces") || normalized.includes("bricolage")) {
-    return "var(--font-display), ui-serif, Georgia, serif";
-  }
-  if (
-    normalized.includes("dm sans") ||
-    normalized.includes("jakarta") ||
-    normalized.includes("manrope")
-  ) {
-    return "var(--font-sans), ui-sans-serif, system-ui, sans-serif";
-  }
-  if (normalized.includes("serif")) {
-    return `"${font}", ui-serif, Georgia, serif`;
-  }
-  return `"${font}", ${fallback}`;
+  const name = font.trim().replace(/^["']|["']$/g, "");
+  if (!name) return fallback;
+  if (name.startsWith("var(")) return `${name}, ${fallback}`;
+  return `"${name}", ${fallback}`;
 }
 
 function paletteVars(palette: ThemePalette, prefix = ""): Record<string, string> {

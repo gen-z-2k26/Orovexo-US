@@ -25,14 +25,14 @@ export function SelectField({
   className?: string;
 }) {
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn("min-w-0 space-y-2", className)}>
       <Label htmlFor={id}>{label}</Label>
       <div className="relative">
         <select
           id={id}
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          className="h-11 w-full appearance-none rounded-xl border border-input bg-background py-2 pr-11 pl-3.5 text-sm outline-none transition-[border-color,box-shadow] duration-200 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="h-11 w-full max-w-full min-w-0 appearance-none rounded-xl border border-input bg-background py-2 pr-11 pl-3.5 text-sm outline-none transition-[border-color,box-shadow] duration-200 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
         >
           {options.map((option) => (
             <option key={option.value} value={option.value}>

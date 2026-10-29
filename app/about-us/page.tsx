@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { PageHero } from "@/components/PageHero";
+import { PageSections } from "@/components/PageSections";
 import { buttonVariants } from "@/components/ui/button";
 import { getSiteSettings } from "@/lib/api";
 import { pageContainer } from "@/lib/layout";
@@ -11,7 +12,8 @@ export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "About us",
-  description: "Who we are, how we pack orders, and how to reach the shop.",
+  description:
+    "Orvexo Electronics is a US-focused online electronics store operated by Universal Lighting Technologies.",
 };
 
 export default async function AboutPage() {
@@ -43,20 +45,20 @@ export default async function AboutPage() {
           </p>
           <div className="flex flex-wrap gap-3">
             <Link href="/products" className={buttonVariants({ size: "lg" })}>
-              Browse the catalog
+              Shop Orvexo Electronics
             </Link>
             <Link
-              href="/contact"
+              href="/contact-us"
               className={cn(buttonVariants({ size: "lg", variant: "outline" }))}
             >
-              Contact us
+              Contact our team
             </Link>
           </div>
         </div>
       </div>
 
       {page.values.length ? (
-        <div className="mt-14 grid gap-6 sm:grid-cols-3">
+        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {page.values.map((value) => (
             <div key={value.title} className="surface-card space-y-2 p-6">
               <h2 className="text-lg tracking-tight">{value.title}</h2>
@@ -65,6 +67,25 @@ export default async function AboutPage() {
               </p>
             </div>
           ))}
+        </div>
+      ) : null}
+
+      <PageSections sections={page.sections || []} />
+
+      {page.ctaTitle ? (
+        <div className="mt-14 rounded-3xl border border-border bg-muted/40 px-6 py-8 text-center">
+          <p className="font-display text-2xl">{page.ctaTitle}</p>
+          {page.ctaBody ? (
+            <p className="mx-auto mt-2 max-w-2xl text-pretty text-sm text-muted-foreground">
+              {page.ctaBody}
+            </p>
+          ) : null}
+          <Link
+            href="/products"
+            className={cn(buttonVariants({ size: "lg" }), "mt-5")}
+          >
+            Shop Orvexo Electronics
+          </Link>
         </div>
       ) : null}
     </div>

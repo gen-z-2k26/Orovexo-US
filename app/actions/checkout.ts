@@ -5,9 +5,11 @@ import {
   createPendingOrderFromCart,
   getCountries,
   getDefaultCountry,
+  getEnabledCheckoutMethods,
   getOrder,
   markOrderPaid,
 } from "@/lib/api";
+import { wooPayUrl } from "@/lib/api/payments";
 import {
   getPendingCheckout,
   getStoreCart,
@@ -22,12 +24,13 @@ import {
   isStripeConfigured,
   mockPaymentIntentId,
   stripeAmountMatches,
-  toStripeAmount,
 } from "@/lib/stripe";
 import type {
   CheckoutDetails,
   CheckoutSessionResult,
   CompleteCheckoutPayload,
+  CheckoutPaymentKind,
+  CheckoutPaymentMethod,
   CountryOption,
   CreateOrderResult,
   StoreCart,
@@ -47,13 +50,21 @@ export async function getCheckoutOptionsAction(): Promise<{
   countries: CountryOption[];
   defaultCountry: string;
   mockPayment: boolean;
+  paymentMethods: CheckoutPaymentMethod[];
 }> {
-  const [cart, countries, defaultCountry] = await Promise.all([
+  const [cart, countries, defaultCountry, paymentMethods] = await Promise.all([
     getStoreCart(),
     getCountries(),
     getDefaultCountry(),
+    getEnabledCheckoutMethods(),
   ]);
-  return { cart, countries, defaultCountry, mockPayment: isMockPaymentEnabled() };
+  return {
+    cart,
+    countries,
+    defaultCountry,
+    mockPayment: isMockPaymentEnabled(),
+    paymentMethods,
+  };
 }
 
 async function abandonPendingIfStale(cartHash: string) {
@@ -61,7 +72,7 @@ async function abandonPendingIfStale(cartHash: string) {
   if (!pending) return;
   if (pending.cartHash === cartHash) return;
   const stripe = isStripeConfigured() ? getStripe() : null;
-  if (pending.paymentIntentId && stripe) {
+  if (pending.paymentIntentId?.startsWith("pi_") && stripe) {
     try {
       await stripe.paymentIntents.cancel(pending.paymentIntentId);
     } catch {
@@ -80,6 +91,18 @@ export async function createCheckoutSessionAction(
   details: CheckoutDetails,
 ): Promise<CheckoutSessionResult> {
   const mockPayment = isMockPaymentEnabled();
+  const methods = mockPayment ? [] : await getEnabledCheckoutMethods();
+  const selected =
+    methods.find((method) => method.kind === details.paymentKind) ||
+    methods[0];
+  if (!mockPayment && !selected) {
+    throw new Error(
+      "No payment methods are enabled. Turn one on in WooCommerce → Settings → Payments.",
+    );
+  }
+  const paymentKind: CheckoutPaymentKind | "mock" = mockPayment
+    ? "mock"
+    : selected!.kind;
   const billing = details.billingSameAsShipping
     ? { ...details.shipping, email: details.billing.email || details.shipping.email, phone: details.billing.phone || details.shipping.phone }
     : details.billing;
@@ -112,30 +135,36 @@ export async function createCheckoutSessionAction(
         email: billing.email,
         cart,
         mockPayment: true,
+        paymentKind: "mock",
       };
     }
-    if (!mockPayment && orderOk) {
-      const stripe = requireStripe();
-      const intent = await stripe.paymentIntents.retrieve(existing.paymentIntentId);
-      if (
-        intent.status !== "canceled" &&
-        intent.status !== "succeeded" &&
-        intent.client_secret
-      ) {
-        return {
-          orderId: existing.orderId,
-          orderKey: existing.orderKey,
-          clientSecret: intent.client_secret,
-          amount: Number(order.total) || cart.totals.total,
-          currency: order.currency || cart.totals.currency,
-          email: billing.email,
-          cart,
-        };
-      }
+    if (
+      !mockPayment &&
+      orderOk &&
+      (paymentKind === "paypal" ||
+        paymentKind === "afterpay" ||
+        paymentKind === "stripe") &&
+      !existing.paymentIntentId.startsWith("pi_")
+    ) {
+      return {
+        orderId: existing.orderId,
+        orderKey: existing.orderKey,
+        clientSecret: "",
+        amount: Number(order.total) || cart.totals.total,
+        currency: order.currency || cart.totals.currency,
+        email: billing.email,
+        cart,
+        paymentKind,
+        paymentUrl: wooPayUrl(existing.orderId, existing.orderKey),
+      };
     }
   }
 
-  const pending = await createPendingOrderFromCart(cart, { mockPayment });
+  const pending = await createPendingOrderFromCart(cart, {
+    mockPayment,
+    paymentMethod: selected?.wooId,
+    paymentMethodTitle: selected?.title,
+  });
 
   if (mockPayment) {
     const paymentIntentId = mockPaymentIntentId(pending.orderId);
@@ -154,45 +183,27 @@ export async function createCheckoutSessionAction(
       email: billing.email,
       cart,
       mockPayment: true,
+      paymentKind: "mock",
     };
   }
 
-  const stripe = requireStripe();
-  const amount = toStripeAmount(pending.total, pending.currency);
-  const intent = await stripe.paymentIntents.create(
-    {
-      amount,
-      currency: pending.currency.toLowerCase(),
-      automatic_payment_methods: { enabled: true },
-      receipt_email: billing.email,
-      metadata: {
-        woo_order_id: pending.orderId,
-        order_key: pending.orderKey,
-        billing_email: billing.email,
-      },
-    },
-    { idempotencyKey: `woo-order-${pending.orderId}` },
-  );
-
-  if (!intent.client_secret) {
-    throw new Error("Stripe did not return a client secret.");
-  }
-
+  const paymentUrl = wooPayUrl(pending.orderId, pending.orderKey);
   await setPendingCheckout({
     orderId: pending.orderId,
     orderKey: pending.orderKey,
-    paymentIntentId: intent.id,
+    paymentIntentId: `${paymentKind}:${pending.orderId}`,
     cartHash: cart.cartHash,
   });
-
   return {
     orderId: pending.orderId,
     orderKey: pending.orderKey,
-    clientSecret: intent.client_secret,
+    clientSecret: "",
     amount: pending.total,
     currency: pending.currency,
     email: billing.email,
     cart,
+    paymentKind,
+    paymentUrl,
   };
 }
 

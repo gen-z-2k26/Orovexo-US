@@ -16,12 +16,22 @@ export function ContactForm({ to }: { to: string }) {
     const data = new FormData(form);
     const name = String(data.get("name") || "").trim();
     const email = String(data.get("email") || "").trim();
+    const phone = String(data.get("phone") || "").trim();
+    const orderNumber = String(data.get("orderNumber") || "").trim();
     const subject = String(data.get("subject") || "").trim();
     const message = String(data.get("message") || "").trim();
     if (!name || !email || !subject || !message) return;
 
     event.preventDefault();
-    const body = `Name: ${name}\nEmail: ${email}\n\n${message}`;
+    const extras = [
+      `Name: ${name}`,
+      `Email: ${email}`,
+      phone ? `Phone: ${phone}` : "",
+      orderNumber ? `Order number: ${orderNumber}` : "",
+    ]
+      .filter(Boolean)
+      .join("\n");
+    const body = `${extras}\n\n${message}`;
     const href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     toast({
       title: "Opening your email app",
@@ -47,6 +57,19 @@ export function ContactForm({ to }: { to: string }) {
         />
       </div>
       <div className="space-y-2">
+        <Label htmlFor="contact-phone">Phone number (optional)</Label>
+        <Input
+          id="contact-phone"
+          name="phone"
+          type="tel"
+          autoComplete="tel"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="contact-order">Order number (if applicable)</Label>
+        <Input id="contact-order" name="orderNumber" />
+      </div>
+      <div className="space-y-2">
         <Label htmlFor="contact-subject">Subject</Label>
         <Input id="contact-subject" name="subject" required />
       </div>
@@ -61,7 +84,7 @@ export function ContactForm({ to }: { to: string }) {
         />
       </div>
       <Button type="submit" size="lg" className="w-full sm:w-auto">
-        Send message
+        Send Message
       </Button>
     </form>
   );

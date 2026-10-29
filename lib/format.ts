@@ -19,7 +19,11 @@ function formatNumber(
 }
 
 /** Formats using WooCommerce currency settings, not a hardcoded symbol. */
-export function formatPrice(amount: number, settings: StoreSettings): string {
+export function formatPrice(
+  amount: number,
+  settings: StoreSettings,
+  currencyCode?: string,
+): string {
   const number = formatNumber(
     amount,
     settings.priceDecimals,
@@ -31,8 +35,18 @@ export function formatPrice(amount: number, settings: StoreSettings): string {
   if (prefix || suffix) {
     return `${prefix}${number}${suffix}`;
   }
-  if (settings.currency) {
-    return `${number} ${settings.currency}`;
+  const code = (currencyCode || settings.currency || "").trim().toUpperCase();
+  if (code) {
+    try {
+      return new Intl.NumberFormat(settings.locale || "en-US", {
+        style: "currency",
+        currency: code,
+        minimumFractionDigits: settings.priceDecimals,
+        maximumFractionDigits: settings.priceDecimals,
+      }).format(amount);
+    } catch {
+      return `${code} ${number}`;
+    }
   }
   return number;
 }

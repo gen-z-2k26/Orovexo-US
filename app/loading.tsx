@@ -1,12 +1,15 @@
 import { StoreLoader } from "@/components/StoreLoader";
 import { ProductGridSkeleton } from "@/components/skeletons/ProductGridSkeleton";
+import { getSiteSettings } from "@/lib/api";
 import { pageContainer } from "@/lib/layout";
 
-export default function HomeLoading() {
+export default async function HomeLoading() {
+  const settings = await getSiteSettings();
+
   return (
     <div aria-busy="true" aria-label="Loading storefront">
       <div className="relative flex min-h-[72dvh] items-center justify-center overflow-hidden border-b border-border bg-muted/40">
-        <StoreLoader label="Preparing Orvexo..." />
+        <StoreLoader label={`Preparing ${settings.name}...`} />
       </div>
       <div className={pageContainer("space-y-8 py-14 sm:py-16")}>
         <div className="space-y-3">

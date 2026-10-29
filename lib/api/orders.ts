@@ -92,7 +92,11 @@ export async function getOrder(orderId: string): Promise<WooOrder> {
 
 export async function createPendingOrderFromCart(
   cart: StoreCart,
-  options?: { mockPayment?: boolean },
+  options?: {
+    mockPayment?: boolean;
+    paymentMethod?: string;
+    paymentMethodTitle?: string;
+  },
 ): Promise<CreateOrderResult> {
   if (!cart.items.length) {
     throw new Error("Checkout requires at least one item.");
@@ -109,11 +113,19 @@ export async function createPendingOrderFromCart(
   return withWooErrorHandling(async () => {
     const selectedShipping = cart.shippingRates.filter((rate) => rate.selected);
     const mockPayment = Boolean(options?.mockPayment);
-    const order = await wooPost<WooOrder>("orders", {
-      payment_method: "stripe",
-      payment_method_title: mockPayment
+    const paymentMethod = options?.paymentMethod || "stripe";
+    const paymentMethodTitle =
+      options?.paymentMethodTitle ||
+      (mockPayment
         ? "Credit card (local skip)"
-        : "Credit card (Stripe)",
+        : paymentMethod === "ppcp-gateway" || paymentMethod === "paypal"
+          ? "PayPal"
+          : paymentMethod === "afterpay"
+            ? "Afterpay"
+            : "Credit card (Stripe)");
+    const order = await wooPost<WooOrder>("orders", {
+      payment_method: paymentMethod,
+      payment_method_title: paymentMethodTitle,
       status: "pending",
       set_paid: false,
       billing: toWooAddress(billing, true),
@@ -135,7 +147,10 @@ export async function createPendingOrderFromCart(
           }
         : {}),
       meta_data: [
-        { key: "_created_via_storefront", value: mockPayment ? "next-dev-mock" : "next-stripe" },
+        {
+          key: "_created_via_storefront",
+          value: mockPayment ? "next-dev-mock" : `next-${paymentMethod}`,
+        },
         { key: "_storefront_cart_hash", value: cart.cartHash },
       ],
     });
@@ -156,6 +171,7 @@ export async function createPendingOrderFromCart(
 export async function markOrderPaid(
   orderId: string,
   transactionId: string,
+  options?: { paymentMethod?: string; paymentMethodTitle?: string },
 ): Promise<CreateOrderResult> {
   return withWooErrorHandling(async () => {
     const existing = await wooGet<WooOrder>(`orders/${orderId}`);
@@ -170,11 +186,18 @@ export async function markOrderPaid(
     }
 
     const mockPayment = transactionId.startsWith("dev_mock_");
+    const paymentMethod = options?.paymentMethod || "stripe";
     const order = await wooPut<WooOrder>(`orders/${orderId}`, {
-      payment_method: "stripe",
-      payment_method_title: mockPayment
-        ? "Credit card (local skip)"
-        : "Credit card (Stripe)",
+      payment_method: paymentMethod,
+      payment_method_title:
+        options?.paymentMethodTitle ||
+        (mockPayment
+          ? "Credit card (local skip)"
+          : paymentMethod === "ppcp-gateway" || paymentMethod === "paypal"
+            ? "PayPal"
+            : paymentMethod === "afterpay"
+              ? "Afterpay"
+              : "Credit card (Stripe)"),
       set_paid: true,
       transaction_id: transactionId,
     });

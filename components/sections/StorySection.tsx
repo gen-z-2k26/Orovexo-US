@@ -43,7 +43,7 @@ export function StorySection({ settings }: { settings: StoreSettings }) {
               Browse the catalog
             </Link>
             <Link
-              href="/about"
+              href="/about-us"
               className={cn(
                 buttonVariants({ size: "lg", variant: "outline" }),
                 "mt-2 inline-flex",

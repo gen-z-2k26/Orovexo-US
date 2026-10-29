@@ -18,6 +18,8 @@ export interface NavLink {
 
 export interface FooterColumn {
   title: string;
+  /** WordPress menu slug when this column is filled from WP admin. */
+  slug?: string;
   links: NavLink[];
 }
 
@@ -47,6 +49,7 @@ export interface ThemePalette {
 export interface StoreTheme {
   font: string;
   fontDisplay: string;
+  fontUrl?: string;
   radius: string;
   defaultMode: ColorMode;
   motion: MotionLevel;
@@ -103,8 +106,17 @@ export interface ProductPageSettings {
 export interface ProductPaymentDisplay {
   icons: PaymentMethodIcon[];
   stripeEnabled: boolean;
+  paypalEnabled: boolean;
   affirmEnabled: boolean;
   afterpayEnabled: boolean;
+}
+
+export type CheckoutPaymentKind = "stripe" | "paypal" | "afterpay";
+
+export interface CheckoutPaymentMethod {
+  kind: CheckoutPaymentKind;
+  wooId: string;
+  title: string;
 }
 
 export const defaultProductPage: ProductPageSettings = {
@@ -129,6 +141,18 @@ export interface AboutValue {
   text: string;
 }
 
+export interface PageSectionItem {
+  title: string;
+  text: string;
+}
+
+export interface PageSection {
+  title: string;
+  paragraphs?: string[];
+  bullets?: string[];
+  items?: PageSectionItem[];
+}
+
 export interface AboutPageContent {
   eyebrow: string;
   title: string;
@@ -136,6 +160,9 @@ export interface AboutPageContent {
   body: string;
   image: string;
   values: AboutValue[];
+  sections?: PageSection[];
+  ctaTitle?: string;
+  ctaBody?: string;
 }
 
 export interface FaqItem {
@@ -155,16 +182,50 @@ export interface FaqPageContent {
   groups: FaqGroup[];
 }
 
+export interface ContactChannel {
+  title: string;
+  detail: string;
+  text: string;
+}
+
+export interface ContactHelpTopic {
+  title: string;
+  text: string;
+}
+
+export interface ContactHour {
+  channel: string;
+  availability: string;
+}
+
 export interface ContactPageContent {
   eyebrow: string;
   title: string;
   intro: string;
+  channels?: ContactChannel[];
+  businessNote?: string;
+  helpTopics?: ContactHelpTopic[];
+  formNote?: string;
+  securityNote?: string;
+  hours?: ContactHour[];
+  faqs?: FaqItem[];
+}
+
+export interface CommitmentPageContent {
+  eyebrow: string;
+  title: string;
+  intro: string;
+  body: string;
+  sections: PageSection[];
+  ctaTitle?: string;
+  ctaBody?: string;
 }
 
 export interface SitePages {
   about: AboutPageContent;
   faq: FaqPageContent;
   contact: ContactPageContent;
+  commitment: CommitmentPageContent;
 }
 
 export const defaultPages: SitePages = {
@@ -176,6 +237,7 @@ export const defaultPages: SitePages = {
     image:
       "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=1200",
     values: [],
+    sections: [],
   },
   faq: {
     eyebrow: "FAQ",
@@ -187,6 +249,13 @@ export const defaultPages: SitePages = {
     eyebrow: "Contact",
     title: "We are here to help",
     intro: "",
+  },
+  commitment: {
+    eyebrow: "Our commitment",
+    title: "A shopping experience built around you",
+    intro: "",
+    body: "",
+    sections: [],
   },
 };
 
@@ -226,6 +295,8 @@ export interface StoreSettings {
   footer: {
     blurb: string;
     trustLine: string;
+    contactTitle?: string;
+    chatLine?: string;
   };
   seo: SiteSeo;
   theme: StoreTheme;
@@ -393,6 +464,7 @@ export interface CheckoutDetails {
   billing: Address;
   billingSameAsShipping: boolean;
   customerNote?: string;
+  paymentKind?: CheckoutPaymentKind;
 }
 
 export interface CheckoutSessionResult {
@@ -404,6 +476,8 @@ export interface CheckoutSessionResult {
   email: string;
   cart: StoreCart;
   mockPayment?: boolean;
+  paymentKind: CheckoutPaymentKind | "mock";
+  paymentUrl?: string;
 }
 
 export interface CompleteCheckoutPayload {

@@ -32,6 +32,15 @@ const wcRemotePatterns = uniqueHostnames().flatMap((hostname) =>
 const nextConfig: NextConfig = {
   // Babel react-compiler workers were SIGBUS-crashing Turbopack on this machine.
   reactCompiler: false,
+  async redirects() {
+    return [
+      { source: "/about", destination: "/about-us", permanent: true },
+      { source: "/contact", destination: "/contact-us", permanent: true },
+      { source: "/faq", destination: "/faqs", permanent: true },
+      { source: "/commitment", destination: "/our-commitment", permanent: true },
+      { source: "/track-order", destination: "/track-your-order", permanent: true },
+    ];
+  },
   images: {
     remotePatterns: [
       {

@@ -23,7 +23,7 @@ export function FaqAccordion({ groups }: { groups: FaqGroup[] }) {
                     </span>
                   </span>
                 </summary>
-                <p className="border-t border-border px-5 py-4 text-pretty text-sm leading-relaxed text-muted-foreground">
+                <p className="border-t border-border px-5 py-4 text-pretty text-sm leading-relaxed whitespace-pre-wrap text-muted-foreground">
                   {item.answer}
                 </p>
               </details>

@@ -29,6 +29,8 @@ import {
 } from "@/app/actions/cart";
 import type {
   Address,
+  CheckoutPaymentKind,
+  CheckoutPaymentMethod,
   CheckoutSessionResult,
   CountryOption,
   StoreCart,
@@ -67,6 +69,10 @@ export function CheckoutModal({
   const [session, setSession] = useState<CheckoutSessionResult | null>(null);
   const [sessionError, setSessionError] = useState("");
   const [mockPayment, setMockPayment] = useState(false);
+  const [paymentMethods, setPaymentMethods] = useState<CheckoutPaymentMethod[]>(
+    [],
+  );
+  const [paymentKind, setPaymentKind] = useState<CheckoutPaymentKind | "">("");
 
   useEffect(() => {
     if (!open) return;
@@ -77,6 +83,13 @@ export function CheckoutModal({
         setCart(options.cart);
         setCountries(options.countries);
         setMockPayment(options.mockPayment);
+        setPaymentMethods(options.paymentMethods);
+        setPaymentKind(
+          (current) =>
+            current ||
+            options.paymentMethods[0]?.kind ||
+            "",
+        );
         setShipping(addressFromCart(options.cart.shippingAddress, options.defaultCountry));
         setBilling(addressFromCart(options.cart.billingAddress, options.defaultCountry));
       })
@@ -150,6 +163,7 @@ export function CheckoutModal({
         shipping,
         billing: same ? { ...shipping, email: shipping.email } : billing,
         billingSameAsShipping: same,
+        paymentKind: paymentKind || undefined,
       });
       setCart(nextSession.cart);
       setSession(nextSession);
@@ -196,21 +210,25 @@ export function CheckoutModal({
     >
       <DialogContent
         data-lenis-prevent
-        className="max-h-[90dvh] gap-0 overflow-y-auto overscroll-contain rounded-2xl p-0 sm:max-w-xl"
+        className="max-h-[90dvh] w-full min-w-0 max-w-[calc(100%-1.5rem)] gap-0 overflow-x-hidden overflow-y-auto overscroll-contain rounded-2xl p-0 sm:max-w-2xl"
       >
-        <div className="space-y-6 p-5 sm:p-7">
-          <DialogHeader className="space-y-3 text-left">
-            <DialogTitle className="font-display text-2xl">
+        <div className="min-w-0 space-y-7 p-6 sm:p-8">
+          <DialogHeader className="space-y-3 pr-8 text-left">
+            <DialogTitle className="font-display text-3xl sm:text-4xl">
               {step === "payment" ? "Payment" : "Checkout"}
             </DialogTitle>
             <DialogDescription className="text-pretty">
               {step === "payment"
                 ? mockPayment
                   ? "Confirm the order. No Stripe charge in local skip mode."
-                  : "Enter your card details to pay this order."
+                  : paymentKind === "paypal"
+                    ? "Pay this order with PayPal."
+                    : paymentKind === "afterpay"
+                      ? "Pay this order with Afterpay."
+                      : "Enter your card details to pay this order."
                 : mockPayment
                   ? "Enter your delivery details, then continue to the next step."
-                  : "Enter your delivery details, then continue to card payment."}
+                  : "Enter your delivery details, then continue to payment."}
             </DialogDescription>
             <p className="text-xs font-medium tracking-wide text-muted-foreground">
               {step === "details" ? "Step 1 of 2 · Delivery" : "Step 2 of 2 · Payment"}
@@ -219,13 +237,13 @@ export function CheckoutModal({
 
           {step === "details" ? (
             <form
-              className="space-y-5"
+              className="min-w-0 space-y-6"
               onSubmit={(event) => {
                 event.preventDefault();
                 void continueToPayment();
               }}
             >
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid min-w-0 gap-x-4 gap-y-5 sm:grid-cols-2">
                 <Field
                   id="first-name"
                   label="First name"
@@ -316,7 +334,7 @@ export function CheckoutModal({
                 )}
               </div>
 
-              <label className="flex items-center gap-2 text-sm">
+              <label className="flex min-w-0 items-start gap-2 text-sm leading-snug">
                 <input
                   type="checkbox"
                   checked={same}
@@ -343,10 +361,38 @@ export function CheckoutModal({
                         {rate.name}
                       </span>
                       <span className="tabular-nums">
-                        {formatPrice(rate.price, settings)}
+                        {formatPrice(rate.price, settings, cart.totals.currency)}
                       </span>
                     </label>
                   ))}
+                </fieldset>
+              ) : null}
+
+              {paymentMethods.length > 1 ? (
+                <fieldset className="space-y-2">
+                  <legend className="text-sm font-medium">Payment method</legend>
+                  <div className="grid gap-2">
+                    {paymentMethods.map((method) => (
+                      <label
+                        key={method.kind}
+                        className={cn(
+                          "flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-sm",
+                          paymentKind === method.kind
+                            ? "border-foreground bg-muted/40"
+                            : "border-border",
+                        )}
+                      >
+                        <input
+                          type="radio"
+                          name="payment-method"
+                          className="size-4"
+                          checked={paymentKind === method.kind}
+                          onChange={() => setPaymentKind(method.kind)}
+                        />
+                        {method.title}
+                      </label>
+                    ))}
+                  </div>
                 </fieldset>
               ) : null}
 
@@ -368,7 +414,11 @@ export function CheckoutModal({
                     : "Preparing payment..."
                   : mockPayment
                     ? "Continue (dev, no charge)"
-                    : "Continue to payment"}
+                    : paymentKind === "paypal"
+                      ? "Continue to PayPal"
+                      : paymentKind === "afterpay"
+                        ? "Continue to Afterpay"
+                        : "Continue to payment"}
               </Button>
             </form>
           ) : null}
@@ -381,6 +431,7 @@ export function CheckoutModal({
                   {formatPrice(
                     session?.amount ?? cart.totals.total,
                     settings,
+                    session?.currency || cart.totals.currency,
                   )}
                 </span>
               </div>
@@ -398,6 +449,8 @@ export function CheckoutModal({
                   orderKey={session.orderKey}
                   email={session.email}
                   mockPayment={session.mockPayment}
+                  paymentKind={session.paymentKind}
+                  paymentUrl={session.paymentUrl}
                   onPaid={(result) => {
                     setCart(emptyStoreCart());
                     onOpenChange(false);
@@ -462,7 +515,7 @@ function Field({
   className?: string;
 }) {
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn("min-w-0 space-y-2", className)}>
       <Label htmlFor={id}>{label}</Label>
       <Input
         id={id}
@@ -493,7 +546,11 @@ function CartTotalsSummary({ cart }: { cart: StoreCart }) {
               </p>
             </div>
             <span className="shrink-0 text-sm font-medium tabular-nums">
-              {formatPrice(item.price * item.quantity, settings)}
+              {formatPrice(
+                item.price * item.quantity,
+                settings,
+                cart.totals.currency,
+              )}
             </span>
           </li>
         ))}
@@ -501,29 +558,41 @@ function CartTotalsSummary({ cart }: { cart: StoreCart }) {
       <div className="space-y-1 border-t border-border pt-3 text-sm">
         <div className="flex justify-between">
           <span>Subtotal</span>
-          <span className="tabular-nums">{formatPrice(cart.totals.subtotal, settings)}</span>
+          <span className="tabular-nums">
+            {formatPrice(cart.totals.subtotal, settings, cart.totals.currency)}
+          </span>
         </div>
         {cart.totals.discount > 0 ? (
           <div className="flex justify-between">
             <span>Discount</span>
             <span className="tabular-nums">
-              -{formatPrice(cart.totals.discount, settings)}
+              -{formatPrice(
+                cart.totals.discount,
+                settings,
+                cart.totals.currency,
+              )}
             </span>
           </div>
         ) : null}
         <div className="flex justify-between">
           <span>Shipping</span>
-          <span className="tabular-nums">{formatPrice(cart.totals.shipping, settings)}</span>
+          <span className="tabular-nums">
+            {formatPrice(cart.totals.shipping, settings, cart.totals.currency)}
+          </span>
         </div>
         {cart.totals.tax > 0 ? (
           <div className="flex justify-between">
             <span>Tax</span>
-            <span className="tabular-nums">{formatPrice(cart.totals.tax, settings)}</span>
+            <span className="tabular-nums">
+            {formatPrice(cart.totals.tax, settings, cart.totals.currency)}
+          </span>
           </div>
         ) : null}
         <div className="flex justify-between pt-1">
           <span>Total</span>
-          <span className="tabular-nums">{formatPrice(cart.totals.total, settings)}</span>
+          <span className="tabular-nums">
+            {formatPrice(cart.totals.total, settings, cart.totals.currency)}
+          </span>
         </div>
       </div>
     </div>

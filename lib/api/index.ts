@@ -1,4 +1,5 @@
 import site from "@/data/site.json";
+import pageContent from "@/data/pages.json";
 import {
   getWooOrigin,
   isWooConfigured,
@@ -19,6 +20,9 @@ import {
   type WooStoreMoney,
 } from "@/lib/api/map-woo-store";
 import { getLivePromo } from "@/lib/api/promo";
+import { fetchWpFooterColumns } from "@/lib/api/wp-menus";
+import { googleFontStylesheetUrl } from "@/lib/fonts";
+import { isWooGatewayEnabled } from "@/lib/api/payments";
 import type {
   Category,
   CountryOption,
@@ -42,6 +46,7 @@ export {
   mapWooOrder,
   type WooOrder,
 } from "@/lib/api/orders";
+export { getEnabledCheckoutMethods } from "@/lib/api/payments";
 
 const designSettings: StoreSettings = {
   ...(site as StoreSettings),
@@ -56,24 +61,35 @@ const designSettings: StoreSettings = {
   pages: {
     about: {
       ...defaultPages.about,
-      ...(site as StoreSettings).pages?.about,
-      values:
-        (site as StoreSettings).pages?.about?.values?.length
-          ? (site as StoreSettings).pages.about.values
-          : defaultPages.about.values,
+      ...pageContent.about,
+      values: pageContent.about.values?.length
+        ? pageContent.about.values
+        : defaultPages.about.values,
+      sections: pageContent.about.sections || [],
     },
     faq: {
       ...defaultPages.faq,
-      ...(site as StoreSettings).pages?.faq,
-      groups:
-        (site as StoreSettings).pages?.faq?.groups?.length
-          ? (site as StoreSettings).pages.faq.groups
-          : defaultPages.faq.groups,
+      ...pageContent.faq,
+      groups: pageContent.faq.groups?.length
+        ? pageContent.faq.groups
+        : defaultPages.faq.groups,
     },
     contact: {
       ...defaultPages.contact,
-      ...(site as StoreSettings).pages?.contact,
+      ...pageContent.contact,
     },
+    commitment: {
+      ...defaultPages.commitment,
+      ...pageContent.commitment,
+      sections: pageContent.commitment.sections || [],
+    },
+  },
+  theme: {
+    ...(site as StoreSettings).theme,
+    fontUrl: googleFontStylesheetUrl([
+      (site as StoreSettings).theme.font,
+      (site as StoreSettings).theme.fontDisplay,
+    ]),
   },
 };
 const REVALIDATE_SECONDS = 60;
@@ -207,7 +223,8 @@ export async function getSiteSettings(): Promise<StoreSettings> {
   }
 
   try {
-    const [siteInfo, general, storeMoney] = await Promise.all([
+    const [siteInfo, general, storeMoney, footerColumns] =
+      await Promise.all([
       fetchWpSiteInfo(),
       cachedSoftWooCall(
         "settings/general",
@@ -217,6 +234,7 @@ export async function getSiteSettings(): Promise<StoreSettings> {
         "settings/general",
       ),
       fetchStoreMoney(),
+      fetchWpFooterColumns(designSettings.navigation.footerColumns),
     ]);
 
     const merged = mergeWooStoreIdentity(designSettings, {
@@ -233,8 +251,21 @@ export async function getSiteSettings(): Promise<StoreSettings> {
           "getLivePromo",
         );
 
+    const liveColumns =
+      footerColumns ?? merged.navigation.footerColumns;
+    const brandedColumns = liveColumns.map((column) => ({
+      ...column,
+      title: merged.name
+        ? column.title.split(designSettings.name).join(merged.name)
+        : column.title,
+    }));
+
     return {
       ...merged,
+      navigation: {
+        ...merged.navigation,
+        footerColumns: brandedColumns,
+      },
       promoBanner: promo.promoBanner,
       promoId: promo.promoId,
       promoCoupon: promo.promoCoupon,
@@ -506,7 +537,7 @@ type WooReview = {
 
 type WooGateway = {
   id?: string;
-  enabled?: string;
+  enabled?: boolean | string;
   title?: string;
   method_title?: string;
 };
@@ -684,9 +715,16 @@ function stripeCardBrands(settings: StoreSettings): PaymentIconSlug[] {
 function classifyGateway(id: string) {
   const key = id.toLowerCase();
   return {
-    stripe: /stripe|woocommerce_payments/.test(key),
-    affirm: /affirm/.test(key),
-    afterpay: /afterpay|clearpay/.test(key),
+    stripe: key === "stripe" || key === "woocommerce_payments",
+    paypal:
+      key === "paypal" ||
+      key === "ppcp-gateway" ||
+      key === "ppec_paypal",
+    affirm: /affirm/.test(key) && !key.startsWith("stripe_"),
+    afterpay:
+      key === "afterpay" ||
+      key === "afterpay-clearpay" ||
+      key === "clearpay",
   };
 }
 
@@ -695,9 +733,9 @@ export async function getProductPaymentDisplay(
 ): Promise<ProductPaymentDisplay> {
   const slugs = new Set<PaymentIconSlug>();
   let stripeEnabled = false;
+  let paypalEnabled = false;
   let affirmEnabled = false;
   let afterpayEnabled = false;
-  let sawEnabledGateway = false;
 
   if (isWooConfigured() && !isWooUnreachable()) {
     const gateways = await cachedSoftWooCall(
@@ -707,10 +745,10 @@ export async function getProductPaymentDisplay(
       "payment_gateways",
     );
     for (const gateway of gateways) {
-      if (gateway.enabled !== "yes" || !gateway.id) continue;
-      sawEnabledGateway = true;
+      if (!isWooGatewayEnabled(gateway.enabled) || !gateway.id) continue;
       const kind = classifyGateway(gateway.id);
       if (kind.stripe) stripeEnabled = true;
+      if (kind.paypal) paypalEnabled = true;
       if (kind.affirm) affirmEnabled = true;
       if (kind.afterpay) afterpayEnabled = true;
       const mapped = GATEWAY_ICON_MAP[gateway.id] ?? [];
@@ -718,18 +756,16 @@ export async function getProductPaymentDisplay(
     }
   }
 
-  const stripeLive = Boolean(
-    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.trim(),
-  );
-  if (stripeLive || stripeEnabled || !sawEnabledGateway) {
-    stripeEnabled = true;
+  if (stripeEnabled) {
     for (const slug of stripeCardBrands(settings)) slugs.add(slug);
   }
+  if (paypalEnabled) slugs.add("paypal");
   if (affirmEnabled) slugs.add("affirm");
   if (afterpayEnabled) slugs.add("afterpay");
 
   return {
     stripeEnabled,
+    paypalEnabled,
     affirmEnabled,
     afterpayEnabled,
     icons: ICON_ORDER.filter((slug) => slugs.has(slug)).map((slug) => ({

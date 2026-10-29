@@ -12,12 +12,12 @@
   "decimalSeparator": ".",
   "locale": "en-US",
   "contact": {
-    "email": "hello@orvexo.com",
-    "phone": "+1 555 010 2244",
-    "address": "100 Demo Lane, Sample City, SC 29000",
-    "openingHours": "Mon-Fri: 09:00-17:00",
-    "legalName": "Orvexo",
-    "vatNumber": "DEMO-VAT-00000"
+    "email": "info@orvexo.us",
+    "phone": "+1 (256) 772-8820",
+    "address": "1430 Wall Triana Hwy SW, Madison, AL 35756, USA",
+    "openingHours": "Monday-Friday, 9:00 AM-5:00 PM CT",
+    "legalName": "Universal Lighting Technologies",
+    "vatNumber": ""
   },
   "promoBanner": "",
   "promoId": "",
@@ -30,38 +30,57 @@
     "header": [
       { "label": "Home", "href": "/" },
       { "label": "Shop", "href": "/products" },
-      { "label": "About", "href": "/about" },
+      { "label": "About", "href": "/about-us" },
       { "label": "Reviews", "href": "/reviews" },
-      { "label": "FAQ", "href": "/faq" },
-      { "label": "Contact", "href": "/contact" }
+      { "label": "FAQ", "href": "/faqs" },
+      { "label": "Contact", "href": "/contact-us" }
     ],
     "footerColumns": [
       {
-        "title": "Quick links",
+        "title": "Discover Orvexo",
+        "slug": "footer-discover",
         "links": [
           { "label": "Home", "href": "/" },
-          { "label": "Shop", "href": "/products" },
-          { "label": "Reviews", "href": "/reviews" },
-          { "label": "About", "href": "/about" },
-          { "label": "FAQ", "href": "/faq" },
-          { "label": "Contact", "href": "/contact" },
-          { "label": "Track order", "href": "/track-order" }
+          { "label": "Shop All Electronics", "href": "/products" },
+          { "label": "About Us", "href": "/about-us" },
+          { "label": "Our Commitment", "href": "/our-commitment" },
+          { "label": "Contact Us", "href": "/contact-us" },
+          { "label": "Frequently Asked Questions", "href": "/faqs" }
         ]
       },
       {
-        "title": "Store policies",
+        "title": "Customer Care",
+        "slug": "footer-customer-care",
         "links": [
-          { "label": "Shipping policy", "href": "/products" },
-          { "label": "Return policy", "href": "/products" },
-          { "label": "Privacy policy", "href": "/products" },
-          { "label": "Terms of service", "href": "/products" }
+          { "label": "Order Help Center", "href": "/order-help-center" },
+          { "label": "Track Your Order", "href": "/track-your-order" },
+          { "label": "Shipping & Delivery", "href": "/shipping-policy" },
+          { "label": "Returns & Refunds", "href": "/return-and-refund-policy" },
+          { "label": "Order Cancellations", "href": "/cancellation-policy" },
+          { "label": "Payment Options", "href": "/payment-policy" },
+          { "label": "Buy Now, Pay Later", "href": "/buy-now-pay-later" },
+          { "label": "Warranty & Support", "href": "/warranty" }
+        ]
+      },
+      {
+        "title": "Trust & Transparency",
+        "slug": "footer-trust",
+        "links": [
+          { "label": "Privacy Policy", "href": "/privacy-policy" },
+          { "label": "Terms of Service", "href": "/terms-of-service" },
+          { "label": "Cookie Policy", "href": "/cookie-policy" },
+          { "label": "Legal Notice", "href": "/legal-notice" },
+          { "label": "Accessibility Statement", "href": "/accessibility-statement" },
+          { "label": "Your Privacy Choices", "href": "/your-privacy-choices" }
         ]
       }
     ]
   },
   "footer": {
-    "blurb": "Orvexo is your place to browse, compare, and check out with a clear total before you pay.",
-    "trustLine": "Free shipping · 30-day returns · Secure checkout"
+    "blurb": "Technology for Everyday Living. Confidence in Every Purchase.",
+    "trustLine": "",
+    "contactTitle": "Business Information",
+    "chatLine": "Live Chat Available 24/7"
   },
   "seo": {
     "title": "Orvexo | Online store",
@@ -225,100 +244,5 @@
         "location": "France"
       }
     ]
-  },
-  "pages": {
-    "about": {
-      "eyebrow": "About us",
-      "title": "Thoughtful products, a clear shopping path",
-      "intro": "We built this shop so you can browse, compare, and check out without noise. Catalog details come from our store; the pages around them are here to explain how we work.",
-      "body": "From the first product photo to the order confirmation, we keep the flow simple: honest descriptions, a locked-in total before you pay, and packing that is ready to gift or keep. If something is unclear, write to us and we will help.",
-      "image": "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=1200",
-      "values": [
-        {
-          "title": "Careful packing",
-          "text": "Orders leave in protective packaging so items arrive ready to use or give."
-        },
-        {
-          "title": "Clear totals",
-          "text": "Shipping, tax, and discounts show before you pay. No last-minute surprises."
-        },
-        {
-          "title": "Real support",
-          "text": "Reach us by email or phone during opening hours. We reply to order questions first."
-        }
-      ]
-    },
-    "faq": {
-      "eyebrow": "FAQ",
-      "title": "Questions, answered",
-      "intro": "Shipping, returns, payments, and tracking. If you still need a hand, send us a message.",
-      "groups": [
-        {
-          "title": "Orders",
-          "items": [
-            {
-              "question": "How do I place an order?",
-              "answer": "Add items to your cart, go to checkout, and pay with a card. You will get an order number, order key, and email you can use to track the order."
-            },
-            {
-              "question": "Can I track a guest order?",
-              "answer": "Yes. Open Track order and enter the order number, order key, and billing email from your confirmation."
-            },
-            {
-              "question": "I need to change an order. What now?",
-              "answer": "Write to us as soon as you can with the order number. If the parcel has not shipped, we will do what we can to update it."
-            }
-          ]
-        },
-        {
-          "title": "Shipping",
-          "items": [
-            {
-              "question": "Do you offer free shipping?",
-              "answer": "Eligible orders include free standard shipping. Delivery windows show at checkout once you enter an address."
-            },
-            {
-              "question": "How long does delivery take?",
-              "answer": "Most orders ship within a few business days. Tracking appears as soon as the carrier has the parcel."
-            }
-          ]
-        },
-        {
-          "title": "Returns",
-          "items": [
-            {
-              "question": "What is the return window?",
-              "answer": "You can request a return within 30 days of delivery. Items should be unused and in original packaging where possible."
-            },
-            {
-              "question": "How do I start a return?",
-              "answer": "Contact us with your order number and the items you want to send back. We will share the next step."
-            }
-          ]
-        },
-        {
-          "title": "Payments",
-          "items": [
-            {
-              "question": "Which cards do you accept?",
-              "answer": "Checkout is encrypted and processed with Stripe. Visa, Mastercard, American Express, and UnionPay are supported on eligible cards, along with wallets Stripe enables for your region."
-            },
-            {
-              "question": "Can I pay over time with Affirm or Afterpay?",
-              "answer": "If Affirm or Afterpay is offered on a product page, you can use that pay-over-time option on eligible orders. Messaging on the product shows the installment example when those methods are active."
-            },
-            {
-              "question": "Is checkout secure?",
-              "answer": "Yes. Card details go through Stripe. We never store full card numbers on this site."
-            }
-          ]
-        }
-      ]
-    },
-    "contact": {
-      "eyebrow": "Contact",
-      "title": "Talk to us",
-      "intro": "Questions about an order, a product, or a return? Send a note and we will get back during opening hours."
-    }
   }
 }

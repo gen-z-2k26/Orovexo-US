@@ -148,6 +148,23 @@ export default async function RootLayout({
       data-motion={settings.theme.motion}
       suppressHydrationWarning
     >
+      <head>
+        {settings.theme.fontUrl ? (
+          <>
+            <link rel="preconnect" href="https://fonts.googleapis.com" />
+            <link
+              rel="preconnect"
+              href="https://fonts.gstatic.com"
+              crossOrigin="anonymous"
+            />
+            <link
+              rel="stylesheet"
+              href={settings.theme.fontUrl}
+              precedence="default"
+            />
+          </>
+        ) : null}
+      </head>
       <body
         className="flex min-h-full flex-col bg-background font-sans text-foreground"
         suppressHydrationWarning

@@ -11,7 +11,8 @@ export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "FAQ",
-  description: "Answers about orders, shipping, returns, and payments.",
+  description:
+    "Answers about Orvexo Electronics products, orders, shipping, payments, Buy Now Pay Later, returns, refunds, and warranty support.",
 };
 
 export default async function FaqPage() {
@@ -34,10 +35,12 @@ export default async function FaqPage() {
       <div className="mt-14 rounded-3xl border border-border bg-muted/40 px-6 py-8 text-center">
         <p className="font-display text-2xl">Still need help?</p>
         <p className="mx-auto mt-2 max-w-md text-pretty text-sm text-muted-foreground">
-          Send a message and we will get back during opening hours.
+          Whether you are choosing a product, checking an order, requesting a
+          return, or learning about flexible payment options, our team is ready
+          to assist.
         </p>
         <Link
-          href="/contact"
+          href="/contact-us"
           className={cn(buttonVariants({ size: "lg" }), "mt-5")}
         >
           Contact us
