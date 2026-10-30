@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { PageHero } from "@/components/PageHero";
 import { PageSections } from "@/components/PageSections";
+import { StoreImage } from "@/components/StoreImage";
 import { buttonVariants } from "@/components/ui/button";
-import { getSiteSettings } from "@/lib/api";
+import { getFeaturedProducts, getSiteSettings } from "@/lib/api";
 import { pageContainer } from "@/lib/layout";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +19,8 @@ export const metadata: Metadata = {
 export default async function AboutPage() {
   const settings = await getSiteSettings();
   const page = settings.pages.about;
+  const products = await getFeaturedProducts(8);
+  const product = products.find((item) => item.images[0]);
 
   return (
     <div className={pageContainer("py-10 sm:py-14")}>
@@ -31,12 +33,11 @@ export default async function AboutPage() {
 
       <div className="mt-10 grid items-start gap-10 lg:grid-cols-2 lg:gap-16">
         <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-border shadow-sm">
-          <Image
-            src={page.image}
-            alt={`${settings.name} workspace`}
-            fill
+          <StoreImage
+            src={product?.images[0] || settings.logo}
+            alt={product?.imageAlts[0] || product?.name || settings.name}
+            fallbackSrc={settings.logo}
             sizes="(max-width: 1024px) 100vw, 50vw"
-            className="object-cover"
           />
         </div>
         <div className="space-y-5">

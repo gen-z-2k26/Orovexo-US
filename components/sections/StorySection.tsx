@@ -1,15 +1,20 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { StoreSettings } from "@/lib/types";
 import { Reveal, RevealImage } from "@/components/sections/Reveal";
+import { StoreImage } from "@/components/StoreImage";
 import { buttonVariants } from "@/components/ui/button";
 import { pageContainer, sectionYClass } from "@/lib/layout";
 import { cn } from "@/lib/utils";
 
-const STORY_IMAGE =
-  "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=1200";
-
-export function StorySection({ settings }: { settings: StoreSettings }) {
+export function StorySection({
+  settings,
+  image,
+  imageAlt,
+}: {
+  settings: StoreSettings;
+  image?: string;
+  imageAlt?: string;
+}) {
   return (
     <section
       aria-labelledby="story-heading"
@@ -55,12 +60,11 @@ export function StorySection({ settings }: { settings: StoreSettings }) {
         </Reveal>
 
         <RevealImage className="relative aspect-[var(--media-story)] overflow-hidden rounded-2xl border border-border shadow-md">
-          <Image
-            src={STORY_IMAGE}
-            alt={`${settings.name} workspace`}
-            fill
+          <StoreImage
+            src={image || settings.logo}
+            alt={imageAlt || `${settings.name} product`}
+            fallbackSrc={settings.logo}
             sizes="(max-width: 1024px) 100vw, 50vw"
-            className="object-cover"
           />
         </RevealImage>
       </div>

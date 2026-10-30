@@ -29,7 +29,14 @@ export function HomeSections({
       <TrustStripSection />
       <CategoriesSection settings={settings} categories={categories} />
       <FeaturedProductsSection products={products} />
-      <StorySection settings={settings} />
+      <StorySection
+        settings={settings}
+        image={products.find((product) => product.images[0])?.images[0]}
+        imageAlt={
+          products.find((product) => product.images[0])?.imageAlts[0] ||
+          products.find((product) => product.images[0])?.name
+        }
+      />
       <StepsSection />
       <TrustSection />
       <NewsletterSection settings={settings} />
