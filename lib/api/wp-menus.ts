@@ -108,7 +108,7 @@ function itemsForMenu(
     .sort((a, b) => (a.menu_order ?? 0) - (b.menu_order ?? 0))
     .map((item) => ({
       label: decodeTitle(item.title),
-      href: storefrontHref(item.url ?? "/", wpOrigin),
+      href: toStorefrontHref(item.url ?? "/", wpOrigin),
     }))
     .filter((link) => link.label && link.href);
 }
@@ -118,7 +118,7 @@ function linksFromHtml(html: string, wpOrigin: string): NavLink[] {
   const seen = new Set<string>();
   const pattern = /<a\s[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
   for (const match of html.matchAll(pattern)) {
-    const href = storefrontHref(match[1], wpOrigin);
+    const href = toStorefrontHref(match[1], wpOrigin);
     const label = decodeTitle(match[2]);
     if (!href || !label) continue;
     const key = `${label}:${href}`;
@@ -181,7 +181,7 @@ function columnsFromPlugin(
     const links = (column.links ?? [])
       .map((link) => ({
         label: (link.label || "").trim(),
-        href: storefrontHref(link.href || "/", origin),
+        href: toStorefrontHref(link.href || "/", origin),
       }))
       .filter((link) => link.label && link.href);
     bySlug.set(slug, {
