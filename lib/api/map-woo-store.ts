@@ -169,7 +169,12 @@ export function mergeWooStoreIdentity(
     general.woocommerce_price_decimal_sep ??
     design.decimalSeparator;
 
-  const address = formatWooStoreAddress(general) || design.contact.address;
+  const wooAddress = formatWooStoreAddress(general);
+  const hasStreet = Boolean(general.woocommerce_store_address?.trim());
+  const address =
+    design.contact.address.trim() ||
+    (hasStreet ? wooAddress : "") ||
+    wooAddress;
   const wpName = decodeEntities(site.name || "").trim();
   const wpTagline = decodeEntities(site.description || "").trim();
   const branded = applyWpBrand(

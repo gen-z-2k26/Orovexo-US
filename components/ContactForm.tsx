@@ -42,32 +42,34 @@ export function ContactForm({ to }: { to: string }) {
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
-      <div className="space-y-2">
-        <Label htmlFor="contact-name">Name</Label>
-        <Input id="contact-name" name="name" required autoComplete="name" />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="contact-email">Email</Label>
-        <Input
-          id="contact-email"
-          name="email"
-          type="email"
-          required
-          autoComplete="email"
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="contact-phone">Phone number (optional)</Label>
-        <Input
-          id="contact-phone"
-          name="phone"
-          type="tel"
-          autoComplete="tel"
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="contact-order">Order number (if applicable)</Label>
-        <Input id="contact-order" name="orderNumber" />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="contact-name">Name</Label>
+          <Input id="contact-name" name="name" required autoComplete="name" />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="contact-email">Email</Label>
+          <Input
+            id="contact-email"
+            name="email"
+            type="email"
+            required
+            autoComplete="email"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="contact-phone">Phone number (optional)</Label>
+          <Input
+            id="contact-phone"
+            name="phone"
+            type="tel"
+            autoComplete="tel"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="contact-order">Order number (if applicable)</Label>
+          <Input id="contact-order" name="orderNumber" />
+        </div>
       </div>
       <div className="space-y-2">
         <Label htmlFor="contact-subject">Subject</Label>

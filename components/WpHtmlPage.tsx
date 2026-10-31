@@ -12,7 +12,7 @@ export function WpHtmlPage({
     <div className={pageContainer("py-10 sm:py-14")}>
       <PageHero current={title} title={title} />
       <div
-        className="prose prose-neutral mt-10 max-w-3xl text-sm leading-relaxed text-muted-foreground dark:prose-invert"
+        className="prose prose-neutral mt-10 max-w-none text-sm leading-relaxed text-muted-foreground dark:prose-invert"
         dangerouslySetInnerHTML={{ __html: html }}
       />
     </div>

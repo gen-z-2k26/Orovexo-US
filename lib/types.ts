@@ -347,6 +347,16 @@ export interface ProductCategoryRef {
   slug: string;
 }
 
+export interface ProductSpecRow {
+  label: string;
+  value: string;
+}
+
+export interface ProductSpecGroup {
+  title: string;
+  rows: ProductSpecRow[];
+}
+
 export interface Product {
   id: string;
   slug: string;
@@ -356,6 +366,10 @@ export interface Product {
   salePrice: number | null;
   onSale: boolean;
   description: string;
+  sku: string;
+  tags: ProductCategoryRef[];
+  specGroups: ProductSpecGroup[];
+  relatedIds: number[];
   images: string[];
   imageAlts: string[];
   category: string;

@@ -2,7 +2,14 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductDetail } from "@/components/ProductDetail";
 import { JsonLd } from "@/components/JsonLd";
-import { getProduct, getProductPaymentDisplay, getSiteSettings, getSiteUrl } from "@/lib/api";
+import {
+  getProduct,
+  getProductPaymentDisplay,
+  getProductsByCategory,
+  getProductsByIds,
+  getSiteSettings,
+  getSiteUrl,
+} from "@/lib/api";
 import { getBnplPublicConfig } from "@/lib/bnpl";
 
 export const revalidate = 60;
@@ -71,6 +78,19 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
 
+  const categorySlug = product.categories[0]?.slug;
+  const relatedFromIds = product.relatedIds?.length
+    ? await getProductsByIds(product.relatedIds.slice(0, 4))
+    : [];
+  const related =
+    relatedFromIds.length > 0
+      ? relatedFromIds.filter((item) => item.id !== product.id).slice(0, 4)
+      : categorySlug
+        ? (await getProductsByCategory(categorySlug))
+            .filter((item) => item.id !== product.id)
+            .slice(0, 4)
+        : [];
+
   const siteUrl = getSiteUrl(settings);
   const url = siteUrl
     ? `${siteUrl}/products/${product.slug}`
@@ -82,7 +102,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     name: product.name,
     description: product.description,
     image: product.images,
-    sku: product.id,
+    sku: product.sku || product.id,
     category: product.category,
     brand: {
       "@type": "Brand",
@@ -145,6 +165,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         product={product}
         payment={await getProductPaymentDisplay(settings)}
         bnpl={getBnplPublicConfig()}
+        related={related}
       />
     </>
   );

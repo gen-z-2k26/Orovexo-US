@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { PageHero } from "@/components/PageHero";
+import {
+  BusinessStrip,
+  EditorialCta,
+  EditorialHero,
+  EditorialShell,
+  PageToc,
+  slugifySection,
+} from "@/components/EditorialPage";
 import { PageSections } from "@/components/PageSections";
 import { StoreImage } from "@/components/StoreImage";
 import { buttonVariants } from "@/components/ui/button";
 import { getFeaturedProducts, getSiteSettings } from "@/lib/api";
-import { pageContainer } from "@/lib/layout";
 import { cn } from "@/lib/utils";
 
 export const revalidate = 60;
@@ -21,20 +27,24 @@ export default async function AboutPage() {
   const page = settings.pages.about;
   const products = await getFeaturedProducts(8);
   const product = products.find((item) => item.images[0]);
+  const toc = (page.sections || []).map((section) => ({
+    id: slugifySection(section.title),
+    title: section.title,
+  }));
 
   return (
-    <div className={pageContainer("py-10 sm:py-14")}>
-      <PageHero
+    <EditorialShell>
+      <EditorialHero
         current="About"
         eyebrow={`${settings.name} · ${page.eyebrow}`}
         title={page.title}
         description={page.intro}
       />
 
-      <div className="mt-10 grid items-start gap-10 lg:grid-cols-2 lg:gap-16">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-border shadow-sm">
+      <div className="mt-10 grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-border shadow-sm">
           <StoreImage
-            src={product?.images[0] || settings.logo}
+            src={product?.images[0] || page.image || settings.logo}
             alt={product?.imageAlts[0] || product?.name || settings.name}
             fallbackSrc={settings.logo}
             sizes="(max-width: 1024px) 100vw, 50vw"
@@ -58,37 +68,47 @@ export default async function AboutPage() {
         </div>
       </div>
 
+      <BusinessStrip settings={settings} />
+
       {page.values.length ? (
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {page.values.map((value) => (
-            <div key={value.title} className="surface-card space-y-2 p-6">
-              <h2 className="text-lg tracking-tight">{value.title}</h2>
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                {value.text}
-              </p>
-            </div>
-          ))}
+        <div className="mt-14">
+          <h2 className="font-display text-2xl tracking-tight sm:text-3xl">
+            What we stand for
+          </h2>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {page.values.map((value) => (
+              <div key={value.title} className="surface-card space-y-2 p-6">
+                <h3 className="text-lg tracking-tight">{value.title}</h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {value.text}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       ) : null}
 
-      <PageSections sections={page.sections || []} />
+      {toc.length ? (
+        <div className="mt-14 grid gap-10 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-14">
+          <div className="lg:sticky lg:top-24 lg:self-start">
+            <PageToc items={toc} />
+          </div>
+          <PageSections className="mt-0" sections={page.sections || []} />
+        </div>
+      ) : (
+        <PageSections sections={page.sections || []} />
+      )}
 
       {page.ctaTitle ? (
-        <div className="mt-14 rounded-3xl border border-border bg-muted/40 px-6 py-8 text-center">
-          <p className="font-display text-2xl">{page.ctaTitle}</p>
-          {page.ctaBody ? (
-            <p className="mx-auto mt-2 max-w-2xl text-pretty text-sm text-muted-foreground">
-              {page.ctaBody}
-            </p>
-          ) : null}
-          <Link
-            href="/products"
-            className={cn(buttonVariants({ size: "lg" }), "mt-5")}
-          >
-            Shop Orvexo Electronics
-          </Link>
-        </div>
+        <EditorialCta
+          title={page.ctaTitle}
+          body={page.ctaBody}
+          primaryHref="/products"
+          primaryLabel="Shop Orvexo Electronics"
+          secondaryHref="/contact-us"
+          secondaryLabel="Contact our team"
+        />
       ) : null}
-    </div>
+    </EditorialShell>
   );
 }

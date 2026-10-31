@@ -1,6 +1,12 @@
 import { CONTENT_PAGES } from "@/lib/site-urls";
 import type { FaqGroup } from "@/lib/types";
 
+export type PolicySection = {
+  title: string;
+  paragraphs?: string[];
+  bullets?: string[];
+};
+
 export type PolicyPageDef = {
   slug: string;
   title: string;
@@ -8,6 +14,8 @@ export type PolicyPageDef = {
   intro: string;
   groupTitles: string[];
   paragraphs?: string[];
+  designed?: boolean;
+  sections?: PolicySection[];
 };
 
 export const POLICY_PAGES: PolicyPageDef[] = [
@@ -62,18 +70,137 @@ export const POLICY_PAGES: PolicyPageDef[] = [
   {
     slug: "privacy-policy",
     title: "Privacy Policy",
-    description: "How this shop collects and uses your information.",
+    description:
+      "How Orvexo Electronics collects, uses, and shares information when you shop with us.",
     intro:
-      "We may use customer information to process orders, provide support, arrange shipping, and maintain the website, as described here and in any WordPress privacy page.",
-    groupTitles: ["Accounts, privacy, and security"],
+      "This policy explains how Orvexo Electronics, operated by Universal Lighting Technologies, handles information when you browse the store, place an order, or contact support.",
+    groupTitles: [],
+    designed: true,
+    sections: [
+      {
+        title: "Who we are",
+        paragraphs: [
+          "Orvexo Electronics is an online store operated by Universal Lighting Technologies. Our business correspondence address is 1430 Wall Triana Hwy SW, Madison, AL 35756, USA. That address is not a retail showroom or an authorized return location.",
+          "Questions about this policy can be sent to info@orvexo.us or +1 (256) 772-8820. Live chat is available 24/7. Phone support hours are Monday-Friday, 9:00 AM-5:00 PM Central Time.",
+        ],
+      },
+      {
+        title: "Information we collect",
+        paragraphs: [
+          "We collect the details needed to complete a purchase and to answer your questions. That typically includes your name, email address, shipping and billing details, phone number, order contents, and messages you send to our team.",
+        ],
+        bullets: [
+          "Account-free checkout details you enter during an order.",
+          "Order history, tracking references, and support tickets tied to your purchase.",
+          "Technical data such as browser type, device, and pages visited, used to keep the store working.",
+          "Payment status from our processors. We do not store full card numbers on this website.",
+        ],
+      },
+      {
+        title: "How we use information",
+        paragraphs: [
+          "We use customer information for store operations, not for unrelated marketing lists created from your order.",
+        ],
+        bullets: [
+          "Processing orders, arranging delivery, and sending confirmations or tracking updates.",
+          "Providing customer assistance by email, phone, or live chat.",
+          "Supporting secure checkout and preventing fraud or abuse.",
+          "Maintaining website functionality, including the shopping cart.",
+          "Meeting applicable legal, tax, and accounting obligations.",
+        ],
+      },
+      {
+        title: "Payments and processors",
+        paragraphs: [
+          "Checkout payments are handled by participating third-party providers such as Stripe and, where shown, Buy Now Pay Later services including Afterpay or Affirm. Those providers process payment credentials under their own terms and privacy notices.",
+          "Prices and checkout totals are displayed in United States Dollars (USD).",
+        ],
+      },
+      {
+        title: "Sharing",
+        paragraphs: [
+          "We share information with service partners who help us fulfill your order, such as shipping carriers, payment processors, and the WordPress / WooCommerce platform that powers catalog and checkout data. We do not sell your personal information.",
+        ],
+      },
+      {
+        title: "Retention and security",
+        paragraphs: [
+          "Order records are kept for as long as needed to fulfill the purchase, handle returns, and meet legal record-keeping requirements. We use reasonable administrative and technical measures to protect the store, including encrypted checkout through our payment provider.",
+        ],
+      },
+      {
+        title: "Your privacy choices",
+        paragraphs: [
+          "You may contact info@orvexo.us with a privacy-related request, including access, correction, or deletion where applicable law provides those rights. We will review the request and respond according to the laws that apply to your situation.",
+          "California residents and other US shoppers can also visit the Your Privacy Choices page on this site.",
+        ],
+      },
+    ],
   },
   {
     slug: "terms-of-service",
     title: "Terms of Service",
-    description: "Terms that apply when you shop with us.",
+    description:
+      "The purchasing, shipping, return, and payment terms that apply when you shop at Orvexo Electronics.",
     intro:
-      "By placing an order you agree to the purchasing, shipping, return, and payment terms published on this site.",
-    groupTitles: ["Placing and managing orders", "Payments and checkout"],
+      "By browsing this store or placing an order you agree to the terms published here, together with our shipping, return, payment, and privacy pages.",
+    groupTitles: [],
+    designed: true,
+    sections: [
+      {
+        title: "The store",
+        paragraphs: [
+          "Orvexo Electronics is a US-focused online electronics store operated by Universal Lighting Technologies. We currently fulfill eligible orders to addresses within the United States. We do not operate a public retail showroom.",
+        ],
+      },
+      {
+        title: "Orders",
+        paragraphs: [
+          "An order is an offer to buy the products listed in your cart at the prices shown at checkout. We may decline or cancel an order if an item is unavailable, a payment cannot be completed, or the order appears fraudulent or incomplete.",
+          "You may request cancellation before fulfillment begins. There is no cancellation fee. Once an order has entered fulfillment, our return policy applies instead.",
+        ],
+      },
+      {
+        title: "Pricing and payment",
+        paragraphs: [
+          "Prices are shown in United States Dollars (USD). Applicable tax and the final order total appear at checkout. The payment methods displayed for your purchase are the options available at that time.",
+          "Afterpay is one of our primary payment options, subject to availability and provider approval. Affirm, PayPal, or card payments may also appear. Financing approval, installments, interest, and fees are set by the payment provider.",
+        ],
+      },
+      {
+        title: "Shipping",
+        paragraphs: [
+          "Eligible domestic orders receive free standard shipping, with no minimum purchase requirement. Typical processing is 1-2 business days, followed by an estimated 3-7 business days in transit, for a total of about 4-9 business days. The order cut-off is 4:00 PM Central Time.",
+          "Delivery estimates can change because of carrier conditions, holidays, weather, or other events outside our control.",
+        ],
+      },
+      {
+        title: "Returns and refunds",
+        paragraphs: [
+          "Eligible products may be returned within 30 calendar days. Approved returns have a $0 restocking fee. For change-of-mind returns, customers generally cover return shipping and must meet the product-condition requirements described on our returns page.",
+          "Do not send products to our Madison business address unless our team specifically authorizes that destination. Contact support first so we can provide the correct return instructions. Approved refunds are typically processed within 10 business days after receipt, inspection, and approval, using the original payment method.",
+        ],
+      },
+      {
+        title: "Product information and warranties",
+        paragraphs: [
+          "Please review product descriptions, specifications, and compatibility notes before you buy. Warranty coverage varies by product and manufacturer. We do not promise a blanket warranty period on every item.",
+          "If a product arrives damaged, defective, or incorrect, contact us so we can review prepaid return shipping and the options available under our return policy.",
+        ],
+      },
+      {
+        title: "Limitation of liability",
+        paragraphs: [
+          "To the fullest extent permitted by law, Universal Lighting Technologies and Orvexo Electronics are not liable for indirect, incidental, or consequential damages arising from your use of the site or from products purchased through it. Nothing in these terms limits rights you have under applicable consumer law.",
+        ],
+      },
+      {
+        title: "Contact",
+        paragraphs: [
+          "Email info@orvexo.us, call +1 (256) 772-8820, or use live chat, available 24/7. Business hours are Monday-Friday, 9:00 AM-5:00 PM Central Time.",
+        ],
+      },
+    ],
   },
   {
     slug: "cookie-policy",
@@ -98,13 +225,44 @@ export const POLICY_PAGES: PolicyPageDef[] = [
   {
     slug: "accessibility-statement",
     title: "Accessibility Statement",
-    description: "Our aim to keep shopping information easier to navigate and understand.",
+    description:
+      "How we aim to keep the Orvexo Electronics store easier to navigate, and how to ask for help.",
     intro:
-      "We want our website and shopping information to be easier for customers to navigate and understand.",
+      "We want our website and shopping information to be easier for customers to navigate and understand. This statement describes that aim and how to reach us if a page, listing, or checkout step is difficult to use.",
     groupTitles: [],
-    paragraphs: [
-      "If you have trouble using a page, product listing, or checkout step, contact us at info@orvexo.us or +1 (256) 772-8820 and we will help you complete your request.",
-      "Live chat is available 24/7. Business hours are Monday-Friday, 9:00 AM-5:00 PM Central Time.",
+    designed: true,
+    sections: [
+      {
+        title: "Our commitment",
+        paragraphs: [
+          "Orvexo Electronics, operated by Universal Lighting Technologies, is working to keep product information, policies, and checkout steps clearer over time. We treat accessibility as an ongoing effort, not a one-time audit claim.",
+        ],
+      },
+      {
+        title: "What we work toward",
+        paragraphs: [
+          "We aim for readable text, visible focus states, keyboard access to primary shopping actions, and captions or text alternatives on important images where we control the markup.",
+        ],
+        bullets: [
+          "Clear headings and labels on key pages.",
+          "Color contrast that remains readable in light and dark modes.",
+          "Forms that identify required fields and errors in text.",
+          "Support through email, phone, and 24/7 live chat if a flow is blocked.",
+        ],
+      },
+      {
+        title: "Known limits",
+        paragraphs: [
+          "Some product photography, third-party payment widgets, and carrier tracking pages are outside our full control. If a third-party step is hard to complete, contact us and we will help you finish the request another way.",
+        ],
+      },
+      {
+        title: "Request assistance",
+        paragraphs: [
+          "If you have trouble using a page, product listing, or checkout step, email info@orvexo.us or call +1 (256) 772-8820. Tell us the page you were on and what you were trying to do. We will help you complete your request.",
+          "Live chat is available 24/7. Phone support hours are Monday-Friday, 9:00 AM-5:00 PM Central Time. Our business address is 1430 Wall Triana Hwy SW, Madison, AL 35756, USA, for correspondence only.",
+        ],
+      },
     ],
   },
   {

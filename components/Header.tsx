@@ -11,6 +11,7 @@ import { PromoBanner } from "@/components/PromoBanner";
 import { useCartStore } from "@/lib/cart-store";
 import { useStore } from "@/lib/store-context";
 import { useMotionEnabled } from "@/lib/use-motion-enabled";
+import { BrandLogo } from "@/components/BrandLogo";
 import { pageContainer } from "@/lib/layout";
 import { cn } from "@/lib/utils";
 
@@ -62,9 +63,9 @@ export function Header() {
 
         <Link
           href="/"
-          className="inline-flex items-center gap-2 rounded-xl text-xl tracking-tight transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-2xl"
+          className="inline-flex items-center rounded-xl transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <span>{settings.name}</span>
+          <BrandLogo heightClass="h-7 sm:h-8" />
         </Link>
 
         <nav

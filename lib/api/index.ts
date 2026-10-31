@@ -111,6 +111,9 @@ const PRODUCT_FIELDS = [
   "short_description",
   "images",
   "categories",
+  "tags",
+  "sku",
+  "related_ids",
   "stock_status",
 ].join(",");
 

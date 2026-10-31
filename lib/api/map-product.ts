@@ -1,4 +1,9 @@
-import type { Category, Product, ProductCategoryRef } from "@/lib/types";
+import type {
+  Category,
+  Product,
+  ProductCategoryRef,
+  ProductSpecGroup,
+} from "@/lib/types";
 
 type WooImage = { src?: string; alt?: string };
 type WooCategory = {
@@ -27,6 +32,9 @@ export type WooProduct = {
   short_description?: string;
   images?: WooImage[];
   categories?: WooCategory[];
+  tags?: WooCategory[];
+  sku?: string;
+  related_ids?: number[];
   stock_status?: string;
 };
 
@@ -64,6 +72,30 @@ function uniqueUrls(urls: string[]): string[] {
     out.push(url);
   }
   return out;
+}
+
+function parseSpecGroups(html: string): ProductSpecGroup[] {
+  if (!html || !/<table/i.test(html)) return [];
+  const groups: ProductSpecGroup[] = [];
+  const chunks = html.split(/<h2[^>]*>/i).slice(1);
+  for (const chunk of chunks) {
+    const titleEnd = chunk.search(/<\/h2>/i);
+    if (titleEnd < 0) continue;
+    const title = stripHtml(chunk.slice(0, titleEnd));
+    const rows: ProductSpecGroup["rows"] = [];
+    const rowPattern = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+    let rowMatch: RegExpExecArray | null;
+    while ((rowMatch = rowPattern.exec(chunk))) {
+      const cells = [...rowMatch[1].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)].map(
+        (cell) => stripHtml(cell[1] || ""),
+      );
+      if (cells.length < 2 || !cells[0] || !cells[1]) continue;
+      if (/^(specification|attribute|details|value)$/i.test(cells[0])) continue;
+      rows.push({ label: cells[0], value: cells[1] });
+    }
+    if (title && rows.length) groups.push({ title, rows });
+  }
+  return groups;
 }
 
 function mapCategories(
@@ -111,6 +143,12 @@ export function mapWooProduct(product: WooProduct): Product {
     salePrice: onSale ? saleRaw : null,
     onSale,
     description,
+    sku: String(product.sku || "").trim(),
+    tags: mapCategories(product.tags),
+    specGroups: parseSpecGroups(product.description || ""),
+    relatedIds: (product.related_ids ?? [])
+      .map((id) => Number(id))
+      .filter((id) => Number.isFinite(id) && id > 0),
     images,
     imageAlts,
     category: categories[0]?.name || "",

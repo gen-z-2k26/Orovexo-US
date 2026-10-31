@@ -134,7 +134,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
           <h1 className="font-display text-balance text-4xl sm:text-5xl">
             {category.name}
           </h1>
-          <p className="max-w-2xl text-pretty text-muted-foreground">
+          <p className="text-pretty text-muted-foreground">
             {category.description ||
               `${products.length} product${products.length === 1 ? "" : "s"} in this collection at ${settings.name}.`}
           </p>

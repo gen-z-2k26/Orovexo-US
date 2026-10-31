@@ -98,6 +98,33 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
+function postalAddressLd(address: string) {
+  const trimmed = address.trim();
+  if (!trimmed) return undefined;
+  const parts = trimmed.split(",").map((part) => part.trim()).filter(Boolean);
+  const streetAddress = parts[0] || trimmed;
+  const locality = parts[1] || "";
+  const regionPostal = parts[2] || "";
+  const [region, ...postalParts] = regionPostal.split(/\s+/);
+  const postalCode = postalParts.join(" ");
+  const countryPart = (parts[3] || parts.at(-1) || "").toUpperCase();
+  const addressCountry =
+    countryPart === "USA" || countryPart === "UNITED STATES" || countryPart === "US"
+      ? "US"
+      : countryPart.length === 2
+        ? countryPart
+        : "US";
+
+  return {
+    "@type": "PostalAddress",
+    streetAddress,
+    addressLocality: locality || undefined,
+    addressRegion: region || undefined,
+    postalCode: postalCode || undefined,
+    addressCountry,
+  };
+}
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -117,13 +144,7 @@ export default async function RootLayout({
     url: absolute("/"),
     email: settings.contact.email,
     telephone: settings.contact.phone,
-    address: settings.contact.address
-      ? {
-          "@type": "PostalAddress",
-          streetAddress: settings.contact.address,
-          addressCountry: "NL",
-        }
-      : undefined,
+    address: postalAddressLd(settings.contact.address),
     vatID: settings.contact.vatNumber || undefined,
   };
 

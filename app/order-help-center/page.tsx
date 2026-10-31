@@ -9,4 +9,6 @@ export const metadata: Metadata = {
     "Get help with an Orvexo Electronics order, tracking, returns, or payments.",
 };
 
-export default ContactPage;
+export default function OrderHelpPage() {
+  return <ContactPage variant="help" />;
+}

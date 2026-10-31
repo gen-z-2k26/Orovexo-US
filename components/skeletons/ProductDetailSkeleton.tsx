@@ -10,14 +10,21 @@ export function ProductDetailSkeleton() {
       aria-label="Loading product"
     >
       <StoreLoader compact label="Loading product details..." />
+      <Skeleton className="h-4 w-64" />
       <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
-        <Skeleton className="aspect-square w-full rounded-2xl" />
-        <div className="space-y-4 lg:py-2">
-          <Skeleton className="h-4 w-28" />
-          <Skeleton className="h-10 w-3/4" />
-          <Skeleton className="h-7 w-24" />
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-28 w-full rounded-2xl" />
+        <div className="flex gap-3">
+          <div className="hidden w-[76px] flex-col gap-2 sm:flex">
+            <Skeleton className="aspect-square w-full rounded-none" />
+            <Skeleton className="aspect-square w-full rounded-none" />
+            <Skeleton className="aspect-square w-full rounded-none" />
+          </div>
+          <Skeleton className="aspect-square min-w-0 flex-1 rounded-none" />
+        </div>
+        <div className="space-y-4">
+          <Skeleton className="h-8 w-3/4" />
+          <Skeleton className="h-7 w-32" />
+          <Skeleton className="h-16 w-full" />
+          <Skeleton className="h-11 w-72" />
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import type { StoreSettings } from "@/lib/types";
+import { BrandLogo } from "@/components/BrandLogo";
 import { pageContainer } from "@/lib/layout";
 
 function isExternal(href: string) {
@@ -24,30 +25,15 @@ export function Footer({ settings }: { settings: StoreSettings }) {
   return (
     <footer className="mt-auto border-t border-border bg-card">
       <div className={pageContainer("py-12 sm:py-14")}>
-        <div className="space-y-4">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-lg tracking-tight"
-          >
-            {settings.logo ? (
-              // SVG store marks are local files; a plain img avoids next/image SVG limits.
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={settings.logo}
-                alt=""
-                width={28}
-                height={28}
-                className="size-7 object-contain"
-              />
-            ) : null}
-            <span className="uppercase">{settings.name}</span>
-          </Link>
-          <p className="max-w-xl text-pretty text-sm leading-relaxed text-muted-foreground">
-            {blurb}
-          </p>
-        </div>
-
-        <div className="mt-8 grid gap-10 border-t border-border pt-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-6 lg:gap-x-8">
+          <div className="space-y-4 sm:col-span-2 lg:col-span-2">
+            <Link href="/" className="inline-flex items-center">
+              <BrandLogo heightClass="h-9 sm:h-10" />
+            </Link>
+            <p className="max-w-sm text-pretty text-sm leading-relaxed text-muted-foreground">
+              {blurb}
+            </p>
+          </div>
           {columns.map((column) => (
             <div key={column.slug || column.title} className="space-y-3">
               <p className="text-sm font-medium tracking-tight">{column.title}</p>
@@ -75,7 +61,7 @@ export function Footer({ settings }: { settings: StoreSettings }) {
             </div>
           ))}
 
-          <div className="space-y-3">
+          <div className="space-y-3 lg:col-span-1">
             <p className="text-sm font-medium tracking-tight">{contactTitle}</p>
             <ul className="space-y-3 text-sm text-muted-foreground">
               {settings.contact.address ? (

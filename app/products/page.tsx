@@ -56,7 +56,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         <h1 className="font-display text-balance text-4xl sm:text-5xl">
           All products
         </h1>
-        <p className="max-w-2xl text-pretty text-muted-foreground">
+        <p className="text-pretty text-muted-foreground">
           Search the catalog, filter by category, and sort by price.
         </p>
       </header>

@@ -36,16 +36,20 @@ export default async function PolicySlugPage({
   const policy = policyBySlug(slug);
   if (!policy) notFound();
 
-  const wp = await getWpPage(slug);
-  if (wp?.content) {
-    return <WpHtmlPage title={wp.title || policy.title} html={wp.content} />;
+  const settings = await getSiteSettings();
+
+  if (!policy.designed) {
+    const wp = await getWpPage(slug);
+    if (wp?.content) {
+      return <WpHtmlPage title={wp.title || policy.title} html={wp.content} />;
+    }
   }
 
-  const settings = await getSiteSettings();
   return (
     <PolicyPageView
       policy={policy}
       groups={groupsForPolicy(policy, settings.pages.faq.groups)}
+      settings={settings}
     />
   );
 }

@@ -73,8 +73,8 @@ export function QuickViewModal({
           Quick view for {active.name}
         </DialogDescription>
 
-        <div className="grid overflow-hidden rounded-2xl bg-muted text-foreground md:grid-cols-2">
-          <div className="relative min-h-72 overflow-hidden md:min-h-[34rem]">
+        <div className="grid max-h-[92dvh] overflow-hidden rounded-2xl bg-background text-foreground md:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+          <div className="relative min-h-64 bg-muted md:min-h-[32rem]">
             <ProductImageCarousel
               images={active.images}
               alt={active.name}
@@ -86,8 +86,8 @@ export function QuickViewModal({
             />
           </div>
 
-          <div className="relative flex flex-col gap-6 bg-card p-6 sm:p-8">
-            <div className="flex justify-end">
+          <div className="flex min-h-0 flex-col bg-card">
+            <div className="flex items-start justify-end px-5 pt-4">
               <button
                 type="button"
                 aria-label="Close quick view"
@@ -98,20 +98,49 @@ export function QuickViewModal({
               </button>
             </div>
 
-            <div className="space-y-3">
-              <h2 className="text-balance text-2xl leading-tight tracking-tight sm:text-3xl">
+            <div className="space-y-3 px-5 pb-4 sm:px-6">
+              {active.category ? (
+                <p className="text-xs tracking-wide text-muted-foreground uppercase">
+                  {active.category}
+                </p>
+              ) : null}
+              <h2 className="text-balance text-xl leading-snug font-medium tracking-tight sm:text-2xl">
                 {active.name}
               </h2>
-              <p className="text-xl tabular-nums tracking-tight">
-                {formatPrice(active.price, settings)}
-              </p>
+              <div className="flex flex-wrap items-baseline gap-2">
+                {active.onSale && active.regularPrice > active.price ? (
+                  <p className="text-sm tabular-nums text-muted-foreground line-through">
+                    {formatPrice(active.regularPrice, settings)}
+                  </p>
+                ) : null}
+                <p className="text-xl tabular-nums tracking-tight">
+                  {formatPrice(active.price, settings)}
+                </p>
+              </div>
               <ProductStatusBadges product={active} />
-              <p className="text-pretty text-sm leading-relaxed text-muted-foreground">
-                {active.description}
-              </p>
             </div>
 
-            <div className="mt-auto space-y-3 pt-2">
+            <div className="min-h-0 flex-1 overflow-y-auto border-y border-border px-5 py-4 sm:px-6">
+              {(active.specGroups?.[0]?.rows.length ?? 0) > 0 ? (
+                <dl className="grid grid-cols-1 gap-px">
+                  {active.specGroups[0].rows.slice(0, 10).map((row) => (
+                    <div
+                      key={row.label}
+                      className="grid grid-cols-[minmax(7rem,0.9fr)_1.1fr] gap-3 border-b border-border/70 py-2 text-sm last:border-b-0"
+                    >
+                      <dt className="text-muted-foreground">{row.label}</dt>
+                      <dd className="text-right">{row.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              ) : (
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {active.description}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-3 px-5 py-4 sm:px-6">
               <div className="flex items-center gap-2.5">
                 <QuantityPicker
                   value={quantity}
@@ -153,10 +182,10 @@ export function QuickViewModal({
                 onClick={() => onOpenChange(false)}
                 className={cn(
                   buttonVariants({ variant: "outline" }),
-                  "h-12 w-full",
+                  "h-11 w-full",
                 )}
               >
-                See detail
+                View full details
               </Link>
             </div>
           </div>

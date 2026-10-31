@@ -86,14 +86,15 @@ export function ProductCard({ product }: { product: Product }) {
             aria-label={`Quick view ${product.name}`}
             title="Quick view"
             className="
-              absolute top-2.5 right-2.5 z-20 border-white/25 bg-black/50 text-white shadow-sm backdrop-blur-md
+              absolute top-2.5 right-2.5 z-20 border-black/10 bg-white text-neutral-950 shadow-md
               opacity-100 sm:scale-90 sm:opacity-0
               group-hover:scale-100 group-hover:opacity-100
-              hover:bg-black/80 hover:text-white
+              hover:bg-white hover:text-neutral-950
               focus-visible:scale-100 focus-visible:opacity-100
+              dark:border-black/10 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-100 dark:hover:text-neutral-950
             "
           >
-            <Eye className="size-3.5" />
+            <Eye className="size-3.5 text-neutral-950" />
           </Button>
         </div>
 

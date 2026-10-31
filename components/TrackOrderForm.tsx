@@ -49,7 +49,7 @@ export function TrackOrderForm() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-lg space-y-8">
+    <div className="w-full space-y-8">
       <form className="space-y-4 text-left" onSubmit={(event) => void onSubmit(event)}>
         <div className="space-y-2">
           <Label htmlFor="track-id">Order number</Label>
