@@ -11,7 +11,7 @@ const HERO_IMAGE =
 
 export function HeroSection({ settings }: { settings: StoreSettings }) {
   return (
-    <section className="relative isolate min-h-[78dvh] overflow-hidden border-b border-border">
+    <section className="relative isolate min-h-[70dvh] overflow-hidden border-b border-border sm:min-h-[78dvh]">
       <div className="absolute inset-0">
         <Image
           src={HERO_IMAGE}
@@ -29,21 +29,21 @@ export function HeroSection({ settings }: { settings: StoreSettings }) {
           "relative flex min-h-[78dvh] flex-col justify-center py-16 sm:py-20",
         )}
       >
-        <Reveal className="max-w-3xl space-y-5">
-          <p className="text-lg tracking-tight text-accent sm:text-xl">
+        <Reveal className="max-w-3xl space-y-4 text-center sm:space-y-5 sm:text-left">
+          <p className="text-base tracking-tight text-accent sm:text-xl">
             {settings.name}
           </p>
-          <h1 className="font-display text-balance text-5xl tracking-tight text-white sm:text-6xl">
+          <h1 className="font-display text-balance text-3xl tracking-tight text-white sm:text-6xl">
             {settings.hero?.headline || "Shop a wide range of products in one place"}
           </h1>
-          <p className="max-w-xl text-pretty text-lg leading-relaxed text-white/88">
+          <p className="text-pretty text-base leading-relaxed text-white/88 sm:max-w-xl sm:text-lg">
             {settings.hero?.support ||
               "From everyday essentials to standout finds, browse many different items and pick what fits you."}
           </p>
-          <div className="flex flex-wrap gap-3 pt-1">
+          <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:flex-wrap">
             <Link
               href="/products"
-              className={cn(buttonVariants({ size: "lg" }), "min-w-40")}
+              className={cn(buttonVariants({ size: "lg" }), "w-full sm:min-w-40 sm:w-auto")}
             >
               Shop now
             </Link>
@@ -51,7 +51,7 @@ export function HeroSection({ settings }: { settings: StoreSettings }) {
               href="/#categories"
               className={cn(
                 buttonVariants({ size: "lg", variant: "outline" }),
-                "min-w-40 border-white/35 bg-white/10 text-white hover:bg-white/15 hover:text-white",
+                "w-full border-white/35 bg-white/10 text-white hover:bg-white/15 hover:text-white sm:min-w-40 sm:w-auto",
               )}
             >
               Browse categories

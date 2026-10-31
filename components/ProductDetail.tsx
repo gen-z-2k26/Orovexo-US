@@ -241,18 +241,18 @@ export function ProductDetail({
             />
           </div>
 
-          <div className="mt-6 flex flex-wrap items-center gap-3">
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <QuantityPicker
               id="quantity"
               value={quantity}
               disabled={!product.inStock}
               onChange={setQuantity}
-              className="rounded-none"
+              className="w-full justify-between rounded-none sm:w-auto"
             />
             <Button
               type="button"
               size="lg"
-              className="min-w-36 rounded-none"
+              className="w-full rounded-none sm:min-w-36 sm:w-auto"
               disabled={!product.inStock || busy}
               onClick={() => void handleAdd()}
             >
@@ -263,7 +263,7 @@ export function ProductDetail({
                 type="button"
                 size="lg"
                 variant="outline"
-                className="min-w-32 rounded-none"
+                className="w-full rounded-none sm:min-w-32 sm:w-auto"
                 disabled={busy}
                 onClick={() => void handleShopNow()}
               >
@@ -337,12 +337,12 @@ export function ProductDetail({
                 {group.rows.map((row) => (
                   <div
                     key={`${group.title}-${row.label}`}
-                    className="grid grid-cols-[minmax(8rem,0.8fr)_1.2fr] border-b border-border last:border-b-0 sm:[&:nth-last-child(-n+2)]:border-b-0"
+                    className="grid grid-cols-1 border-b border-border last:border-b-0 sm:grid-cols-[minmax(8rem,0.8fr)_1.2fr] sm:[&:nth-last-child(-n+2)]:border-b-0"
                   >
-                    <dt className="bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+                    <dt className="bg-muted/40 px-4 pt-3 pb-1 text-sm text-muted-foreground sm:py-3">
                       {row.label}
                     </dt>
-                    <dd className="px-4 py-3 text-sm">{row.value}</dd>
+                    <dd className="px-4 pt-1 pb-3 text-sm sm:py-3">{row.value}</dd>
                   </div>
                 ))}
               </dl>
@@ -402,7 +402,7 @@ export function ProductDetail({
           <h2 className="mb-8 text-center text-2xl font-medium tracking-tight">
             Related Products
           </h2>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-6">
+          <div className="grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-6">
             {related.map((item) => (
               <ProductCard key={item.id} product={item} />
             ))}

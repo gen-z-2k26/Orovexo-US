@@ -7,7 +7,7 @@ export function BrandLogo({
   className?: string;
   heightClass?: string;
 }) {
-  const imageClass = cn("w-auto", heightClass);
+  const imageClass = cn("h-auto w-auto max-w-full object-contain", heightClass);
 
   return (
     <span className={cn("inline-flex items-center", className)}>

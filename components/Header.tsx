@@ -49,7 +49,7 @@ export function Header() {
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-xl supports-backdrop-filter:bg-background/75">
       <PromoBanner />
 
-      <div className={pageContainer("flex h-16 items-center gap-3 lg:gap-8")}>
+      <div className={pageContainer("flex h-14 items-center gap-1.5 sm:h-16 sm:gap-3 lg:gap-8")}>
         <Button
           type="button"
           variant="ghost"
@@ -63,9 +63,12 @@ export function Header() {
 
         <Link
           href="/"
-          className="inline-flex items-center rounded-xl transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="inline-flex min-w-0 shrink items-center rounded-xl transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <BrandLogo heightClass="h-7 sm:h-8" />
+          <BrandLogo
+            heightClass="h-6 sm:h-8"
+            className="max-w-[7.25rem] sm:max-w-none"
+          />
         </Link>
 
         <nav
@@ -85,7 +88,7 @@ export function Header() {
 
         <div
           data-header-chrome
-          className="ml-auto flex min-w-0 items-center justify-end gap-2"
+          className="ml-auto flex min-w-0 shrink-0 items-center justify-end gap-1 sm:gap-2"
         >
           <Suspense
             fallback={
@@ -95,7 +98,9 @@ export function Header() {
             <SearchBar />
           </Suspense>
 
-          <ThemeToggle />
+          <div className="hidden sm:block">
+            <ThemeToggle />
+          </div>
 
           <Button
             type="button"
@@ -138,6 +143,10 @@ export function Header() {
               </Link>
             ))}
           </nav>
+          <div className="mt-3 flex items-center justify-between border-t border-border px-3 pt-3 sm:hidden">
+            <span className="text-sm text-muted-foreground">Appearance</span>
+            <ThemeToggle />
+          </div>
         </div>
       ) : null}
     </header>

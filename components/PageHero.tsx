@@ -16,7 +16,7 @@ export function PageHero({
   return (
     <>
       <nav className="text-sm text-muted-foreground" aria-label="Breadcrumb">
-        <ol className="flex flex-wrap items-center gap-2">
+        <ol className="flex flex-wrap items-center justify-center gap-2">
           <li>
             <Link href="/" className="hover:text-foreground">
               Home
@@ -27,17 +27,15 @@ export function PageHero({
         </ol>
       </nav>
 
-      <header className="mt-8 grid gap-6 lg:grid-cols-2 lg:items-start lg:gap-x-16">
-        <div className="space-y-3">
-          {eyebrow ? (
-            <p className="text-sm font-medium tracking-wide text-primary">{eyebrow}</p>
-          ) : null}
-          <h1 className="font-display text-balance text-4xl leading-tight sm:text-5xl">
-            {title}
-          </h1>
-        </div>
+      <header className="mx-auto mt-6 max-w-4xl space-y-3 text-center sm:mt-8 sm:space-y-4">
+        {eyebrow ? (
+          <p className="text-sm font-medium tracking-wide text-primary">{eyebrow}</p>
+        ) : null}
+        <h1 className="font-display text-balance text-3xl leading-tight sm:text-5xl">
+          {title}
+        </h1>
         {description ? (
-          <p className="max-w-prose text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg lg:pt-8">
+          <p className="text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
             {description}
           </p>
         ) : null}

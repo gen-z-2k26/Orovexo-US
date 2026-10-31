@@ -77,7 +77,7 @@
   /* Layout */
   --content-width: 80rem;
   --content-narrow: 42rem;
-  --page-gutter: clamp(1.25rem, 4vw, 2.5rem);
+  --page-gutter: clamp(1rem, 4vw, 2.5rem);
   --section-y: clamp(3.75rem, 6.5vw, 6rem);
   --section-gap: clamp(1.75rem, 3vw, 2.5rem);
 
@@ -345,5 +345,20 @@ html[data-search-transition]::view-transition-new(root) {
   }
   100% {
     transform: translateX(400%);
+  }
+}
+
+@keyframes loader-draw {
+  0% {
+    stroke-dashoffset: 100;
+    opacity: 1;
+  }
+  72% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
   }
 }
