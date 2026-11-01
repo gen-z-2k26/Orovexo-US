@@ -10,6 +10,30 @@ import { cn } from "@/lib/utils";
 const fieldClass =
   "h-11 w-full min-w-0 rounded-xl border border-input bg-background px-3.5 py-2 text-base outline-none transition-[color,background-color,border-color,box-shadow] duration-200 placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm dark:bg-input/30";
 
+export function SubjectChips({ topics }: { topics: string[] }) {
+  if (!topics.length) return null;
+  return (
+    <div data-ui-chrome="topics" className="mb-4 flex flex-wrap gap-2">
+      {topics.map((topic) => (
+        <button
+          key={topic}
+          type="button"
+          className="min-h-11 rounded-full border border-border px-3 text-sm"
+          onClick={() => {
+            const input = document.getElementById("contact-subject");
+            if (input instanceof HTMLInputElement) {
+              input.value = topic;
+              input.focus();
+            }
+          }}
+        >
+          {topic}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export function ContactForm({ to }: { to: string }) {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     const form = event.currentTarget;

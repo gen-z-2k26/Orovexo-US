@@ -1,5 +1,12 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { Mail, Phone } from "lucide-react";
+import {
+  BackToTop,
+  CopyAnchor,
+  PolicyToc,
+  PrintButton,
+} from "@/components/footer-pages/Chrome";
 import {
   CARE_LABEL_HREFS,
   hrefForAbsoluteUrl,
@@ -22,16 +29,14 @@ function isInternalHref(href: string) {
 function Linked({ href, children }: { href: string; children: ReactNode }) {
   if (isInternalHref(href)) {
     return (
-      <Link href={href} className="underline decoration-muted-foreground/60 underline-offset-[3px] hover:text-primary">
+      <Link href={href} className="fp-link">
         {children}
       </Link>
     );
   }
   return (
-    <a
-      href={href}
-      className="underline decoration-muted-foreground/60 underline-offset-[3px] hover:text-primary"
-    >
+    <a href={href} className="fp-link">
+
       {children}
     </a>
   );
@@ -65,16 +70,13 @@ export function RichText({ text, className }: { text: string; className?: string
   );
 }
 
-function displayTitle(title: string) {
-  const splits: Record<string, [string, string]> = {
-    "Privacy Policy": ["Privacy", "Policy"],
-    "Terms of Service": ["Terms", "of Service"],
-    "Cookie Policy": ["Cookie", "Policy"],
-    "Legal Notice": ["Legal", "Notice"],
-    "Accessibility Statement": ["Accessibility", "Statement"],
-    "Your Privacy Choices": ["Your Privacy", "Choices"],
-  };
-  return splits[title] ?? null;
+const bodyText =
+  "mb-4 max-w-[68ch] text-[16px] leading-[1.7] text-muted-foreground sm:text-[17px]";
+
+function splitLabel(item: string) {
+  const index = item.indexOf(": ");
+  if (index < 2 || index > 48) return null;
+  return { label: item.slice(0, index), rest: item.slice(index + 2) };
 }
 
 export function BlockView({
@@ -86,15 +88,26 @@ export function BlockView({
 }) {
   switch (block.type) {
     case "paragraph":
+      if (CARE_LABEL_HREFS[block.text]) {
+        return (
+          <p className="my-3">
+            <Linked href={CARE_LABEL_HREFS[block.text]}>
+              <span className="inline-flex min-h-11 items-center rounded-full border border-foreground px-4 text-sm text-foreground">
+                {block.text}
+              </span>
+            </Linked>
+          </p>
+        );
+      }
       if (block.text.startsWith("Important:")) {
         return (
-          <div className="my-4 border-l-2 border-primary bg-muted/60 px-5 py-4 text-[13px] leading-relaxed text-muted-foreground">
+          <div className="my-4 max-w-[68ch] rounded-2xl border border-[color-mix(in_srgb,var(--accent)_40%,transparent)] border-l-4 border-l-[var(--fp-bar)] bg-card px-5 py-4 text-[16px] leading-[1.7] sm:text-[17px]">
             <RichText text={block.text} />
           </div>
         );
       }
       return (
-        <p className="mb-3.5 text-[15px] leading-[1.75] text-muted-foreground">
+        <p className={bodyText}>
           <RichText text={block.text} />
         </p>
       );
@@ -106,13 +119,31 @@ export function BlockView({
       );
     case "heading":
       return (
-        <h3 className="font-display mt-6 mb-3 text-[21px] font-normal tracking-tight">
+        <h3 className="font-display mt-6 mb-3 text-[20px] font-normal tracking-tight">
           <RichText text={block.text} />
         </h3>
       );
-    case "bullets":
+    case "bullets": {
+      const pairs = block.items.map(splitLabel);
+      if (pairs.every(Boolean)) {
+        return (
+          <dl className="mb-4 max-w-[68ch] divide-y divide-border rounded-2xl border border-[color-mix(in_srgb,var(--accent)_40%,transparent)]">
+            {block.items.map((item) => {
+              const pair = splitLabel(item)!;
+              return (
+                <div key={item} className="grid gap-1 px-4 py-3 sm:grid-cols-[minmax(0,12rem)_1fr] sm:gap-4">
+                  <dt className="font-medium text-foreground">{pair.label}:</dt>
+                  <dd className="text-[16px] leading-[1.7] text-muted-foreground sm:text-[17px]">
+                    <RichText text={pair.rest} />
+                  </dd>
+                </div>
+              );
+            })}
+          </dl>
+        );
+      }
       return (
-        <ul className="mb-3.5 list-disc space-y-1.5 pl-[22px] text-[15px] leading-[1.75] text-muted-foreground">
+        <ul className="mb-4 max-w-[68ch] list-disc space-y-1.5 pl-[22px] text-[16px] leading-[1.7] text-muted-foreground sm:text-[17px]">
           {block.items.map((item) => (
             <li key={item}>
               <RichText text={item} />
@@ -120,9 +151,10 @@ export function BlockView({
           ))}
         </ul>
       );
+    }
     case "numbered":
       return (
-        <ol className="mb-3.5 list-decimal space-y-1.5 pl-[22px] text-[15px] leading-[1.75] text-muted-foreground">
+        <ol className="mb-4 max-w-[68ch] list-decimal space-y-1.5 pl-[22px] text-[16px] leading-[1.7] text-muted-foreground sm:text-[17px]">
           {block.items.map((item) => (
             <li key={item}>
               <RichText text={item} />
@@ -136,34 +168,37 @@ export function BlockView({
           <h3 className="font-display mb-2 text-[21px] font-normal tracking-tight">
             {block.question}
           </h3>
-          <p className="text-[15px] leading-[1.75] text-muted-foreground">
+          <p className={bodyText}>
             <RichText text={block.answer} />
           </p>
         </div>
       );
     case "table":
       return (
-        <div className="mb-5 overflow-hidden rounded-[3px] border border-border">
+        <div className="mb-5 overflow-hidden rounded-2xl border border-[color-mix(in_srgb,var(--accent)_40%,transparent)]">
           <table className="w-full text-left text-sm">
-            <thead className="bg-muted/50">
+            <thead className="bg-primary/15">
               <tr>
                 {block.headers.map((header) => (
-                  <th
-                    key={header}
-                    className="px-4 py-3 font-medium text-foreground"
-                  >
+                  <th key={header} className="px-4 py-3 font-medium text-foreground">
                     {header}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {block.rows.map((row) => (
-                <tr key={`${row.label}-${row.value}`} className="border-t border-border">
-                  <td className="px-4 py-3 font-medium text-foreground">
+              {block.rows.map((row, rowIndex) => (
+                <tr
+                  key={`${row.label}-${row.value}`}
+                  className={cn(
+                    "border-t border-border max-sm:block",
+                    rowIndex % 2 === 1 && "bg-muted/30",
+                  )}
+                >
+                  <td className="px-4 py-3 font-medium text-foreground max-sm:block max-sm:pb-0">
                     <RichText text={row.label} />
                   </td>
-                  <td className="px-4 py-3 text-muted-foreground">
+                  <td className="px-4 py-3 text-muted-foreground max-sm:block max-sm:pt-1">
                     <RichText text={row.value} />
                   </td>
                 </tr>
@@ -181,63 +216,39 @@ export function BlockView({
         else if (value.startsWith("http")) href = hrefForAbsoluteUrl(value);
         return { ...field, href };
       });
-      if (contactStyle === "grid") {
-        return (
-          <div className="mt-6 grid gap-6 border-t border-border pt-8 sm:grid-cols-2">
-            {fields.map((field) => (
-              <div key={field.label}>
-                <span className="mb-1 block text-[10px] font-bold tracking-[0.16em] text-muted-foreground uppercase">
-                  {field.label}
-                </span>
-                {field.href ? (
-                  <Linked href={field.href}>{field.value}</Linked>
-                ) : (
-                  <p className="m-0 text-sm leading-relaxed">{field.value}</p>
-                )}
-              </div>
-            ))}
-          </div>
-        );
-      }
+      const grid = (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {fields.map((field) => (
+            <div key={field.label}>
+              <span className="mb-1 block text-[10px] font-bold tracking-[0.14em] uppercase opacity-70">
+                {field.label}
+              </span>
+              {field.href ? (
+                <Linked href={field.href}>
+                  <span className="inline-flex min-h-11 items-center gap-2">
+                    {field.href.startsWith("mailto:") ? <Mail className="size-4" aria-hidden /> : null}
+                    {field.href.startsWith("tel:") ? <Phone className="size-4" aria-hidden /> : null}
+                    {field.value}
+                  </span>
+                </Linked>
+              ) : (
+                <p className="m-0 text-sm leading-relaxed">{field.value}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      );
       if (contactStyle === "panel") {
         return (
-          <div className="mt-6 rounded-[3px] border border-border bg-muted/50 px-6 py-6">
+          <div className="mt-6 rounded-2xl border border-border bg-muted/50 px-6 py-6">
             <p className="font-display mb-4 text-2xl">Accessibility support</p>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {fields.map((field) => (
-                <div key={field.label}>
-                  <span className="mb-0.5 block text-[10px] font-bold tracking-[0.14em] text-muted-foreground uppercase">
-                    {field.label}
-                  </span>
-                  {field.href ? (
-                    <Linked href={field.href}>{field.value}</Linked>
-                  ) : (
-                    <p className="m-0 text-sm leading-relaxed">{field.value}</p>
-                  )}
-                </div>
-              ))}
-            </div>
+            {grid}
           </div>
         );
       }
       return (
-        <div className="mt-4 rounded-[3px] bg-foreground px-6 py-6 text-background">
-          <div className="grid gap-4 sm:grid-cols-2">
-            {fields.map((field) => (
-              <div key={field.label}>
-                <span className="mb-0.5 block text-[9px] font-bold tracking-[0.14em] text-background/60 uppercase">
-                  {field.label}
-                </span>
-                {field.href ? (
-                  <Linked href={field.href}>{field.value}</Linked>
-                ) : (
-                  <p className="m-0 text-[13px] leading-relaxed text-background/85">
-                    {field.value}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
+        <div className={cn("mt-4 rounded-2xl px-6 py-6", contactStyle === "grid" ? "border border-border bg-card" : "bg-foreground text-background")}>
+          {grid}
         </div>
       );
     }
@@ -246,8 +257,137 @@ export function BlockView({
   }
 }
 
-export function CustomerCareShell({
+export function PageHeader({
+  eyebrow,
+  title,
+  intro,
+  effectiveDate,
+  actions,
+  variant = "policy",
+}: {
+  eyebrow?: string;
+  title: string;
+  intro?: ReactNode;
+  effectiveDate?: string;
+  actions?: ReactNode;
+  variant?: "brand" | "help" | "policy";
+}) {
+  const lead = variant === "help";
+  return (
+    <header className="mb-8 grid items-end gap-6 text-left lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+      <div>
+        {eyebrow ? (
+          <p className="mb-3 text-[11px] font-bold tracking-[0.16em] text-foreground uppercase">
+            {eyebrow}
+          </p>
+        ) : null}
+        <h1 className="fp-h1 font-display">{title}</h1>
+        {effectiveDate ? (
+          <p className="mt-4 inline-flex rounded-full border border-[color-mix(in_srgb,var(--accent)_40%,transparent)] px-3 py-1 text-xs">
+            {effectiveDate}
+          </p>
+        ) : null}
+        {actions ? <div className="mt-4">{actions}</div> : null}
+      </div>
+      {intro ? (
+        <div className={cn("space-y-3 text-[16px] leading-[1.7] text-muted-foreground sm:text-[17px]", lead && "lg:text-[18px]")}>
+          {intro}
+        </div>
+      ) : null}
+    </header>
+  );
+}
+
+export function RelatedLinks({
   settings,
+  href,
+}: {
+  settings: StoreSettings;
+  href: string;
+}) {
+  const column = settings.navigation.footerColumns.find((group) =>
+    group.links.some((link) => link.href === href),
+  );
+  if (!column) return null;
+  return (
+    <nav data-ui-chrome="related" aria-label={column.title} className="mt-16 border-t border-border pt-8 print:hidden">
+      <p className="mb-4 text-[10px] font-bold tracking-[0.16em] text-muted-foreground uppercase">
+        {column.title}
+      </p>
+      <ul className="flex flex-wrap gap-2">
+        {column.links.map((link) => (
+          <li key={link.href}>
+            <Link
+              href={link.href}
+              aria-current={link.href === href ? "page" : undefined}
+              className="inline-flex min-h-11 items-center rounded-full border border-border px-4 text-sm aria-[current=page]:border-foreground"
+            >
+              {link.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
+function glanceRows(page: CarePage) {
+  const rows = page.sections.flatMap((section) =>
+    section.blocks.flatMap((block) => (block.type === "table" ? block.rows : [])),
+  );
+  const preferred = [
+    "Standard Domestic Shipping",
+    "Order Processing",
+    "Shipping Transit",
+    "Estimated Total Delivery",
+  ];
+  const picked = preferred
+    .map((label) => rows.find((row) => row.label === label))
+    .filter((row): row is { label: string; value: string } => Boolean(row));
+  return (picked.length ? picked : rows).slice(0, 4);
+}
+
+export function AtAGlance({ page }: { page: CarePage }) {
+  const rows = glanceRows(page);
+  if (rows.length < 2) return null;
+  return (
+    <div data-ui-chrome="glance" className="mb-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {rows.map((row) => (
+        <div
+          key={`${row.label}-${row.value}`}
+          className="rounded-2xl border border-[color-mix(in_srgb,var(--accent)_40%,transparent)] bg-card p-4"
+        >
+          <p className="text-[11px] font-bold tracking-[0.08em] text-foreground uppercase">
+            <RichText text={row.label} />
+          </p>
+          <p className="font-display mt-2 text-xl">
+            <RichText text={row.value} />
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ShippingTimeline({ page }: { page: CarePage }) {
+  if (page.slug !== "shipping-policy") return null;
+  const rows = glanceRows(page).filter((row) =>
+    ["Order Processing", "Shipping Transit", "Estimated Total Delivery"].includes(row.label),
+  );
+  if (rows.length < 3) return null;
+  return (
+    <ol data-ui-chrome="timeline" className="mb-10 grid gap-3 sm:grid-cols-3">
+      {rows.map((row) => (
+        <li key={row.label} className="rounded-2xl border-t-4 border-t-[var(--fp-bar)] bg-muted/40 px-4 py-3">
+          <p className="text-sm font-medium">{row.label}</p>
+          <p className="text-sm text-muted-foreground">{row.value}</p>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+export function CustomerCareShell({
   title,
   eyebrow,
   intro,
@@ -255,8 +395,9 @@ export function CustomerCareShell({
   children,
   toc,
   tocLabel = "In this policy",
+  actions,
+  variant = "policy",
 }: {
-  settings: StoreSettings;
   title: string;
   eyebrow?: string;
   intro?: ReactNode;
@@ -264,80 +405,29 @@ export function CustomerCareShell({
   children: ReactNode;
   toc?: Array<{ id: string; title: string }>;
   tocLabel?: string;
+  actions?: ReactNode;
+  variant?: "brand" | "help" | "policy";
+  settings?: StoreSettings;
 }) {
-  const split = displayTitle(title);
-  const ampersand = title.split(" & ");
   return (
-    <div className={pageContainer("py-12 sm:py-16")}>
-      <div className="flex items-center justify-between gap-6 border-b border-border pb-5 text-[10px] font-semibold tracking-[0.18em] text-muted-foreground uppercase">
-        <Link href="/" className="text-[13px] tracking-[0.25em] text-foreground">
-          {settings.name}
-        </Link>
-        <span>{settings.tagline}</span>
-      </div>
-
-      <header className="mx-auto max-w-3xl py-12 text-center sm:py-16">
-        {eyebrow ? (
-          <p className="mb-4 text-[10px] font-bold tracking-[0.2em] text-primary uppercase">
-            {eyebrow}
-          </p>
-        ) : null}
-        <h1 className="font-display text-[clamp(2.5rem,7vw,4.5rem)] leading-[1.04] font-normal tracking-[-0.045em]">
-          {split ? (
-            <>
-              {split[0]}
-              <br />
-              {split[1]}
-            </>
-          ) : ampersand.length === 2 ? (
-            <>
-              {ampersand[0]}
-              <br />
-              & {ampersand[1]}
-            </>
-          ) : (
-            title
-          )}
-        </h1>
-        {intro ? (
-          <div className="mx-auto mt-6 max-w-2xl space-y-3.5 text-base leading-[1.75] text-muted-foreground sm:text-[17px]">
-            {intro}
-          </div>
-        ) : null}
-        {effectiveDate ? (
-          <p className="mt-6 inline-flex items-center gap-2.5 text-xs text-muted-foreground">
-            <span className="size-1.5 rounded-full bg-primary" aria-hidden />
-            {effectiveDate}
-          </p>
-        ) : null}
-      </header>
-
+    <div className={pageContainer("fp-page py-10 sm:py-14")}>
+      <PageHeader
+        eyebrow={eyebrow}
+        title={title}
+        intro={intro}
+        effectiveDate={effectiveDate}
+        actions={actions}
+        variant={variant}
+      />
       {toc?.length ? (
-        <div className="grid items-start gap-8 lg:grid-cols-[230px_minmax(0,1fr)] lg:gap-[62px]">
-          <nav
-            aria-label="In this policy"
-            className="rounded-[3px] border border-border bg-card/70 p-5 lg:sticky lg:top-24"
-          >
-            <p className="mb-3 text-[10px] font-bold tracking-[0.16em] text-muted-foreground uppercase">
-              {tocLabel}
-            </p>
-            <div className="grid grid-cols-2 gap-x-4 lg:grid-cols-1">
-              {toc.map((item) => (
-                <a
-                  key={item.id}
-                  href={`#${item.id}`}
-                  className="block py-1.5 text-xs leading-snug text-muted-foreground hover:text-primary hover:underline hover:underline-offset-[3px]"
-                >
-                  {item.title}
-                </a>
-              ))}
-            </div>
-          </nav>
+        <div className="lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start lg:gap-10">
+          <PolicyToc items={toc} label={tocLabel} />
           <article className="min-w-0">{children}</article>
         </div>
       ) : (
         <article className="min-w-0">{children}</article>
       )}
+      <BackToTop />
     </div>
   );
 }
@@ -351,7 +441,8 @@ export function CustomerCarePage({
   settings: StoreSettings;
   layout?: CareLayout;
 }) {
-  const showToc = layout === "policy";
+  const help = page.slug === "order-help-center";
+  const showToc = !help;
   const toc = showToc
     ? page.sections.map((section) => ({
         id: section.id,
@@ -401,7 +492,17 @@ export function CustomerCarePage({
       ))}
       toc={toc}
       tocLabel={tocLabel}
+      variant={help ? "help" : "policy"}
+      actions={
+        help ? null : (
+          <div className="flex flex-wrap gap-2">
+            <PrintButton />
+          </div>
+        )
+      }
     >
+      {help ? null : <AtAGlance page={page} />}
+      {help ? null : <ShippingTimeline page={page} />}
       {page.sections.map((section, index) => {
         const blocks = section.blocks.filter((block) => {
           if (block.type !== "paragraph") return true;
@@ -413,21 +514,22 @@ export function CustomerCarePage({
             key={section.id}
             id={section.id}
             className={cn(
-              "scroll-mt-24 border-b border-border pb-8 mb-8",
-              index === page.sections.length - 1 && "mb-0 border-b-0 pb-0",
+              "group scroll-mt-32 border-b border-border py-10 sm:py-16",
+              index === page.sections.length - 1 && "border-b-0",
             )}
           >
-            <h2 className="font-display mb-3.5 text-[27px] leading-tight font-normal tracking-[-0.025em]">
+            <h2 className="font-display mb-4 flex items-start gap-2 text-[28px] leading-tight font-normal sm:text-[32px]">
               {numbered ? (
-                <span className="flex gap-4">
-                  <span className="text-primary/80 tabular-nums">
+                <span className="grid flex-1 gap-2 sm:grid-cols-[3.5rem_minmax(0,1fr)] sm:gap-4">
+                  <span className="font-display text-4xl text-foreground/80 tabular-nums">
                     {String(index + 1).padStart(2, "0")}
                   </span>
-                  <span>{section.title.replace(/^\d+\.\s+/, "")}</span>
+                  <span>{section.title}</span>
                 </span>
               ) : (
-                section.title
+                <span className="flex-1">{section.title}</span>
               )}
+              <CopyAnchor id={section.id} />
             </h2>
             {blocks.map((block, blockIndex) => (
               <BlockView
@@ -444,6 +546,7 @@ export function CustomerCarePage({
           {copyright}
         </p>
       ) : null}
+      <RelatedLinks settings={settings} href={`/${page.slug}`} />
     </CustomerCareShell>
   );
 }

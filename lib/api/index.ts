@@ -523,7 +523,7 @@ export function getSiteUrl(settings?: StoreSettings) {
   if (fromEnv) return fromEnv;
   const fromSettings = settings?.seo.siteUrl?.replace(/\/$/, "");
   if (fromSettings) return fromSettings;
-  return "";
+  return "https://orvexo.us";
 }
 
 type WooReview = {
