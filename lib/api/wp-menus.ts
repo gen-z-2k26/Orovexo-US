@@ -1,7 +1,6 @@
 import type { FooterColumn, NavLink } from "@/lib/types";
 import { getWooOrigin, WOO_TIMEOUT_MS } from "@/lib/api/client";
-import { listWpPages } from "@/lib/api/wp-pages";
-import { rewriteStorefrontPath, toStorefrontHref } from "@/lib/site-urls";
+import { toStorefrontHref } from "@/lib/site-urls";
 
 /**
  * Block-theme navigations to create in WP Admin → Appearance → Editor → Navigation.
@@ -129,37 +128,6 @@ function linksFromHtml(html: string, wpOrigin: string): NavLink[] {
   return links;
 }
 
-function overlayPublishedPages(
-  columns: FooterColumn[],
-  pages: Array<{ slug: string; title: string }>,
-): FooterColumn[] {
-  const legal = pages.filter((page) =>
-    ["privacy-policy", "privacy", "terms-of-service", "terms", "cookie-policy"].includes(
-      page.slug,
-    ),
-  );
-  if (!legal.length) return columns;
-
-  return columns.map((column) => {
-    if (column.slug !== "footer-trust") return column;
-    const links = [...column.links];
-    for (const page of legal) {
-      const href = rewriteStorefrontPath(`/${page.slug}`);
-      const existing = links.findIndex(
-        (link) =>
-          link.href === href ||
-          link.label.toLowerCase() === page.title.toLowerCase(),
-      );
-      if (existing >= 0) {
-        links[existing] = { label: page.title, href };
-      } else {
-        links.unshift({ label: page.title, href });
-      }
-    }
-    return { ...column, links };
-  });
-}
-
 type OrvexoFooterPayload = {
   columns?: Array<{
     slug?: string;
@@ -208,7 +176,7 @@ function columnsFromPlugin(
  * 1. orvexo/v1/footer (plugin: Appearance → Menus)
  * 2. Classic wp/v2 menus if public
  * 3. Block navigations (Appearance → Editor → Navigation)
- * 4. Published legal pages overlaid on the Trust column
+ * Page bodies stay in Next JSON, not wp/v2/pages.
  */
 export async function fetchWpFooterColumns(
   fallback: FooterColumn[],
@@ -216,17 +184,16 @@ export async function fetchWpFooterColumns(
   const origin = getWooOrigin();
   if (!origin) return null;
 
-  const [pluginFooter, menus, items, navigations, pages] = await Promise.all([
+  const [pluginFooter, menus, items, navigations] = await Promise.all([
     wpJson<OrvexoFooterPayload>("orvexo/v1/footer"),
     wpJson<WpMenu[]>("wp/v2/menus?per_page=20"),
     wpJson<WpMenuItem[]>("wp/v2/menu-items?per_page=100"),
     wpJson<WpNavigation[]>("wp/v2/navigation?per_page=50"),
-    listWpPages(),
   ]);
 
   const fromPlugin = columnsFromPlugin(pluginFooter, fallback, origin);
   if (fromPlugin) {
-    return overlayPublishedPages(fromPlugin, pages);
+    return fromPlugin;
   }
 
   const bySlug = new Map<string, FooterColumn>();
@@ -268,11 +235,6 @@ export async function fetchWpFooterColumns(
     return fallback[index];
   }).filter(Boolean) as FooterColumn[];
 
-  const withPages = overlayPublishedPages(merged.length ? merged : fallback, pages);
-  if (!hasNav && withPages === fallback) return null;
-  if (!hasNav && JSON.stringify(withPages) === JSON.stringify(fallback)) {
-    return null;
-  }
-
-  return withPages;
+  if (!hasNav) return null;
+  return merged.length ? merged : null;
 }

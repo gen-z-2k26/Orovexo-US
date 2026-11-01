@@ -491,13 +491,14 @@ export interface CheckoutSessionResult {
   cart: StoreCart;
   mockPayment?: boolean;
   paymentKind: CheckoutPaymentKind | "mock";
-  paymentUrl?: string;
+  redirectUrl?: string;
 }
 
 export interface CompleteCheckoutPayload {
   orderId: string;
   orderKey: string;
   paymentIntentId: string;
+  provider?: "stripe" | "paypal" | "afterpay" | "mock";
 }
 
 export interface CreateOrderResult {

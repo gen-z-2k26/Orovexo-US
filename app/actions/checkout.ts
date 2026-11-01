@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import {
   cancelUnpaidOrder,
   createPendingOrderFromCart,
@@ -9,7 +10,8 @@ import {
   getOrder,
   markOrderPaid,
 } from "@/lib/api";
-import { wooPayUrl } from "@/lib/api/payments";
+import { captureAfterpayPayment, createAfterpayCheckout } from "@/lib/afterpay";
+import { capturePayPalOrder, createPayPalOrder } from "@/lib/paypal";
 import {
   getPendingCheckout,
   getStoreCart,
@@ -24,8 +26,11 @@ import {
   isStripeConfigured,
   mockPaymentIntentId,
   stripeAmountMatches,
+  toStripeAmount,
 } from "@/lib/stripe";
+import { stripeShippingParams } from "@/lib/stripe-address";
 import type {
+  Address,
   CheckoutDetails,
   CheckoutSessionResult,
   CompleteCheckoutPayload,
@@ -87,6 +92,66 @@ async function abandonPendingIfStale(cartHash: string) {
   await setPendingCheckout(null);
 }
 
+async function requestOrigin() {
+  const headerList = await headers();
+  const host = headerList.get("x-forwarded-host") || headerList.get("host") || "";
+  const proto =
+    headerList.get("x-forwarded-proto") ||
+    (host.includes("localhost") ? "http" : "https");
+  if (host) return `${proto}://${host}`;
+  return process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, "") || "";
+}
+
+async function createCardPaymentIntent(input: {
+  orderId: string;
+  orderKey: string;
+  amount: number;
+  currency: string;
+  email: string;
+  shipping: Address;
+  existingIntentId?: string;
+}) {
+  const stripe = requireStripe();
+  const amount = toStripeAmount(input.amount, input.currency);
+  const currency = input.currency.trim().toLowerCase();
+  const metadata = {
+    woo_order_id: input.orderId,
+    order_key: input.orderKey,
+  };
+  const shipping = stripeShippingParams(input.shipping);
+
+  if (input.existingIntentId?.startsWith("pi_")) {
+    try {
+      const existing = await stripe.paymentIntents.retrieve(input.existingIntentId);
+      if (
+        existing.status !== "canceled" &&
+        existing.client_secret &&
+        existing.metadata?.woo_order_id === input.orderId
+      ) {
+        if (existing.status === "succeeded") return existing;
+        return await stripe.paymentIntents.update(existing.id, {
+          amount,
+          currency,
+          metadata,
+          receipt_email: input.email || undefined,
+          shipping,
+        });
+      }
+    } catch {
+      // Create a new card intent below.
+    }
+  }
+
+  return stripe.paymentIntents.create({
+    amount,
+    currency,
+    allowed_payment_method_types: ["card"],
+    metadata,
+    receipt_email: input.email || undefined,
+    shipping,
+  });
+}
+
 export async function createCheckoutSessionAction(
   details: CheckoutDetails,
 ): Promise<CheckoutSessionResult> {
@@ -138,25 +203,19 @@ export async function createCheckoutSessionAction(
         paymentKind: "mock",
       };
     }
-    if (
-      !mockPayment &&
-      orderOk &&
-      (paymentKind === "paypal" ||
-        paymentKind === "afterpay" ||
-        paymentKind === "stripe") &&
-      !existing.paymentIntentId.startsWith("pi_")
-    ) {
-      return {
+    if (!mockPayment && orderOk && paymentKind !== "mock") {
+      return beginProviderPayment({
+        kind: paymentKind,
         orderId: existing.orderId,
         orderKey: existing.orderKey,
-        clientSecret: "",
         amount: Number(order.total) || cart.totals.total,
         currency: order.currency || cart.totals.currency,
         email: billing.email,
+        shipping: cart.shippingAddress,
+        billing,
         cart,
-        paymentKind,
-        paymentUrl: wooPayUrl(existing.orderId, existing.orderKey),
-      };
+        existingRef: existing.paymentIntentId,
+      });
     }
   }
 
@@ -187,24 +246,129 @@ export async function createCheckoutSessionAction(
     };
   }
 
-  const paymentUrl = wooPayUrl(pending.orderId, pending.orderKey);
-  await setPendingCheckout({
+  if (paymentKind === "mock") {
+    throw new Error("Could not start checkout.");
+  }
+  return beginProviderPayment({
+    kind: paymentKind,
     orderId: pending.orderId,
     orderKey: pending.orderKey,
-    paymentIntentId: `${paymentKind}:${pending.orderId}`,
-    cartHash: cart.cartHash,
-  });
-  return {
-    orderId: pending.orderId,
-    orderKey: pending.orderKey,
-    clientSecret: "",
     amount: pending.total,
     currency: pending.currency,
     email: billing.email,
+    shipping: cart.shippingAddress,
+    billing,
     cart,
-    paymentKind,
-    paymentUrl,
+  });
+}
+
+async function beginProviderPayment(input: {
+  kind: CheckoutPaymentKind;
+  orderId: string;
+  orderKey: string;
+  amount: number;
+  currency: string;
+  email: string;
+  shipping: Address;
+  billing: Address;
+  cart: StoreCart;
+  existingRef?: string;
+}): Promise<CheckoutSessionResult> {
+  const base = {
+    orderId: input.orderId,
+    orderKey: input.orderKey,
+    amount: input.amount,
+    currency: input.currency,
+    email: input.email,
+    cart: input.cart,
+    paymentKind: input.kind,
   };
+
+  if (input.kind === "paypal") {
+    const paypalOrderId = await createPayPalOrder({
+      orderId: input.orderId,
+      amount: input.amount,
+      currency: input.currency,
+    });
+    await setPendingCheckout({
+      orderId: input.orderId,
+      orderKey: input.orderKey,
+      paymentIntentId: `paypal:${paypalOrderId}`,
+      cartHash: input.cart.cartHash,
+    });
+    return { ...base, clientSecret: paypalOrderId };
+  }
+
+  if (input.kind === "afterpay") {
+    const origin = await requestOrigin();
+    const confirm = new URL(`/order/${input.orderId}`, origin || "http://localhost:3000");
+    confirm.searchParams.set("key", input.orderKey);
+    confirm.searchParams.set("email", input.email);
+    const cancel = new URL("/checkout", origin || "http://localhost:3000");
+    cancel.searchParams.set("afterpay", "cancel");
+    const checkout = await createAfterpayCheckout({
+      orderId: input.orderId,
+      amount: input.amount,
+      currency: input.currency,
+      email: input.email,
+      shipping: input.shipping,
+      billing: input.billing,
+      confirmUrl: confirm.toString(),
+      cancelUrl: cancel.toString(),
+    });
+    await setPendingCheckout({
+      orderId: input.orderId,
+      orderKey: input.orderKey,
+      paymentIntentId: `afterpay:${checkout.token}`,
+      cartHash: input.cart.cartHash,
+    });
+    return {
+      ...base,
+      clientSecret: checkout.token,
+      redirectUrl: checkout.redirectUrl,
+    };
+  }
+
+  const intent = await createCardPaymentIntent({
+    orderId: input.orderId,
+    orderKey: input.orderKey,
+    amount: input.amount,
+    currency: input.currency,
+    email: input.email,
+    shipping: input.shipping,
+    existingIntentId: input.existingRef,
+  });
+  if (!intent.client_secret) {
+    throw new Error("Could not start Stripe payment.");
+  }
+  await setPendingCheckout({
+    orderId: input.orderId,
+    orderKey: input.orderKey,
+    paymentIntentId: intent.id,
+    cartHash: input.cart.cartHash,
+  });
+  return { ...base, clientSecret: intent.client_secret };
+}
+
+async function finishPaid(
+  orderId: string,
+  orderKey: string,
+  transactionId: string,
+  kind: CheckoutPaymentKind,
+) {
+  const methods = await getEnabledCheckoutMethods();
+  const method = methods.find((entry) => entry.kind === kind);
+  const paid = await markOrderPaid(orderId, transactionId, {
+    paymentMethod: method?.wooId,
+    paymentMethodTitle: method?.title,
+  });
+  try {
+    await clearStoreCart();
+  } catch {
+    // Cart clear is best-effort after payment.
+  }
+  await setPendingCheckout(null);
+  return { ...paid, orderKey: paid.orderKey || orderKey || "" };
 }
 
 export async function completeCheckoutAction(
@@ -240,6 +404,35 @@ export async function completeCheckoutAction(
     return { ...paid, orderKey: paid.orderKey || orderKey || "" };
   }
 
+  const provider = payload.provider;
+
+  if (provider === "paypal") {
+    const captured = await capturePayPalOrder(paymentIntentId);
+    if (captured.orderId && captured.orderId !== orderId) {
+      throw new Error("Payment does not match this order.");
+    }
+    const order = await getOrder(orderId);
+    if (Math.abs(captured.amount - Number(order.total || 0)) > 0.05) {
+      throw new Error("Payment amount does not match the order.");
+    }
+    return finishPaid(orderId, orderKey, captured.captureId, "paypal");
+  }
+
+  if (provider === "afterpay") {
+    const captured = await captureAfterpayPayment(paymentIntentId, orderId);
+    if (captured.orderId && captured.orderId !== orderId) {
+      throw new Error("Payment does not match this order.");
+    }
+    const order = await getOrder(orderId);
+    if (
+      captured.amount > 0 &&
+      Math.abs(captured.amount - Number(order.total || 0)) > 0.05
+    ) {
+      throw new Error("Payment amount does not match the order.");
+    }
+    return finishPaid(orderId, orderKey, captured.paymentId, "afterpay");
+  }
+
   const stripe = requireStripe();
   const intent = await stripe.paymentIntents.retrieve(paymentIntentId);
   const wooOrderId = intent.metadata?.woo_order_id;
@@ -267,12 +460,5 @@ export async function completeCheckoutAction(
     throw new Error("Payment amount does not match the order.");
   }
 
-  const paid = await markOrderPaid(orderId, intent.id);
-  try {
-    await clearStoreCart();
-  } catch {
-    // Cart clear is best-effort after payment.
-  }
-  await setPendingCheckout(null);
-  return { ...paid, orderKey: paid.orderKey || orderKey || order.order_key || "" };
+  return finishPaid(orderId, orderKey, intent.id, "stripe");
 }

@@ -39,9 +39,7 @@ export async function shopNowToCheckout(
       quantity,
       emptyCart,
     });
-    const store = useCartStore.getState();
-    store.setCart(cart, { open: false, bump: true });
-    store.openCheckout();
+    useCartStore.getState().setCart(cart, { open: false, bump: true });
     return cart;
   } catch (error) {
     toast({

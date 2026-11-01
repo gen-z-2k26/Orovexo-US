@@ -180,12 +180,12 @@ export function DiscoverContact({
             <BlockView key={index} block={block} contactStyle="grid" />
           ))}
           <div className="mt-6 rounded-[3px] border border-border bg-card p-6 sm:p-8">
-            <ContactForm to={settings.contact.email} />
+            <ContactForm />
           </div>
         </section>
       ) : (
         <div className="mt-10 rounded-[3px] border border-border bg-card p-6 sm:p-8">
-          <ContactForm to={settings.contact.email} />
+          <ContactForm />
         </div>
       )}
       <FooterNote page={page} />

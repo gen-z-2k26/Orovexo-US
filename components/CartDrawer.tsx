@@ -14,7 +14,6 @@ import {
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CartItemRow } from "@/components/CartItemRow";
-import { CheckoutModal } from "@/components/CheckoutModal";
 import { useCartStore } from "@/lib/cart-store";
 import { useStore } from "@/lib/store-context";
 import { formatPrice } from "@/lib/format";
@@ -30,8 +29,6 @@ export function CartDrawer() {
   const setOpen = useCartStore((state) => state.setOpen);
   const setCart = useCartStore((state) => state.setCart);
   const setError = useCartStore((state) => state.setError);
-  const checkoutOpen = useCartStore((state) => state.checkoutOpen);
-  const setCheckoutOpen = useCartStore((state) => state.setCheckoutOpen);
   const [coupon, setCoupon] = useState("");
   const [couponBusy, setCouponBusy] = useState(false);
   const items = cart.items;
@@ -189,21 +186,22 @@ export function CartDrawer() {
               {settings.footer?.trustLine ||
                 "Free shipping · 30-day returns · Secure checkout"}
             </p>
-            <Button
-              type="button"
-              size="lg"
-              disabled={items.length === 0}
-              onClick={() => {
-                useCartStore.getState().openCheckout();
-              }}
-            >
-              Checkout
-            </Button>
+            {items.length ? (
+              <Link
+                href="/checkout"
+                className={cn(buttonVariants({ size: "lg" }), "w-full")}
+                onClick={() => setOpen(false)}
+              >
+                Checkout
+              </Link>
+            ) : (
+              <Button type="button" size="lg" disabled>
+                Checkout
+              </Button>
+            )}
           </SheetFooter>
         </SheetContent>
       </Sheet>
-
-      <CheckoutModal open={checkoutOpen} onOpenChange={setCheckoutOpen} />
     </>
   );
 }

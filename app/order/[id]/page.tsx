@@ -25,8 +25,9 @@ export default async function OrderPage({
       orderId={id}
       orderKey={value("key")}
       email={value("email")}
-      paymentIntentId={value("payment_intent")}
-      redirectStatus={value("redirect_status")}
+      paymentIntentId={value("payment_intent") || value("orderToken")}
+      redirectStatus={value("redirect_status") || value("status")}
+      provider={value("orderToken") ? "afterpay" : "stripe"}
     />
   );
 }

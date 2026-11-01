@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CustomerCarePage } from "@/components/CustomerCarePage";
 import { PolicyPageView } from "@/components/PolicyPageView";
-import { WpHtmlPage } from "@/components/WpHtmlPage";
 import { getSiteSettings } from "@/lib/api";
-import { getWpPage } from "@/lib/api/wp-pages";
 import { customerCareBySlug } from "@/lib/customer-care";
 import { layoutForTrustSlug, trustBySlug } from "@/lib/trust";
 import {
@@ -62,13 +60,6 @@ export default async function PolicySlugPage({
 
   const policy = policyBySlug(slug);
   if (!policy) notFound();
-
-  if (!policy.designed) {
-    const wp = await getWpPage(slug);
-    if (wp?.content) {
-      return <WpHtmlPage title={wp.title || policy.title} html={wp.content} />;
-    }
-  }
 
   return (
     <PolicyPageView

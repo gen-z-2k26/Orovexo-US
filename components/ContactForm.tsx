@@ -1,6 +1,7 @@
 "use client";
 
-import type { FormEvent } from "react";
+import { useState, type FormEvent } from "react";
+import { submitContactAction } from "@/app/actions/contact";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,38 +11,41 @@ import { cn } from "@/lib/utils";
 const fieldClass =
   "h-11 w-full min-w-0 rounded-xl border border-input bg-background px-3.5 py-2 text-base outline-none transition-[color,background-color,border-color,box-shadow] duration-200 placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm dark:bg-input/30";
 
-export function ContactForm({ to }: { to: string }) {
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+export function ContactForm() {
+  const [sending, setSending] = useState(false);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
-    const name = String(data.get("name") || "").trim();
-    const email = String(data.get("email") || "").trim();
-    const phone = String(data.get("phone") || "").trim();
-    const orderNumber = String(data.get("orderNumber") || "").trim();
-    const subject = String(data.get("subject") || "").trim();
-    const message = String(data.get("message") || "").trim();
-    if (!name || !email || !subject || !message) return;
-
-    event.preventDefault();
-    const extras = [
-      `Name: ${name}`,
-      `Email: ${email}`,
-      phone ? `Phone: ${phone}` : "",
-      orderNumber ? `Order number: ${orderNumber}` : "",
-    ]
-      .filter(Boolean)
-      .join("\n");
-    const body = `${extras}\n\n${message}`;
-    const href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    toast({
-      title: "Opening your email app",
-      description: "Finish sending to reach the store.",
-    });
-    window.location.href = href;
+    setSending(true);
+    try {
+      const result = await submitContactAction({
+        name: String(data.get("name") || ""),
+        email: String(data.get("email") || ""),
+        phone: String(data.get("phone") || ""),
+        orderNumber: String(data.get("orderNumber") || ""),
+        subject: String(data.get("subject") || ""),
+        message: String(data.get("message") || ""),
+      });
+      form.reset();
+      toast({
+        title: "Message sent",
+        description: result.inbox
+          ? `We sent your note to ${result.inbox}.`
+          : "We sent your note to the store.",
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Could not send your message.";
+      toast({ title: "Message not sent", description: message, variant: "error" });
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit}>
+    <form className="space-y-4" onSubmit={(event) => void handleSubmit(event)}>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="contact-name">Name</Label>
@@ -85,8 +89,8 @@ export function ContactForm({ to }: { to: string }) {
           className={cn(fieldClass, "h-auto min-h-36 py-3")}
         />
       </div>
-      <Button type="submit" size="lg" className="w-full sm:w-auto">
-        Send Message
+      <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={sending}>
+        {sending ? "Sending..." : "Send Message"}
       </Button>
     </form>
   );

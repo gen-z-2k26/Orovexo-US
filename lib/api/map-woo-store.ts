@@ -131,11 +131,14 @@ export function mergeWooStoreIdentity(
   design: StoreSettings,
   options: {
     generalSettings?: WooSetting[];
+    emailSettings?: WooSetting[];
     siteInfo?: WpSiteInfo | null;
     storeMoney?: WooStoreMoney | null;
   },
 ): StoreSettings {
   const general = settingMap(options.generalSettings ?? []);
+  const emailSettings = settingMap(options.emailSettings ?? []);
+  const wooEmail = emailSettings.woocommerce_email_from_address?.trim() || "";
   const site = options.siteInfo ?? {};
   const money = options.storeMoney ?? {};
 
@@ -188,6 +191,7 @@ export function mergeWooStoreIdentity(
     contact: {
       ...branded.contact,
       address,
+      email: wooEmail || branded.contact.email,
     },
     currency,
     currencySymbol: symbol,

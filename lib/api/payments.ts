@@ -12,15 +12,22 @@ export function isWooGatewayEnabled(value: unknown) {
   return value === true || value === "yes" || value === "true";
 }
 
-function kindForGateway(id: string): CheckoutPaymentKind | null {
+export function checkoutKindForGateway(id: string): CheckoutPaymentKind | null {
   const key = id.toLowerCase();
-  if (key === "ppcp-gateway" || key === "paypal" || key === "ppec_paypal") {
+  if (key.includes("klarna") || key.includes("affirm") || key.includes("link")) {
+    return null;
+  }
+  if (key.includes("paypal") || key.includes("ppcp") || key === "ppec_paypal") {
     return "paypal";
   }
-  if (key === "afterpay" || key === "afterpay-clearpay") {
+  if (key.includes("afterpay") || key.includes("clearpay")) {
     return "afterpay";
   }
-  if (key === "stripe" || key === "woocommerce_payments") {
+  if (
+    key === "stripe" ||
+    key === "woocommerce_payments" ||
+    key.startsWith("stripe")
+  ) {
     return "stripe";
   }
   return null;
@@ -38,7 +45,7 @@ export async function getEnabledCheckoutMethods(): Promise<
     const found = new Map<CheckoutPaymentKind, CheckoutPaymentMethod>();
     for (const gateway of gateways) {
       if (!gateway.id || !isWooGatewayEnabled(gateway.enabled)) continue;
-      const kind = kindForGateway(gateway.id);
+      const kind = checkoutKindForGateway(gateway.id);
       if (!kind || found.has(kind)) continue;
       found.set(kind, {
         kind,
@@ -61,8 +68,3 @@ export async function getEnabledCheckoutMethods(): Promise<
   }
 }
 
-export function wooPayUrl(orderId: string, orderKey: string) {
-  const origin = process.env.WC_URL?.trim().replace(/\/$/, "");
-  if (!origin || !orderId || !orderKey) return "";
-  return `${origin}/checkout/order-pay/${orderId}/?pay_for_order=true&key=${encodeURIComponent(orderKey)}`;
-}

@@ -22,7 +22,7 @@ import {
 import { getLivePromo } from "@/lib/api/promo";
 import { fetchWpFooterColumns } from "@/lib/api/wp-menus";
 import { googleFontStylesheetUrl } from "@/lib/fonts";
-import { isWooGatewayEnabled } from "@/lib/api/payments";
+import { checkoutKindForGateway, isWooGatewayEnabled } from "@/lib/api/payments";
 import type {
   Category,
   CountryOption,
@@ -226,7 +226,7 @@ export async function getSiteSettings(): Promise<StoreSettings> {
   }
 
   try {
-    const [siteInfo, general, storeMoney, footerColumns] =
+    const [siteInfo, general, emailSettings, storeMoney, footerColumns] =
       await Promise.all([
       fetchWpSiteInfo(),
       cachedSoftWooCall(
@@ -236,12 +236,20 @@ export async function getSiteSettings(): Promise<StoreSettings> {
         [],
         "settings/general",
       ),
+      cachedSoftWooCall(
+        "settings/email",
+        () =>
+          wooGet<Array<{ id?: string; value?: string }>>("settings/email"),
+        [],
+        "settings/email",
+      ),
       fetchStoreMoney(),
       fetchWpFooterColumns(designSettings.navigation.footerColumns),
     ]);
 
     const merged = mergeWooStoreIdentity(designSettings, {
       generalSettings: general,
+      emailSettings,
       siteInfo,
       storeMoney,
     });
@@ -717,17 +725,12 @@ function stripeCardBrands(settings: StoreSettings): PaymentIconSlug[] {
 
 function classifyGateway(id: string) {
   const key = id.toLowerCase();
+  const checkoutKind = checkoutKindForGateway(id);
   return {
-    stripe: key === "stripe" || key === "woocommerce_payments",
-    paypal:
-      key === "paypal" ||
-      key === "ppcp-gateway" ||
-      key === "ppec_paypal",
+    stripe: checkoutKind === "stripe",
+    paypal: checkoutKind === "paypal",
     affirm: /affirm/.test(key) && !key.startsWith("stripe_"),
-    afterpay:
-      key === "afterpay" ||
-      key === "afterpay-clearpay" ||
-      key === "clearpay",
+    afterpay: checkoutKind === "afterpay",
   };
 }
 

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Check, Share2 } from "lucide-react";
 import type {
   BnplPublicConfig,
@@ -35,6 +36,7 @@ export function ProductDetail({
   bnpl: BnplPublicConfig;
   related?: Product[];
 }) {
+  const router = useRouter();
   const { settings } = useStore();
   const setError = useCartStore((state) => state.setError);
   const [quantity, setQuantity] = useState(1);
@@ -66,6 +68,7 @@ export function ProductDetail({
     setBusy(true);
     try {
       await shopNowToCheckout(product, quantity, page.shopNowEmptyCart);
+      router.push("/checkout");
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "Could not start checkout.",
@@ -330,13 +333,13 @@ export function ProductDetail({
 
       <section className="mt-16 space-y-12 border-t border-border pt-10">
         {(product.specGroups ?? []).length > 0 ? (
-          product.specGroups.map((group) => (
-            <div key={group.title}>
+          product.specGroups.map((group, groupIndex) => (
+            <div key={`${group.title}-${groupIndex}`}>
               <h2 className="mb-4 text-lg font-medium">{group.title}</h2>
               <dl className="grid overflow-hidden border border-border sm:grid-cols-2">
-                {group.rows.map((row) => (
+                {group.rows.map((row, rowIndex) => (
                   <div
-                    key={`${group.title}-${row.label}`}
+                    key={`${group.title}-${groupIndex}-${row.label}-${rowIndex}`}
                     className="grid grid-cols-1 border-b border-border last:border-b-0 sm:grid-cols-[minmax(8rem,0.8fr)_1.2fr] sm:[&:nth-last-child(-n+2)]:border-b-0"
                   >
                     <dt className="bg-muted/40 px-4 pt-3 pb-1 text-sm text-muted-foreground sm:py-3">
