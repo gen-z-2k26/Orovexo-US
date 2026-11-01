@@ -1,14 +1,20 @@
 import type { Metadata } from "next";
-import ContactPage from "../contact-us/page";
+import { notFound } from "next/navigation";
+import { CustomerCarePage } from "@/components/CustomerCarePage";
+import { getSiteSettings } from "@/lib/api";
+import { customerCareBySlug } from "@/lib/customer-care";
 
 export const revalidate = 60;
 
+const PAGE = customerCareBySlug("order-help-center");
+
 export const metadata: Metadata = {
-  title: "Order Help Center",
-  description:
-    "Get help with an Orvexo Electronics order, tracking, returns, or payments.",
+  title: PAGE?.title ?? "Order Help Center",
+  description: PAGE?.description,
 };
 
-export default function OrderHelpPage() {
-  return <ContactPage variant="help" />;
+export default async function OrderHelpPage() {
+  if (!PAGE) notFound();
+  const settings = await getSiteSettings();
+  return <CustomerCarePage page={PAGE} settings={settings} />;
 }

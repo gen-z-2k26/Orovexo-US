@@ -1,114 +1,20 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import {
-  BusinessStrip,
-  EditorialCta,
-  EditorialHero,
-  EditorialShell,
-  PageToc,
-  slugifySection,
-} from "@/components/EditorialPage";
-import { PageSections } from "@/components/PageSections";
-import { StoreImage } from "@/components/StoreImage";
-import { buttonVariants } from "@/components/ui/button";
-import { getFeaturedProducts, getSiteSettings } from "@/lib/api";
-import { cn } from "@/lib/utils";
+import { notFound } from "next/navigation";
+import { DiscoverAbout } from "@/components/DiscoverView";
+import { getSiteSettings } from "@/lib/api";
+import { discoverBySlug } from "@/lib/discover";
 
 export const revalidate = 60;
 
+const PAGE = discoverBySlug("about-us");
+
 export const metadata: Metadata = {
-  title: "About us",
-  description:
-    "Orvexo Electronics is a US-focused online electronics store operated by Universal Lighting Technologies.",
+  title: PAGE?.title ?? "About Us",
+  description: PAGE?.description,
 };
 
 export default async function AboutPage() {
+  if (!PAGE) notFound();
   const settings = await getSiteSettings();
-  const page = settings.pages.about;
-  const products = await getFeaturedProducts(8);
-  const product = products.find((item) => item.images[0]);
-  const toc = (page.sections || []).map((section) => ({
-    id: slugifySection(section.title),
-    title: section.title,
-  }));
-
-  return (
-    <EditorialShell>
-      <EditorialHero
-        current="About"
-        eyebrow={`${settings.name} · ${page.eyebrow}`}
-        title={page.title}
-        description={page.intro}
-      />
-
-      <div className="mt-10 grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-border shadow-sm">
-          <StoreImage
-            src={product?.images[0] || page.image || settings.logo}
-            alt={product?.imageAlts[0] || product?.name || settings.name}
-            fallbackSrc={settings.logo}
-            sizes="(max-width: 1024px) 100vw, 50vw"
-          />
-        </div>
-        <div className="space-y-5">
-          <p className="text-pretty text-lg leading-relaxed text-muted-foreground">
-            {page.body}
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/products" className={buttonVariants({ size: "lg" })}>
-              Shop Orvexo Electronics
-            </Link>
-            <Link
-              href="/contact-us"
-              className={cn(buttonVariants({ size: "lg", variant: "outline" }))}
-            >
-              Contact our team
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      <BusinessStrip settings={settings} />
-
-      {page.values.length ? (
-        <div className="mt-14">
-          <h2 className="font-display text-2xl tracking-tight sm:text-3xl">
-            What we stand for
-          </h2>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {page.values.map((value) => (
-              <div key={value.title} className="surface-card space-y-2 p-6">
-                <h3 className="text-lg tracking-tight">{value.title}</h3>
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {value.text}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : null}
-
-      {toc.length ? (
-        <div className="mt-14 grid gap-10 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-14">
-          <div className="lg:sticky lg:top-24 lg:self-start">
-            <PageToc items={toc} />
-          </div>
-          <PageSections className="mt-0" sections={page.sections || []} />
-        </div>
-      ) : (
-        <PageSections sections={page.sections || []} />
-      )}
-
-      {page.ctaTitle ? (
-        <EditorialCta
-          title={page.ctaTitle}
-          body={page.ctaBody}
-          primaryHref="/products"
-          primaryLabel="Shop Orvexo Electronics"
-          secondaryHref="/contact-us"
-          secondaryLabel="Contact our team"
-        />
-      ) : null}
-    </EditorialShell>
-  );
+  return <DiscoverAbout page={PAGE} settings={settings} />;
 }

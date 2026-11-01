@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { CustomerCarePage } from "@/components/CustomerCarePage";
 import { PolicyPageView } from "@/components/PolicyPageView";
 import { WpHtmlPage } from "@/components/WpHtmlPage";
 import { getSiteSettings } from "@/lib/api";
 import { getWpPage } from "@/lib/api/wp-pages";
+import { customerCareBySlug } from "@/lib/customer-care";
+import { layoutForTrustSlug, trustBySlug } from "@/lib/trust";
 import {
   groupsForPolicy,
   POLICY_PAGES,
@@ -22,6 +25,14 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  const care = customerCareBySlug(slug);
+  if (care) {
+    return { title: care.title, description: care.description };
+  }
+  const trust = trustBySlug(slug);
+  if (trust) {
+    return { title: trust.title, description: trust.description };
+  }
   const policy = policyBySlug(slug);
   if (!policy) return {};
   return { title: policy.title, description: policy.description };
@@ -33,10 +44,24 @@ export default async function PolicySlugPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const settings = await getSiteSettings();
+  const care = customerCareBySlug(slug);
+  if (care) {
+    return <CustomerCarePage page={care} settings={settings} />;
+  }
+  const trust = trustBySlug(slug);
+  if (trust) {
+    return (
+      <CustomerCarePage
+        page={trust}
+        settings={settings}
+        layout={layoutForTrustSlug(slug)}
+      />
+    );
+  }
+
   const policy = policyBySlug(slug);
   if (!policy) notFound();
-
-  const settings = await getSiteSettings();
 
   if (!policy.designed) {
     const wp = await getWpPage(slug);
