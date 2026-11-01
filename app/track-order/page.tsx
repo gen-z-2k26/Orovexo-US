@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { CustomerCareShell } from "@/components/CustomerCarePage";
+import { CustomerCareShell, RelatedLinks } from "@/components/CustomerCarePage";
 import { TrackOrderForm } from "@/components/TrackOrderForm";
 import { getSiteSettings } from "@/lib/api";
 
@@ -15,11 +15,12 @@ export default async function TrackOrderPage() {
   return (
     <CustomerCareShell
       settings={settings}
+      variant="help"
       title="Track Your Order"
       eyebrow="Customer care"
     >
       <div className="grid gap-8 lg:grid-cols-[minmax(0,28rem)_minmax(0,1fr)] lg:items-start">
-        <div className="rounded-[3px] border border-border bg-card p-6 sm:p-8">
+        <div className="rounded-2xl border border-border border-t-4 border-t-[var(--fp-bar)] bg-card p-6 sm:p-8">
           <TrackOrderForm />
         </div>
         <aside className="space-y-4 text-sm leading-relaxed text-muted-foreground">
@@ -47,6 +48,7 @@ export default async function TrackOrderPage() {
           </div>
         </aside>
       </div>
+      <RelatedLinks settings={settings} href="/track-your-order" />
     </CustomerCareShell>
   );
 }

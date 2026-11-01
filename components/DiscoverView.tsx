@@ -1,11 +1,13 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { ContactForm } from "@/components/ContactForm";
+import { ContactForm, SubjectChips } from "@/components/ContactForm";
 import {
   BlockView,
   CustomerCareShell,
+  RelatedLinks,
   RichText,
 } from "@/components/CustomerCarePage";
+import { CARE_LABEL_HREFS } from "@/lib/customer-care";
 import type { CareBlock, CarePage, CareSection } from "@/lib/customer-care";
 import type { StoreSettings } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -37,9 +39,9 @@ function SectionBody({
   return (
     <section
       id={section.id}
-      className="scroll-mt-24 mb-10 border-b border-border pb-10 last:mb-0 last:border-b-0 last:pb-0"
+      className="group scroll-mt-32 mb-0 border-b border-border py-10 last:border-b-0 sm:py-16"
     >
-      <h2 className="font-display mb-4 text-[27px] leading-tight font-normal tracking-[-0.025em]">
+      <h2 className="font-display mb-4 text-[28px] leading-tight font-normal sm:text-[32px]">
         {numbered ? (
           <span className="flex gap-4">
             <span className="text-primary/80 tabular-nums">
@@ -72,6 +74,100 @@ function FooterNote({ page }: { page: CarePage }) {
   );
 }
 
+function pullQuoteBlocks(section: CareSection) {
+  const quote = "But finding the right product shouldn't feel complicated.";
+  return section.blocks.map((block, index) => {
+    if (block.type === "paragraph" && block.text === quote) {
+      return (
+        <blockquote
+          key={quote}
+          className="font-display my-6 max-w-[20ch] text-3xl leading-tight sm:text-4xl"
+        >
+          {quote}
+        </blockquote>
+      );
+    }
+    return (
+      <BlockView key={`${section.id}-${index}`} block={block} contactStyle="grid" />
+    );
+  });
+}
+
+function offerCards(section: CareSection) {
+  const bullets = section.blocks.find((block) => block.type === "bullets");
+  const rest = section.blocks.filter((block) => block.type !== "bullets");
+  return (
+    <>
+      {rest.map((block, index) => (
+        <BlockView key={index} block={block} contactStyle="grid" />
+      ))}
+      {bullets && bullets.type === "bullets" ? (
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {bullets.items.map((item) => {
+            const split = item.split(": ");
+            const title = split.length > 1 ? split[0] : item;
+            const body = split.length > 1 ? split.slice(1).join(": ") : "";
+            return (
+              <article key={item} className="rounded-2xl border border-[color-mix(in_srgb,var(--accent)_40%,transparent)] bg-card p-5">
+                <h3 className="font-display text-xl">{title}:</h3>
+                {body ? <p className="mt-2 text-[16px] leading-[1.7] text-muted-foreground">{body}</p> : null}
+              </article>
+            );
+          })}
+        </div>
+      ) : null}
+    </>
+  );
+}
+
+function headingCards(section: CareSection) {
+  const groups: Array<{ title: string; blocks: CareBlock[] }> = [];
+  const loose: CareBlock[] = [];
+  for (const block of withoutCopyright(section.blocks)) {
+    if (block.type === "heading") groups.push({ title: block.text, blocks: [] });
+    else if (groups.length) groups[groups.length - 1].blocks.push(block);
+    else loose.push(block);
+  }
+  return (
+    <>
+      {loose.map((block, index) => (
+        <BlockView key={`loose-${index}`} block={block} contactStyle="grid" />
+      ))}
+      <div className="grid gap-3 md:grid-cols-3">
+        {groups.map((group) => (
+          <article key={group.title} className="rounded-2xl border border-[color-mix(in_srgb,var(--accent)_40%,transparent)] bg-card p-5">
+            <h3 className="font-display text-xl">{group.title}</h3>
+            {group.blocks.map((block, index) =>
+              block.type === "paragraph" && CARE_LABEL_HREFS[block.text] ? (
+                <p key={index} className="mt-4">
+                  <Link href={CARE_LABEL_HREFS[block.text]} className="inline-flex min-h-11 items-center rounded-full bg-foreground px-4 text-sm text-background">
+                    {block.text}
+                  </Link>
+                </p>
+              ) : (
+                <BlockView key={index} block={block} contactStyle="grid" />
+              ),
+            )}
+          </article>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function typographicBand(section: CareSection) {
+  return withoutCopyright(section.blocks).map((block, index) => {
+    if (block.type === "heading") {
+      return (
+        <p key={block.text} className="font-display my-4 text-4xl leading-tight sm:text-6xl">
+          {block.text}
+        </p>
+      );
+    }
+    return <BlockView key={index} block={block} contactStyle="grid" />;
+  });
+}
+
 export function DiscoverAbout({
   page,
   settings,
@@ -79,25 +175,72 @@ export function DiscoverAbout({
   page: CarePage;
   settings: StoreSettings;
 }) {
+  const [lead, ...restIntro] = page.intro;
+  const mission = page.sections.find((section) => section.id === "our-mission");
+  const vision = page.sections.find((section) => section.id === "our-vision");
+  const skipped = new Set(["our-mission", "our-vision"]);
   return (
     <CustomerCareShell
       settings={settings}
+      variant="brand"
       title={page.tagline || page.title}
       eyebrow="About Us"
-      intro={page.intro.map((paragraph) => (
-        <p key={paragraph.slice(0, 40)}>
-          <RichText text={paragraph} />
-        </p>
-      ))}
+      intro={
+        lead ? (
+          <p className="font-display text-2xl leading-snug text-foreground">
+            <RichText text={lead} />
+          </p>
+        ) : null
+      }
     >
-      {page.sections.map((section) => (
-        <SectionBody
-          key={section.id}
-          section={section}
-          contactStyle="grid"
-        />
-      ))}
+      {restIntro.length ? (
+        <div className="mb-10 grid gap-4 sm:grid-cols-2">
+          {restIntro.map((paragraph) => (
+            <p key={paragraph.slice(0, 40)} className="text-[16px] leading-[1.7] text-muted-foreground sm:text-[17px]">
+              <RichText text={paragraph} />
+            </p>
+          ))}
+        </div>
+      ) : null}
+      {page.sections.map((section, index) => {
+        if (skipped.has(section.id)) {
+          if (section.id !== "our-mission" || !mission || !vision) return null;
+          return (
+            <div key="mission-vision" className="grid gap-4 py-10 sm:grid-cols-2 sm:py-16">
+              {[mission, vision].map((item, panel) => (
+                <section key={item.id} id={item.id} className={panel === 0 ? "rounded-2xl bg-muted/50 p-6" : "rounded-2xl bg-primary/15 p-6"}>
+                  <h2 className="font-display mb-4 text-[28px]">{item.title}</h2>
+                  {withoutCopyright(item.blocks).map((block, blockIndex) => (
+                    <BlockView key={blockIndex} block={block} contactStyle="grid" />
+                  ))}
+                </section>
+              ))}
+            </div>
+          );
+        }
+        return (
+          <section
+            key={section.id}
+            id={section.id}
+            className={`scroll-mt-32 py-10 sm:py-16 ${index % 2 === 1 ? "bg-muted/30" : ""}`}
+          >
+            <h2 className="font-display mb-4 text-[28px] sm:text-[32px]">{section.title}</h2>
+            {section.id === "our-story"
+              ? pullQuoteBlocks(section)
+              : section.id === "what-we-offer"
+                ? offerCards(section)
+                : section.id === "the-values-behind-orvexo" || section.id === "why-shop-with-orvexo-electronics"
+                  ? headingCards(section)
+                  : section.id === "a-shopping-experience-designed-around-you"
+                    ? typographicBand(section)
+                    : withoutCopyright(section.blocks).map((block, blockIndex) => (
+                        <BlockView key={blockIndex} block={block} contactStyle="grid" />
+                      ))}
+          </section>
+        );
+      })}
       <FooterNote page={page} />
+      <RelatedLinks settings={settings} href="/about-us" />
     </CustomerCareShell>
   );
 }
@@ -132,6 +275,7 @@ export function DiscoverContact({
   return (
     <CustomerCareShell
       settings={settings}
+      variant="help"
       title={page.title}
       eyebrow={page.tagline || "We're Here to Help"}
       intro={page.intro.map((paragraph) => (
@@ -141,15 +285,16 @@ export function DiscoverContact({
       ))}
     >
       {channels.length ? (
-        <div className="mb-14">
-          <h2 className="font-display mb-6 text-[27px]">{getInTouch?.title}</h2>
-          <div className="grid gap-6 sm:grid-cols-2">
+        <div className="mb-14 grid items-start gap-8 lg:grid-cols-2">
+          <div>
+          <h2 className="font-display mb-6 text-[28px] sm:text-[32px]">{getInTouch?.title}</h2>
+          <div className="grid gap-4">
             {channels.map((channel, index) => (
               <div
                 key={channel.title}
                 className="rounded-[3px] border border-border p-6"
               >
-                <p className="mb-3 text-[10px] font-bold tracking-[0.16em] text-primary uppercase">
+                <p className="mb-3 text-[10px] font-bold tracking-[0.16em] text-foreground uppercase">
                   {String(index + 1).padStart(2, "0")} / {channel.title}
                 </p>
                 {channel.blocks.map((block, blockIndex) => (
@@ -162,6 +307,25 @@ export function DiscoverContact({
               </div>
             ))}
           </div>
+          </div>
+          {send ? (
+            <section id={send.id} className="scroll-mt-32 rounded-2xl border border-border border-t-4 border-t-[var(--fp-bar)] bg-card p-6 sm:p-8">
+              <h2 className="font-display mb-3 text-[28px]">{send.title}</h2>
+              {withoutCopyright(send.blocks).map((block, index) => (
+                <BlockView key={index} block={block} contactStyle="grid" />
+              ))}
+              <SubjectChips
+                topics={
+                  page.sections
+                    .find((section) => section.id === "how-can-we-help-you")
+                    ?.blocks.filter((block) => block.type === "heading")
+                    .map((block) => (block.type === "heading" ? block.text : ""))
+                    .filter(Boolean) ?? []
+                }
+              />
+              <ContactForm to={settings.contact.email} />
+            </section>
+          ) : null}
         </div>
       ) : null}
 
@@ -173,22 +337,8 @@ export function DiscoverContact({
         />
       ))}
 
-      {send ? (
-        <section id={send.id} className="mt-10 scroll-mt-24">
-          <h2 className="font-display mb-3 text-[27px]">{send.title}</h2>
-          {withoutCopyright(send.blocks).map((block, index) => (
-            <BlockView key={index} block={block} contactStyle="grid" />
-          ))}
-          <div className="mt-6 rounded-[3px] border border-border bg-card p-6 sm:p-8">
-            <ContactForm to={settings.contact.email} />
-          </div>
-        </section>
-      ) : (
-        <div className="mt-10 rounded-[3px] border border-border bg-card p-6 sm:p-8">
-          <ContactForm to={settings.contact.email} />
-        </div>
-      )}
       <FooterNote page={page} />
+      <RelatedLinks settings={settings} href="/contact-us" />
     </CustomerCareShell>
   );
 }
@@ -203,6 +353,7 @@ export function DiscoverCommitment({
   return (
     <CustomerCareShell
       settings={settings}
+      variant="brand"
       title={page.tagline || page.title}
       eyebrow="Our Commitment"
       intro={page.intro.map((paragraph) => (
@@ -221,6 +372,7 @@ export function DiscoverCommitment({
         />
       ))}
       <FooterNote page={page} />
+      <RelatedLinks settings={settings} href="/our-commitment" />
     </CustomerCareShell>
   );
 }
@@ -237,6 +389,7 @@ export function DiscoverFaqFrame({
   return (
     <CustomerCareShell
       settings={settings}
+      variant="help"
       title={page.title}
       eyebrow={page.tagline}
       intro={page.intro
@@ -269,6 +422,7 @@ export function DiscoverFaqFrame({
         </Link>
       </p>
       <FooterNote page={page} />
+      <RelatedLinks settings={settings} href="/faqs" />
     </CustomerCareShell>
   );
 }
