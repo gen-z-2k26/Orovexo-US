@@ -194,7 +194,7 @@ export function DiscoverAbout({
       }
     >
       {restIntro.length ? (
-        <div className="mb-10 grid gap-4 sm:grid-cols-2">
+        <div className="mb-10 flex max-w-[68ch] flex-col gap-4">
           {restIntro.map((paragraph) => (
             <p key={paragraph.slice(0, 40)} className="text-[16px] leading-[1.7] text-muted-foreground sm:text-[17px]">
               <RichText text={paragraph} />
