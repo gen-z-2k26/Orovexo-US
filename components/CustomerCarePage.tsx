@@ -272,9 +272,8 @@ export function PageHeader({
   actions?: ReactNode;
   variant?: "brand" | "help" | "policy";
 }) {
-  const lead = variant === "help";
   return (
-    <header className="mb-8 grid items-end gap-6 text-left lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+    <header className="mb-10 flex max-w-[68ch] flex-col gap-5 text-left">
       <div>
         {eyebrow ? (
           <p className="mb-3 text-[11px] font-bold tracking-[0.16em] text-foreground uppercase">
@@ -290,7 +289,7 @@ export function PageHeader({
         {actions ? <div className="mt-4">{actions}</div> : null}
       </div>
       {intro ? (
-        <div className={cn("space-y-3 text-[16px] leading-[1.7] text-muted-foreground sm:text-[17px]", lead && "lg:text-[18px]")}>
+        <div className={cn("space-y-3 text-[16px] leading-[1.7] text-muted-foreground sm:text-[17px]", variant === "help" && "sm:text-[18px]")}>
           {intro}
         </div>
       ) : null}
