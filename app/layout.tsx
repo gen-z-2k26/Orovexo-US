@@ -79,7 +79,7 @@ export async function generateMetadata(): Promise<Metadata> {
         follow: true,
       },
       verification: {
-        google: "K5OpExPL0GS0pV-imCaeizrzBsuArNxq6HnJatROH_I",
+        google: "vi_Kz_u22DEh9LXg6x9ueMeWPUemFhg6mdTm3t7-7i0",
       },
       alternates: {
         canonical: "/",
