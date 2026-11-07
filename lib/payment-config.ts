@@ -113,8 +113,14 @@ export type PaymentSettingsInput = {
 };
 
 const BLOB_PATH = "payments/config.enc";
+const BLOB_CACHE_SECONDS = 60 * 60 * 24;
+const FRESH_MS = 5 * 60 * 1000;
+const QUIET_MS = 60 * 60 * 1000;
 
-let cache: { etag: string; config: StoredPaymentConfig } | null = null;
+let memory: { config: StoredPaymentConfig | null; expiresAt: number } | null = null;
+let inflight: Promise<StoredPaymentConfig | null> | null = null;
+let cacheExtended = false;
+let revision = 0;
 
 function encryptionKey() {
   const raw = process.env.PAYMENT_CONFIG_KEY?.trim() || "";
@@ -192,37 +198,78 @@ function decryptStored(key: Buffer, raw: string) {
   return normalizeStored(JSON.parse(json));
 }
 
+function cacheLifetime(header: string | null | undefined) {
+  const ages = [...(header || "").matchAll(/(?:s-maxage|max-age)=(\d+)/gi)].map((match) =>
+    Number(match[1]),
+  );
+  const finite = ages.filter((age) => Number.isFinite(age));
+  if (!finite.length) return 0;
+  return Math.max(...finite);
+}
+
+function remember(config: StoredPaymentConfig | null, maxAgeSeconds: number) {
+  const ttl = maxAgeSeconds >= 3600 ? FRESH_MS : QUIET_MS;
+  memory = { config, expiresAt: Date.now() + ttl };
+}
+
+async function extendBlobCache(raw: string, etag: string) {
+  try {
+    await put(BLOB_PATH, raw, {
+      access: "private",
+      addRandomSuffix: false,
+      allowOverwrite: true,
+      contentType: "application/json",
+      cacheControlMaxAge: BLOB_CACHE_SECONDS,
+      ifMatch: etag,
+    });
+  } catch {
+    cacheExtended = false;
+  }
+}
+
+async function loadStored(key: Buffer): Promise<StoredPaymentConfig | null> {
+  const rev = revision;
+  try {
+    // CDN hits are free on Hobby. Skipping the cache bills every product view.
+    const result = await get(BLOB_PATH, { access: "private" });
+    if (revision !== rev) return memory?.config ?? null;
+    if (!result || result.statusCode !== 200 || !result.stream) {
+      remember(null, 0);
+      return null;
+    }
+    const raw = await new Response(result.stream).text();
+    const config = decryptStored(key, raw);
+    if (revision !== rev) return memory?.config ?? config;
+    let lifetime = cacheLifetime(result.blob.cacheControl);
+    if (!cacheExtended && lifetime < 3600) {
+      cacheExtended = true;
+      await extendBlobCache(raw, result.blob.etag);
+      if (revision !== rev) return memory?.config ?? config;
+      if (cacheExtended) lifetime = BLOB_CACHE_SECONDS;
+    }
+    remember(config, lifetime);
+    return config;
+  } catch {
+    if (revision !== rev) return memory?.config ?? null;
+    if (memory?.config) {
+      memory = { config: memory.config, expiresAt: Date.now() + FRESH_MS };
+      return memory.config;
+    }
+    memory = { config: null, expiresAt: Date.now() + FRESH_MS };
+    return null;
+  }
+}
+
 async function readStored(): Promise<StoredPaymentConfig | null> {
   const key = encryptionKey();
   if (!key || !blobTokenReady()) return null;
-  let result;
-  try {
-    result = await get(BLOB_PATH, {
-      access: "private",
-      useCache: false,
-      ifNoneMatch: cache?.etag || undefined,
+  if (memory && memory.expiresAt > Date.now()) return memory.config;
+  if (!inflight) {
+    inflight = loadStored(key).finally(() => {
+      inflight = null;
     });
-  } catch {
-    return cache?.config ?? null;
   }
-  if (!result) {
-    cache = null;
-    return null;
-  }
-  if (result.statusCode === 304) {
-    if (cache) return cache.config;
-    const fresh = await get(BLOB_PATH, { access: "private", useCache: false });
-    if (!fresh || fresh.statusCode !== 200 || !fresh.stream) return null;
-    const raw = await new Response(fresh.stream).text();
-    const config = decryptStored(key, raw);
-    cache = { etag: fresh.blob.etag, config };
-    return config;
-  }
-  if (!result.stream) return null;
-  const raw = await new Response(result.stream).text();
-  const config = decryptStored(key, raw);
-  cache = { etag: result.blob.etag, config };
-  return config;
+  return inflight;
 }
 
 function normalizeStored(value: Partial<StoredPaymentConfig>): StoredPaymentConfig {
@@ -412,14 +459,16 @@ async function writeStored(config: StoredPaymentConfig) {
     tag: tag.toString("base64"),
     data: encrypted.toString("base64"),
   });
-  const stored = await put(BLOB_PATH, body, {
+  await put(BLOB_PATH, body, {
     access: "private",
     addRandomSuffix: false,
     allowOverwrite: true,
     contentType: "application/json",
-    cacheControlMaxAge: 60,
+    cacheControlMaxAge: BLOB_CACHE_SECONDS,
   });
-  cache = { etag: stored.etag, config };
+  revision += 1;
+  cacheExtended = true;
+  memory = { config, expiresAt: Date.now() + FRESH_MS };
 }
 
 export function checkoutPublicConfig(accounts: PaymentAccounts) {
