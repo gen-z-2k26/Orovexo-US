@@ -3,6 +3,7 @@ import Script from "next/script";
 import { Fraunces, Varela_Round } from "next/font/google";
 import { JsonLd } from "@/components/JsonLd";
 import { SiteChrome } from "@/components/SiteChrome";
+import { StaleDeployGuard } from "@/components/StaleDeployGuard";
 import { StoreProvider } from "@/lib/store-context";
 import { ThemeModeProvider } from "@/lib/theme-mode";
 import { getSiteSettings, getSiteUrl } from "@/lib/api";
@@ -196,6 +197,7 @@ export default async function RootLayout({
         />
         <JsonLd data={organizationLd} />
         <JsonLd data={websiteLd} />
+        <StaleDeployGuard />
         <ThemeModeProvider defaultMode={settings.theme.defaultMode}>
           <StoreProvider settings={{ ...settings, pages: defaultPages }}>
             <SiteChrome settings={{ ...settings, pages: defaultPages }}>
