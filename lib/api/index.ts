@@ -46,6 +46,7 @@ export {
   markOrderPaid,
   mapWooOrder,
   setOrderCustomerNote,
+  setOrderMeta,
   type WooOrder,
 } from "@/lib/api/orders";
 export { getEnabledCheckoutMethods } from "@/lib/api/payments";

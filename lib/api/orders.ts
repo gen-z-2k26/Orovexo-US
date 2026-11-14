@@ -1,5 +1,10 @@
 import { wooGet, wooPost, wooPut } from "@/lib/api/client";
 import { withWooErrorHandling } from "@/lib/api/errors";
+import {
+  ABANDONMENT_SESSION_META,
+  noteCartForAbandonment,
+  releaseAbandonedCart,
+} from "@/lib/api/cart-abandonment";
 import { toWooAddress } from "@/lib/api/map-cart";
 import { majorTotalsMatch } from "@/lib/money";
 import type {
@@ -151,6 +156,7 @@ export async function createPendingOrderFromCart(
             : paymentMethod === "affirm"
               ? "Affirm"
               : "Credit card (Stripe)");
+    const abandonmentSession = await noteCartForAbandonment(cart);
     const order = await wooPost<WooOrder>("orders", {
       payment_method: paymentMethod,
       payment_method_title: paymentMethodTitle,
@@ -181,6 +187,9 @@ export async function createPendingOrderFromCart(
           value: mockPayment ? "next-dev-mock" : `next-${paymentMethod}`,
         },
         { key: "_storefront_cart_hash", value: cart.cartHash },
+        ...(abandonmentSession
+          ? [{ key: ABANDONMENT_SESSION_META, value: abandonmentSession }]
+          : []),
       ],
     });
 
@@ -194,6 +203,12 @@ export async function createPendingOrderFromCart(
     }
 
     return mapWooOrder(order, cart);
+  });
+}
+
+export async function setOrderMeta(orderId: string, key: string, value: string) {
+  await withWooErrorHandling(async () => {
+    await wooPut(`orders/${orderId}`, { meta_data: [{ key, value }] });
   });
 }
 
@@ -242,6 +257,12 @@ export async function markOrderPaid(
         existing.customer_note?.trim() || trackingCustomerNote(mappedPreview),
     });
 
+    const abandonment = existing.meta_data?.find(
+      (meta) => meta.key === ABANDONMENT_SESSION_META,
+    );
+    if (typeof abandonment?.value === "string") {
+      await releaseAbandonedCart(abandonment.value);
+    }
     return mapWooOrder(order);
   });
 }
