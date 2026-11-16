@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { IntentLink as Link } from "@/components/IntentLink";
 import Image from "next/image";
 import type { StoreSettings } from "@/lib/types";
 import { Reveal, RevealImage } from "@/components/sections/Reveal";

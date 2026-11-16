@@ -4,7 +4,7 @@ import { DiscoverAbout } from "@/components/DiscoverView";
 import { getSiteSettings } from "@/lib/api";
 import { discoverBySlug } from "@/lib/discover";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 const PAGE = discoverBySlug("about-us");
 

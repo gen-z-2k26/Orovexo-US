@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { IntentLink as Link } from "@/components/IntentLink";
 import { useState } from "react";
 import { ArrowUpRight, Check, Eye, ShoppingBag } from "lucide-react";
 import type { Product } from "@/lib/types";

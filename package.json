@@ -6,7 +6,8 @@
     "dev": "node init && next dev",
     "build": "node init && next build",
     "start": "node init && next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "npx --yes vitest@3.2.7 run"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

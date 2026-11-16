@@ -95,7 +95,7 @@ const designSettings: StoreSettings = {
     ]),
   },
 };
-const REVALIDATE_SECONDS = 60;
+const REVALIDATE_SECONDS = 60 * 60;
 const CACHE_TTL_MS = REVALIDATE_SECONDS * 1000;
 
 const PRODUCT_FIELDS = [

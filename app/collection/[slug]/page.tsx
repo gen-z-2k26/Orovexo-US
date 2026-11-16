@@ -11,7 +11,7 @@ import {
 import { toCardProduct } from "@/lib/catalog-card";
 import { pageContainer } from "@/lib/layout";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 type CollectionPageProps = {
   params: Promise<{ slug: string }>;

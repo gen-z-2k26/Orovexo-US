@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { IntentLink as Link } from "@/components/IntentLink";
 import { ReviewStars } from "@/components/ReviewStars";
 import { displaySocialProof } from "@/lib/social-proof";
 import type { Product } from "@/lib/types";

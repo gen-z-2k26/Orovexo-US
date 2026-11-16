@@ -5,7 +5,7 @@ import { PageHero } from "@/components/PageHero";
 import { ReviewsBoard } from "@/components/ReviewsBoard";
 import { storeReviews } from "@/lib/store-reviews";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Customer reviews",

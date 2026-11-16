@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { IntentLink as Link } from "@/components/IntentLink";
 import { Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import type { StoreSettings } from "@/lib/types";
 import { BrandLogo } from "@/components/BrandLogo";

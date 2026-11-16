@@ -1,3 +1,4 @@
+import { refreshProductsById } from "@/lib/api/catalog-refresh";
 import { wooGet, wooPost, wooPut } from "@/lib/api/client";
 import { withWooErrorHandling } from "@/lib/api/errors";
 import {
@@ -257,6 +258,10 @@ export async function markOrderPaid(
         existing.customer_note?.trim() || trackingCustomerNote(mappedPreview),
     });
 
+    await refreshProductsById(
+      (order.line_items || []).map((item) => item.product_id),
+    );
+
     const abandonment = existing.meta_data?.find(
       (meta) => meta.key === ABANDONMENT_SESSION_META,
     );
@@ -273,6 +278,9 @@ export async function cancelUnpaidOrder(orderId: string): Promise<void> {
     if (isPaidStatus(existing)) return;
     if (existing.status === "cancelled" || existing.status === "failed") return;
     await wooPut<WooOrder>(`orders/${orderId}`, { status: "cancelled" });
+    await refreshProductsById(
+      (existing.line_items || []).map((item) => item.product_id),
+    );
   });
 }
 
@@ -282,5 +290,8 @@ export async function failUnpaidOrder(orderId: string): Promise<void> {
     if (isPaidStatus(existing)) return;
     if (existing.status === "cancelled" || existing.status === "failed") return;
     await wooPut<WooOrder>(`orders/${orderId}`, { status: "failed" });
+    await refreshProductsById(
+      (existing.line_items || []).map((item) => item.product_id),
+    );
   });
 }

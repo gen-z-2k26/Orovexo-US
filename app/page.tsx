@@ -10,7 +10,7 @@ import {
 import { toCardProduct } from "@/lib/catalog-card";
 import { defaultPages } from "@/lib/types";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();

@@ -14,7 +14,7 @@ import { getBnplPublicConfig } from "@/lib/bnpl-server";
 import { toCardProduct } from "@/lib/catalog-card";
 import type { ProductPaymentDisplay, BnplPublicConfig } from "@/lib/types";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 function emptyPayment(): ProductPaymentDisplay {
   return {

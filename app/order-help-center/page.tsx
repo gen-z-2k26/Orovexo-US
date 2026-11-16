@@ -4,7 +4,7 @@ import { CustomerCarePage } from "@/components/CustomerCarePage";
 import { getSiteSettings } from "@/lib/api";
 import { customerCareBySlug } from "@/lib/customer-care";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 const PAGE = customerCareBySlug("order-help-center");
 

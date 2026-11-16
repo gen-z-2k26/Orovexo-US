@@ -24,7 +24,7 @@ function visibleCatalog(products: Product[]) {
   });
 }
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 type ProductsPageProps = {
   searchParams: Promise<{ q?: string }>;

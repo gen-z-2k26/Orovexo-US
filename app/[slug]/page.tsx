@@ -11,7 +11,7 @@ import {
   policyBySlug,
 } from "@/lib/policy-pages";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export function generateStaticParams() {
   return POLICY_PAGES.map((page) => ({ slug: page.slug }));

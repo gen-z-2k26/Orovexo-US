@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
+import { IntentLink as Link } from "@/components/IntentLink";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { PageHero } from "@/components/PageHero";
 import { buttonVariants } from "@/components/ui/button";
